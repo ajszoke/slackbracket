@@ -10,8 +10,6 @@
 	
 	<link href="css/style.css" rel="stylesheet">
 	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	
 	<!-- 
 	  -- Created by Andy Szoke 2019 (zoke2556@gmail.com)
 	  -- https://github.com/ajszoke/slackbracket
@@ -38,13 +36,13 @@
 		<div class="container">
 			<div class="split-container left">
 				<div class="split split-section">
-					<div class="round-details region">northwest<br/></div>
+					<div class="round-details region">midwest<br/></div>
 				</div>
-				<div class="split split-section top">
+				<div class="split split-section top" id="Midwest">
 					<div class="round round-64 current">
 						<div class="round-details">Round 1<br/><span class="date">March 21-22</span></div>
 						<ul class="matchup">
-							<li class="team team-top">Minnesota<span class="seed">1</span></li>
+							<li class="team team-top"><div class="team-entry">Team</div></li>
 							<li class="team team-bottom">Northwestern<span class="seed">16</span></li>
 						</ul>
 						<ul class="matchup">
@@ -119,9 +117,9 @@
 					</div>	<!-- END e8 -->	
 				</div>
 				<div class="split split-section">
-					<div class="round-details region">Southwest<br/></div>
+					<div class="round-details region">west<br/></div>
 				</div>
-				<div class="split split-section bottom">
+				<div class="split split-section bottom" id="West">
 					<div class="round round-64 current">
 						<ul class="matchup">
 							<li class="team team-top">Minnesota<span class="seed">1</span></li>
@@ -196,7 +194,6 @@
 					</div>	<!-- END e8 -->	
 				</div>
 			</div>
-			
 
 		<div class="champion">
 			<div class="semis-l">
@@ -225,9 +222,9 @@
 
 		<div class="split-container right">
 			<div class="split split-section">
-				<div class="round-details region">northeast<br/></div>
+				<div class="round-details region">east<br/></div>
 			</div>
-			<div class="split split-section top">
+			<div class="split split-section top" id="East">
 				<div class="round round-8">
 					<div class="round-details">elite 8<br/><span class="date">March 28-29</span></div>		
 					<div class="mobile-f4-pick">
@@ -307,9 +304,9 @@
 				</div>	<!-- END ROUND ONE -->          				
 			</div>
 			<div class="split split-section">
-				<div class="round-details region">Southeast<br/></div>
+				<div class="round-details region">south<br/></div>
 			</div>
-			<div class="split split-section bottom">
+			<div class="split split-section bottom" id="South">
 				<div class="round round-8">
 					<div class="mobile-f4-pick">
 						<span class="mobile-f4-label">Final Four</span>
@@ -395,5 +392,7 @@
 				<a class="share-icon" href="#"><i class="fa fa-envelope"></i></a>
 			</div>
 	</section>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="js/PapaParse.js"></script>
 	<script src="js/main.js"></script>
 </body>
