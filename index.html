@@ -7,6 +7,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Kaushan+Script|Herr+Von+Muellerhoff' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Istok+Web|Roboto+Condensed:700' rel='stylesheet' type='text/css'>
+	<link href="https://fonts.googleapis.com/css?family=Spectral:300i" rel="stylesheet" type='text/css'>
 	
 	<link href="css/style.css" rel="stylesheet">
 	
@@ -27,8 +28,11 @@
 		<div class="hero-wrap">
 			<p class="intro" id="intro">slack</p>
 				<h1 id="headline">bracket</h1>
-				<p class="year"><i class="fa fa-star"></i> 2019 <i class="fa fa-star"></i></p>
-			<p>data-driven bracket forecasting</p>
+				<p class="year">&#8239;2019</p>
+			<p><strong>data-driven bracket forecasting</strong></p>
+			<hr style="width:20%">
+			<p class="use-info">Fill out as much or as little of the bracket as you want, then hit the button below and Slack Bracket will take care of the rest.</p>
+			<button type="button" class="btn">Generate</button>
 	    </div>
 	</header>
 
@@ -39,80 +43,80 @@
 					<div class="round-details region">midwest<br/></div>
 				</div>
 				<div class="split split-section top" id="Midwest">
-					<div class="round round-64 current">
+					<div class="round round-1">
 						<div class="round-details">Round 1<br/><span class="date">March 21-22</span></div>
 						<ul class="matchup">
-							<li class="team team-top"><div class="team-entry">Team</div></li>
-							<li class="team team-bottom">Northwestern<span class="seed">16</span></li>
+							<li class="team team-top set" ondrop="drop(event)" ondragover="allowDrop(event)"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Michigan<span class="seed">8</span></li>
-							<li class="team team-bottom">Iowa<span class="seed">9</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Illinois<span class="seed">5</span></li>
-							<li class="team team-bottom">Wisconsin<span class="seed">12</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Purdue<span class="seed">4</span></li>
-							<li class="team team-bottom">Boise State<span class="seed">13</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>			
 						<ul class="matchup">
-							<li class="team team-top">Penn State<span class="seed">6</span></li>
-							<li class="team team-bottom">Indiana<span class="seed">11</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">Ohio State<span class="seed">3</span></li>
-							<li class="team team-bottom">VCU<span class="seed">14</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">USC<span class="seed">7</span></li>
-							<li class="team team-bottom">Cal<span class="seed">10</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Virginia Tech<span class="seed">2</span></li>
-							<li class="team team-bottom">Dartmouth<span class="seed">15</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>											
 					</div>	<!-- END ROUND ONE --> 
-					<div class="round round-32">
+					<div class="round round-2">
 						<div class="round-details">Round 2<br/><span class="date">March 23-24</span></div>						
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset" ondrop="drop(event)" ondragover="allowDrop(event)"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>
 					</div>	<!-- END ROUND TWO -->
-					<div class="round round-16">
+					<div class="round round-3">
 						<div class="round-details">sweet 16<br/><span class="date">March 28-29</span></div>						
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>												
 					</div>	<!-- END ROUND THREE -->	
-					<div class="round round-8">
+					<div class="round round-4">
 						<div class="mobile-f4-pick">
 							<span class="mobile-f4-label">Final Four</span>
 							<div class="mobile-f4-icon"></div>
 						</div>
 						<div class="round-details">elite 8<br/><span class="date">March 28-29</span></div>			
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 					</div>	<!-- END e8 -->	
 				</div>
@@ -120,76 +124,76 @@
 					<div class="round-details region">west<br/></div>
 				</div>
 				<div class="split split-section bottom" id="West">
-					<div class="round round-64 current">
+					<div class="round round-1 current">
 						<ul class="matchup">
-							<li class="team team-top">Minnesota<span class="seed">1</span></li>
-							<li class="team team-bottom">Northwestern<span class="seed">16</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Michigan<span class="seed">8</span></li>
-							<li class="team team-bottom">Iowa<span class="seed">9</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Illinois<span class="seed">5</span></li>
-							<li class="team team-bottom">Wisconsin<span class="seed">12</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Purdue<span class="seed">4</span></li>
-							<li class="team team-bottom">Boise State<span class="seed">13</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>			
 						<ul class="matchup">
-							<li class="team team-top">Penn State<span class="seed">6</span></li>
-							<li class="team team-bottom">Indiana<span class="seed">11</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">Ohio State<span class="seed">3</span></li>
-							<li class="team team-bottom">VCU<span class="seed">14</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">USC<span class="seed">7</span></li>
-							<li class="team team-bottom">Cal<span class="seed">10</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">Virginia Tech<span class="seed">2</span></li>
-							<li class="team team-bottom">Dartmouth<span class="seed">15</span></li>
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
 						</ul>											
 					</div>	<!-- END ROUND ONE --> 
-					<div class="round round-32">				
+					<div class="round round-2">				
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>
 					</div>	<!-- END ROUND TWO -->
-					<div class="round round-16">					
+					<div class="round round-3">					
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>												
 					</div>	<!-- END ROUND THREE -->	
-					<div class="round round-8">
+					<div class="round round-4">
 						<div class="mobile-f4-pick">
 							<span class="mobile-f4-label">Final Four</span>
 							<div class="mobile-f4-icon"></div>
 						</div>
 						<ul class="matchup">
-							<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-							<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
 						</ul>	
 					</div>	<!-- END e8 -->	
 				</div>
@@ -198,24 +202,24 @@
 		<div class="champion">
 			<div class="semis-l">
 				<div class="round-details">final 4<br/><span class="date">april 6</span></div>		
-				<ul class ="matchup championship">
-					<li class="team team-top">&nbsp;<span class="vote-count">&nbsp;</span></li>
-					<li class="team team-bottom">&nbsp;<span class="vote-count">&nbsp;</span></li>
+				<ul class ="matchup championship round-5">
+					<li class="team team-top unset"></li>
+					<li class="team team-bottom unset"></li>
 				</ul>
 			</div>
 			<div class="final">
 				<i class="fa fa-trophy"></i>
 				<div class="round-details">championship <br/><span class="date">april 8</span></div>		
-				<ul class ="matchup championship">
-					<li class="team team-top">&nbsp;<span class="vote-count">&nbsp;</span></li>
-					<li class="team team-bottom">&nbsp;<span class="vote-count">&nbsp;</span></li>
+				<ul class ="matchup championship round-6">
+					<li class="team team-top unset"></li>
+					<li class="team team-bottom unset"></li>
 				</ul>
 			</div>
 			<div class="round-details">final 4<br/><span class="date">april 6</span></div>	
 			<div class="semis-r">			
-				<ul class ="matchup championship">
-					<li class="team team-top">&nbsp;<span class="vote-count">&nbsp;</span></li>
-					<li class="team team-bottom">&nbsp;<span class="vote-count">&nbsp;</span></li>
+				<ul class ="matchup championship round-5">
+					<li class="team team-top unset"></li>
+					<li class="team team-bottom unset"></li>
 				</ul>
 			</div>	
 		</div>
@@ -225,81 +229,81 @@
 				<div class="round-details region">east<br/></div>
 			</div>
 			<div class="split split-section top" id="East">
-				<div class="round round-8">
+				<div class="round round-4">
 					<div class="round-details">elite 8<br/><span class="date">March 28-29</span></div>		
 					<div class="mobile-f4-pick">
 						<span class="mobile-f4-label">Final Four</span>
 						<div class="mobile-f4-icon"></div>
 					</div>
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 				</div>	<!-- END e8 -->	
-				<div class="round round-16">
+				<div class="round round-3">
 					<div class="round-details">sweet 16<br/><span class="date">March 28-29</span></div>						
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>												
 				</div>	<!-- END ROUND THREE -->	
 
-				<div class="round round-32">
+				<div class="round round-2">
 					<div class="round-details">Round 2<br/><span class="date">March 23-24</span></div>						
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>
 				</div>	<!-- END ROUND TWO -->
-				<div class="round round-64 current">
+				<div class="round round-1 current">
 					<div class="round-details">Round 1<br/><span class="date">March 21-22</span></div>
 					<ul class="matchup">
-						<li class="team team-top">Minnesota<span class="seed">1</span></li>
-						<li class="team team-bottom">Northwestern<span class="seed">16</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Michigan<span class="seed">8</span></li>
-						<li class="team team-bottom">Iowa<span class="seed">9</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Illinois<span class="seed">5</span></li>
-						<li class="team team-bottom">Wisconsin<span class="seed">12</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Purdue<span class="seed">4</span></li>
-						<li class="team team-bottom">Boise State<span class="seed">13</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>			
 					<ul class="matchup">
-						<li class="team team-top">Penn State<span class="seed">6</span></li>
-						<li class="team team-bottom">Indiana<span class="seed">11</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">Ohio State<span class="seed">3</span></li>
-						<li class="team team-bottom">VCU<span class="seed">14</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">USC<span class="seed">7</span></li>
-						<li class="team team-bottom">Cal<span class="seed">10</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Virginia Tech<span class="seed">2</span></li>
-						<li class="team team-bottom">Dartmouth<span class="seed">15</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>											
 				</div>	<!-- END ROUND ONE -->          				
 			</div>
@@ -307,77 +311,77 @@
 				<div class="round-details region">south<br/></div>
 			</div>
 			<div class="split split-section bottom" id="South">
-				<div class="round round-8">
+				<div class="round round-4">
 					<div class="mobile-f4-pick">
 						<span class="mobile-f4-label">Final Four</span>
 						<div class="mobile-f4-icon"></div>
 					</div>
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 				</div>	<!-- END ELITE 8 -->	
-				<div class="round round-16">					
+				<div class="round round-3">					
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>												
 				</div>	<!-- END SWEET 16 -->	
 
-				<div class="round round-32">				
+				<div class="round round-2">				
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">&nbsp;<span class="seed">&nbsp;</span></li>
-						<li class="team team-bottom">&nbsp;<span class="seed">&nbsp;</span></li>
+						<li class="team team-top unset"></li>
+						<li class="team team-bottom unset"></li>
 					</ul>
 				</div>	<!-- END ROUND TWO -->
-				<div class="round round-64 current">
+				<div class="round round-1 current">
 					<ul class="matchup">
-						<li class="team team-top">Minnesota<span class="seed">1</span></li>
-						<li class="team team-bottom">Northwestern<span class="seed">16</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Michigan<span class="seed">8</span></li>
-						<li class="team team-bottom">Iowa<span class="seed">9</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Illinois<span class="seed">5</span></li>
-						<li class="team team-bottom">Wisconsin<span class="seed">12</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Purdue<span class="seed">4</span></li>
-						<li class="team team-bottom">Boise State<span class="seed">13</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>			
 					<ul class="matchup">
-						<li class="team team-top">Penn State<span class="seed">6</span></li>
-						<li class="team team-bottom">Indiana<span class="seed">11</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">Ohio State<span class="seed">3</span></li>
-						<li class="team team-bottom">VCU<span class="seed">14</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>	
 					<ul class="matchup">
-						<li class="team team-top">USC<span class="seed">7</span></li>
-						<li class="team team-bottom">Cal<span class="seed">10</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>
 					<ul class="matchup">
-						<li class="team team-top">Virginia Tech<span class="seed">2</span></li>
-						<li class="team team-bottom">Dartmouth<span class="seed">15</span></li>
+						<li class="team team-top set"></li>
+						<li class="team team-bottom set"></li>
 					</ul>											
 				</div>	<!-- END ROUND ONE -->          				
 			</div>
@@ -387,7 +391,7 @@
 	</section>
 	<section class="share">
 			<div class="share-wrap">
-				<a class="share-icon" href="https://twitter.com/basement47"><i class="fa fa-twitter"></i></a>
+				<a class="share-icon" href="#"><i class="fa fa-twitter"></i></a>
 				<a class="share-icon" href="#"><i class="fa fa-facebook"></i></a>
 				<a class="share-icon" href="#"><i class="fa fa-envelope"></i></a>
 			</div>
