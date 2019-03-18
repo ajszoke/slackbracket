@@ -59,7 +59,8 @@ function clearTeamForward(team, fromRd) {
 	for (var i = fromRd; i <= 7; i++) {
 		var curCoord = slots[i - 2];
 		if (i <= 4) {
-			curSlot = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curCoord[0] + ') li.team.team-' + topOrBottom(curCoord[1]);
+			curSlot = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curCoord[0]
+					+ ') li.team.team-' + topOrBottom(curCoord[1]);
 		} else if (i === 5) {
 			curSlot = '.champion .semis-' + curCoord[0] + ' li.team.team-' + topOrBottom(curCoord[1]);
 		} else if (i === 6) {
@@ -81,11 +82,69 @@ function clearTeamForward(team, fromRd) {
 }
 
 function onGenerate() {
+	for (var i = 1; i <= 4; i++) { // generate winners through final 4
+		var numMatches = Math.pow(2, (4 - i));
+		$('.round-' + i + ' ul.matchup').each(function(index, element) {
+			// first, look forward and make sure the next round slot is unset
+			var region = $(element).parents().eq(1).attr('id');
+			var winnerCoord = findNextRdSlot((index % numMatches) + 1);
+			var winnerSlot;
+			if (i < 4) {
+				winnerSlot = '#' + region + ' .round-' + (i + 1) + ' ul.matchup:nth-of-type(' + winnerCoord[0] + ') li.team.team-'
+					+ topOrBottom(winnerCoord[1]);
+				advanceAutoWinner(winnerSlot, element);
+			} else if (i === 4) {
+				var leftOrRight, topOrBot;
+				if (index % 2 == 0) {
+					leftOrRight = 'l';
+				} else {
+					leftOrRight = 'r';
+				}
+				if (region === "East" || region === "West") {
+					topOrBot = "top";
+				} else {
+					topOrBot = "bottom";
+				}
+				winnerSlot = '.champion .semis-' + leftOrRight + ' li.team.team-' + topOrBot;
+				advanceAutoWinner(winnerSlot, element);
+			}
+		});
+	}
 	
+	// generate final 4 winners
+	$('ul.matchup.round-5').each(function(index, element){
+		winnerSlot = '.final ul.championship li.team.team-' + topOrBottom(index);
+		advanceAutoWinner(winnerSlot, element);
+	});
+	
+	// generate champion
+	winnerSlot = '.fa.fa-trophy';
+	advanceAutoWinner(winnerSlot, 'ul.matchup.round-6');
+}
+
+function advanceAutoWinner(winnerSlot, element) {
+	if ($(winnerSlot).hasClass('unset')) {
+		$(winnerSlot).empty();
+		var teamTop = findTeamById(parseInt($(element).find('li.team-top .teamObj').attr('id').substring(5)))[0];
+		var teamBottom = findTeamById(parseInt($(element).find('li.team-bottom .teamObj').attr('id').substring(5)))[0];
+		var winner = generateWinner(teamTop, teamBottom);
+		$(element).find('li.team-' + winner + ' .teamObj').clone().appendTo($(winnerSlot));
+	}
 }
 
 function generateWinner(topTeam, bottomTeam) {
+	var y = topTeam.team_rating - bottomTeam.team_rating;
 	
+	// below equation found by fitting a team's 538 expected win curve to their 538 rating difference with their opponent
+	var topWinProb = .00000275096 * (4.6415888 * Math.pow((62961.779 * Math.sqrt(991046400750000 * Math.pow(y, 2)
+			+ 216640010213000 * y + 4075535163691823) + 1982092801500 * y + 216640010213), (1/3)) - 1172263010
+			/ Math.pow((62961.779 * Math.sqrt(991046400750000 * Math.pow(y, 2) + 216640010213000 * y + 4075535163691823)
+			+ 1982092801500 * y + 216640010213), (1/3)) + 179120);
+	if (topWinProb > Math.random()) {
+		return "top";
+	} else {
+		return "bottom";
+	}
 }
 
 function onMobileF4Assign(input) {
@@ -93,6 +152,7 @@ function onMobileF4Assign(input) {
 }
 
 function replacePlayInWithPseudoTeams() {
+	var counter = -1;
 	var playinTeams = $.grep(teamData, function(team) {
 		return team.playin_flag === 1;
 	});
@@ -101,15 +161,15 @@ function replacePlayInWithPseudoTeams() {
 		var seedNo = t1.team_seed.slice(0, 2);
 		var t2 = $.grep(playinTeams.slice(1), function (team) {
 			return (seedNo === team.team_seed.slice(0, 2) && t1.team_region === team.team_region);
-		});
+		})[0];
 		var combTeam = {
 			gender: "mens",
 			forecast_date: t1.forecast_date,
 			playin_flag: 0,
 			team_alive: 1, // TODO: update
-			team_id: t1.team_region + seedNo,
+			team_id: counter--,
 			team_name: t1.team_region + seedNo, // TODO fix
-			team_rating: 0, // TODO
+			team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win), // weight combined rating by round 1 win chance
 			team_region: t1.team_region,
 			team_seed: parseInt(seedNo)
 		};
@@ -124,8 +184,36 @@ function replacePlayInWithPseudoTeams() {
 	});
 }
 
+function replaceOversizedTeamNames() {
+	var dict = {
+		"East16": "NCCU/NDST",
+		"Virginia Commonwealth": "VCU",
+		"Central Florida": "Cen. Florida",
+		"Mississippi State": "Miss. State",
+		"East11": "BEL/TEM",
+		"Louisiana State": "Louisiana St.",
+		"Michigan State": "Michigan St.",
+		"West16": "FDU/PV",
+		"West11": "SJU/ASU",
+		"Northern Kentucky": "N. Kentucky",
+		"Saint Mary's (CA)": "Saint Mary's",
+		"North Carolina": "UNC",
+		"New Mexico State": "NM State",
+		"Abilene Christian": "Abilene Chr."
+	};
+	
+	for (var longName in dict) {
+		var foundTeam = $.grep(teamData, function(team) {
+			return team.team_name === longName;
+		})[0];
+		foundTeam.team_name = dict[longName];
+	}
+}
+
 function teamToDiv(team) {
-	return ('<div class="teamObj" id="team_' + team.team_id + '" draggable="true" ondragstart="teamIsDraggingEvent(event)">' + team.team_name + '<span class="seed">' + team.team_seed + '</span></div>');
+	return ('<div class="teamObj" id="team_' + team.team_id
+			+ '" draggable="true" ondragstart="teamIsDraggingEvent(event)"><span class="teamName">' + team.team_name + '</span><span class="seed">'
+			+ team.team_seed + '</span></div>');
 }
 
 function topOrBottom(sel) {
@@ -242,7 +330,8 @@ function onTeamDropped(team, toRd) {
 		console.log(curSlot);
 		var oldClass, newClass;
 		if (i <= 4) {
-			oldClass = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curSlot[0] + ') li.team.team-' + topOrBottom(curSlot[1]);
+			oldClass = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curSlot[0]
+					+ ') li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 5) {
 			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 6) {
@@ -273,7 +362,8 @@ function onTeamDrag(team, fromRd) {
 	for (var i = fromRd - 1; i <= 4; i++) {
 		var curSlot = slots[i];
 		if (i <= 2) {
-			oldClass = '#' + team.team_region + ' .round.round-' + (i + 2) + ' ul.matchup:nth-of-type(' + curSlot[0] + ') li.team.team-' + topOrBottom(curSlot[1]);
+			oldClass = '#' + team.team_region + ' .round.round-' + (i + 2) + ' ul.matchup:nth-of-type(' + curSlot[0]
+					+ ') li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 3) {
 			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
 			$('#' + team.team_region + ' .mobile-f4-pick')
@@ -303,7 +393,8 @@ function onTeamDrag(team, fromRd) {
 function populateBracket() {
 	teamData.forEach(function (team) {
 		var coord = convertSeedToCoordinate(team.team_seed);
-		var slot = '#' + team.team_region + ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-' + topOrBottom(coord[1]);
+		var slot = '#' + team.team_region + ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-'
+				+ topOrBottom(coord[1]);
 		$(slot).html(teamToDiv(team));
 		var test = $(slot).parents().eq(1).attr('class');
 		var teamDiv = slot + " #team_" + team.team_id;
@@ -317,7 +408,7 @@ function populateBracket() {
 $(document).ready(function() {
 	
 	$(function() {
-		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2018/fivethirtyeight_ncaa_forecasts.csv", {
+		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2019/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",
 			download: true,
 			header: true,
@@ -325,11 +416,12 @@ $(document).ready(function() {
 			skipEmptyLines: "greedy",
 			complete: function(results) {
 				results.data = $.grep(results.data, function(line) {
-					return line.gender === 'mens' && line.forecast_date === '2018-03-31';
+					return line.gender === 'mens' && line.forecast_date === '2019-03-17';
 				});
 				console.log(results);
 				teamData = results.data;
 				replacePlayInWithPseudoTeams();
+				replaceOversizedTeamNames();
 				populateBracket();
 			}
 		});

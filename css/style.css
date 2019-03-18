@@ -170,6 +170,9 @@ body {
 	top: 35px;
 	left: -107px;
 }
+.champion .fa-trophy.unset .teamObj span.teamName {
+	color: #444;
+}
 .champion .fa-trophy .teamObj span.seed {
 	display: none;
 }
@@ -300,6 +303,12 @@ li.team.set {
 li.team.unset {
 	background-color: #e3e3e3;
 	opacity: 1;
+}
+li.team.unset span.teamName {
+	font-style: italic;
+}
+li.team.unset span.seed {
+	color: #444;
 }
 li.team.receptive {
 	background-color: #e3e3e3;
