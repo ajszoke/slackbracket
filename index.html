@@ -7,6 +7,7 @@
 	<link href='https://fonts.googleapis.com/css?family=Kaushan+Script|Herr+Von+Muellerhoff' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Abel' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Istok+Web|Roboto+Condensed:700' rel='stylesheet' type='text/css'>
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,900" rel="stylesheet"  type='text/css'>
 	<link href="https://fonts.googleapis.com/css?family=Spectral:300i" rel="stylesheet" type='text/css'>
 	
 	<link href="css/style.css" rel="stylesheet">
@@ -32,7 +33,7 @@
 			<p><strong>data-driven bracket forecasting</strong></p>
 			<hr style="width:20%">
 			<p class="use-info">Fill out as much or as little of the bracket as you want, then hit the button below and Slack Bracket will take care of the rest.</p>
-			<button type="button" class="btn">Generate</button>
+			<button type="button" class="btn" onclick="onGenerate()">Generate</button>
 	    </div>
 	</header>
 
@@ -40,13 +41,13 @@
 		<div class="container">
 			<div class="split-container left">
 				<div class="split split-section">
-					<div class="round-details region">midwest<br/></div>
+					<div class="round-details region">east<br/></div>
 				</div>
-				<div class="split split-section top" id="Midwest">
+				<div class="split split-section top" id="East">
 					<div class="round round-1">
 						<div class="round-details">Round 1<br/><span class="date">March 21-22</span></div>
 						<ul class="matchup">
-							<li class="team team-top set" ondrop="drop(event)" ondragover="allowDrop(event)"></li>
+							<li class="team team-top set"></li>
 							<li class="team team-bottom set"></li>
 						</ul>
 						<ul class="matchup">
@@ -81,7 +82,7 @@
 					<div class="round round-2">
 						<div class="round-details">Round 2<br/><span class="date">March 23-24</span></div>						
 						<ul class="matchup">
-							<li class="team team-top unset" ondrop="drop(event)" ondragover="allowDrop(event)"></li>
+							<li class="team team-top unset"></li>
 							<li class="team team-bottom unset"></li>
 						</ul>	
 						<ul class="matchup">
@@ -124,7 +125,7 @@
 					<div class="round-details region">west<br/></div>
 				</div>
 				<div class="split split-section bottom" id="West">
-					<div class="round round-1 current">
+					<div class="round round-1">
 						<ul class="matchup">
 							<li class="team team-top set"></li>
 							<li class="team team-bottom set"></li>
@@ -208,7 +209,7 @@
 				</ul>
 			</div>
 			<div class="final">
-				<i class="fa fa-trophy"></i>
+				<div class="fa fa-trophy"></div>
 				<div class="round-details">championship <br/><span class="date">april 8</span></div>		
 				<ul class ="matchup championship round-6">
 					<li class="team team-top unset"></li>
@@ -226,9 +227,9 @@
 
 		<div class="split-container right">
 			<div class="split split-section">
-				<div class="round-details region">east<br/></div>
+				<div class="round-details region">south<br/></div>
 			</div>
-			<div class="split split-section top" id="East">
+			<div class="split split-section top" id="South">
 				<div class="round round-4">
 					<div class="round-details">elite 8<br/><span class="date">March 28-29</span></div>		
 					<div class="mobile-f4-pick">
@@ -271,7 +272,7 @@
 						<li class="team team-bottom unset"></li>
 					</ul>
 				</div>	<!-- END ROUND TWO -->
-				<div class="round round-1 current">
+				<div class="round round-1">
 					<div class="round-details">Round 1<br/><span class="date">March 21-22</span></div>
 					<ul class="matchup">
 						<li class="team team-top set"></li>
@@ -308,9 +309,9 @@
 				</div>	<!-- END ROUND ONE -->          				
 			</div>
 			<div class="split split-section">
-				<div class="round-details region">south<br/></div>
+				<div class="round-details region">midwest<br/></div>
 			</div>
-			<div class="split split-section bottom" id="South">
+			<div class="split split-section bottom" id="Midwest">
 				<div class="round round-4">
 					<div class="mobile-f4-pick">
 						<span class="mobile-f4-label">Final Four</span>
@@ -350,7 +351,7 @@
 						<li class="team team-bottom unset"></li>
 					</ul>
 				</div>	<!-- END ROUND TWO -->
-				<div class="round round-1 current">
+				<div class="round round-1">
 					<ul class="matchup">
 						<li class="team team-top set"></li>
 						<li class="team team-bottom set"></li>

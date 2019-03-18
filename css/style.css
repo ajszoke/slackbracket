@@ -136,16 +136,42 @@ body {
 	text-align: center;
 	padding: 230px 0\9;
 } 
-.champion i {
+.champion .fa-trophy {
+	content: "\f091";
 	color: #a0a6a8;
-	font-size: 45px;
-	padding: 10px 0;
+	font-size: 72px;
+	margin: 10px 0;
+	padding: 10px;
+	position: relative;
+	border-style: dashed;
+	border-width: 6px;
+	border-radius: 16px;
+	border-color: #cbcbcb;
 }
-.champion i.receptive {
+.champion .fa-trophy.receptive {
 	color: #a0a6a8;
 	animation-name: transitionTrophyToReceptive, colorTrophyReceptive;
 	animation-duration: 0.5s, 2s;
 	animation-iteration-count: 1, infinite;
+}
+.champion .fa-trophy.set {
+	color: #fff;
+}
+.champion .fa-trophy .teamObj {
+	width: 300px;
+	color: #2C7399;
+	font-size: 24px;
+	font-family: 'Roboto';
+	font-weight: 900;
+	text-shadow: 0 0 10px #fff;
+	text-transform: uppercase;
+	position: absolute;
+	margin: 0 auto;
+	top: 35px;
+	left: -107px;
+}
+.champion .fa-trophy .teamObj span.seed {
+	display: none;
 }
 .round {
 	display: block;
@@ -233,6 +259,13 @@ body {
 	border-color: #e1e1e1;
 	background-color: #e3e3e3;
 }
+.mobile-f4-pick.receptive {
+	background-color: #e3e3e3;
+	opacity: 1;
+	animation-name: transitionMobileF4ToReceptive, colorMobileF4Receptive;
+	animation-duration: 0.5s, 2s;
+	animation-iteration-count: 1, infinite;
+}
 .split-container.left .mobile-f4-pick {
 	right: 0;
 }
@@ -261,6 +294,7 @@ span.mobile-f4-label {
 }
 li.team.set {
 	background-color: #fff;
+	font-weight: 500;
 	opacity: 1;
 }
 li.team.unset {
@@ -295,7 +329,7 @@ li.team.receptive {
 	margin: 60px auto;
 }
 .final {
-	margin: 4.5em 0;
+	margin: 3em 0;
 }
 
 @-webkit-keyframes transitionSlotToReceptive {
@@ -358,11 +392,84 @@ li.team.receptive {
   }
 }
 
+@-webkit-keyframes transitionMobileF4ToReceptive {
+  0% {
+    background-color: #e3e3e3;
+	border-color: #e3e3e3;
+  }
+  100% {
+    background-color: #fff;
+	border-color: #fff;
+  }
+}
+
+@keyframes transitionMobileF4ToReceptive {
+  0% {
+    background-color: #e3e3e3;
+	border-color: #e3e3e3;
+  }
+  100% {
+    background-color: #fff;
+	border-color: #fff;
+  }
+}
+
+@-webkit-keyframes transitionMobileF4FromReceptive {
+  0% {
+    background-color: #fff;
+	border-color: #fff;
+  }
+  100% {
+    background-color: #e3e3e3;
+	border-color: #e3e3e3;
+  }
+}
+
+@keyframes transitionMobileF4FromReceptive {
+  0% {
+    background-color: #fff;
+	border-color: #fff;
+  }
+  100% {
+    background-color: #e3e3e3;
+	border-color: #e3e3e3;
+  }
+}
+
+@-webkit-keyframes colorMobileF4Receptive {
+  0% {
+	background-color: #fff;
+	border-color: #fff;
+  }
+  50% {
+	border-color: #4285f4;
+  }
+  100% {
+	background-color: #fff;
+	border-color: #fff;
+  }
+}
+
+@keyframes colorMobileF4Receptive {
+  0% {
+	background-color: #fff;
+	border-color: #fff;
+  }
+  50% {
+	border-color: #4285f4;
+  }
+  100% {
+	background-color: #fff;
+	border-color: #fff;
+  }
+}
+
 @-webkit-keyframes transitionTrophyToReceptive {
   0% {
     color: #a0a6a8;
   }
   100% {
+	border-color: #fff;
     color: #fff;
   }
 }
@@ -372,6 +479,7 @@ li.team.receptive {
     color: #a0a6a8;
   }
   100% {
+	border-color: #fff;
     color: #fff;
   }
 }
@@ -379,41 +487,51 @@ li.team.receptive {
 @-webkit-keyframes transitionTrophyFromReceptive {
   0% {
     color: #fff;
+	border-color: #fff;
   }
   100% {
     color: #a0a6a8;
+	border-color: #cbcbcb;
   }
 }
 
 @keyframes transitionTrophyFromReceptive {
   0% {
     color: #fff;
+	border-color: #fff;
   }
   100% {
     color: #a0a6a8;
+	border-color: #cbcbcb;
   }
 }
 
 @-webkit-keyframes colorTrophyReceptive {
   0% {
     color: #fff;
+	border-color: #fff;
   }
   50% {
+	border-color: #4285f4;
     color: #4285f4;
   }
   100% {
+	border-color: #fff;
     color: #fff;
   }
 }
 
 @keyframes colorTrophyReceptive {
   0% {
+	border-color: #fff;
     color: #fff;
   }
   50% {
+	border-color: #4285f4;
     color: #4285f4;
   }
   100% {
+	border-color: #fff;
     color: #fff;
   }
 }
