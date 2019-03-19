@@ -10,6 +10,9 @@ function teamIsDraggingEvent(ev) {
 	var team = findTeamById(parseInt(tid.substring(5)))[0];
 	
 	var dragFromRd = $(ev.target).parents().eq(2).attr('class').substring(12);
+	if (dragFromRd == "") {
+		dragFromRd = 5;
+	}
 	onTeamDrag(team, parseInt(dragFromRd));
 }
 
@@ -22,17 +25,17 @@ function anyDrop(ev) {
 	// handle the drop depending on what the team was dropped on
 	if ($(ev.target).hasClass('team')) { // team dropped on an empty slot
 		confirmedTarget = ev.target;
+	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
+		confirmedTarget = ev.target;
+	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
+			($(ev.target).hasClass('mobile-f4-icon'))) {
+		confirmedTarget = ev.target.parentNode;
 	} else if ($(ev.target).hasClass('teamObj')) { // team dropped on an occupied slot
 		confirmedTarget = ev.target.parentNode;
 	} else if ($(ev.target).hasClass('teamName')) {
 		confirmedTarget = ev.target.parentNode.parentNode;
 	} else if ($(ev.target).hasClass('fa-trophy')) { // team picked as tourney winner
 		confirmedTarget = ev.target;
-	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
-		confirmedTarget = ev.target;
-	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
-			($(ev.target).hasClass('mobile-f4-icon'))) {
-		confirmedTarget = ev.target.parentNode;
 	} else {
 		console.log('Invalid drop target ' + $(ev.target));
 	}
@@ -50,6 +53,13 @@ function validDrop(ev) {
 	// handle the drop depending on what the team was dropped on
 	if ($(ev.target).hasClass('team')) { // team dropped on an empty slot
 		confirmedTarget = ev.target;
+	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
+		confirmedTarget = ev.target;
+		var evictedTeam = findTeamById(parseInt($(ev.target).attr('class').substring(5)))[0];
+	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
+			($(ev.target).hasClass('mobile-f4-icon'))) {
+		confirmedTarget = ev.target.parentNode;
+		var evictedTeam = findTeamById(parseInt($(ev.target).attr('class').substring(5)))[0];
 	} else if ($(ev.target).hasClass('teamObj')) { // team dropped on an occupied slot
 		confirmedTarget = ev.target.parentNode;
 		var evictedTeam = findTeamById(parseInt($(ev.target).attr('class').substring(5)))[0];
@@ -58,17 +68,17 @@ function validDrop(ev) {
 		var evictedTeam = findTeamById(parseInt($(ev.target.parentNode).attr('class').substring(5)))[0];
 	} else if ($(ev.target).hasClass('fa-trophy')) { // team picked as tourney winner
 		confirmedTarget = ev.target;
-	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
-		confirmedTarget = ev.target;
-	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
-			($(ev.target).hasClass('mobile-f4-icon'))) {
-		confirmedTarget = ev.target.parentNode;
 	} else {
 		console.log('Invalid drop target ' + $(ev.target));
 		droppedOnRd = "0";
 	}
 	
-	// find the chosen round, check for first four rounds first
+	// find the chosen round
+	if (confirmedTarget.className.includes('mobile-f4')) {
+		confirmedTarget.appendChild(document.getElementById(data));
+		onTeamDropped(team, 5, true);
+		return;
+	}
 	var droppedOnRd = $(confirmedTarget).parents().eq(1).attr('class').substring(12);
 	if (droppedOnRd === "") { // user dropped on final 4 or champ round
 		droppedOnRd = $(confirmedTarget).parent().attr('class').substring(27);
@@ -98,6 +108,11 @@ function clearTeamForward(team, fromRd) {
 					+ ') li.team.team-' + topOrBottom(curCoord[1]);
 		} else if (i === 5) {
 			curSlot = '.champion .semis-' + curCoord[0] + ' li.team.team-' + topOrBottom(curCoord[1]);
+			$('#' + team.team_region + ' .mobile-f4-pick')
+				.empty()
+				.removeClass('set')
+				.addClass('unset')
+				.append('<span class="mobile-f4-label">Final Four</span><div class="mobile-f4-icon"></div>')
 		} else if (i === 6) {
 			curSlot = '.final ul.championship li.team.team-' + topOrBottom(curCoord);
 		} else if (i === 7) {
@@ -164,6 +179,15 @@ function advanceAutoWinner(winnerSlot, element) {
 		var teamBottom = findTeamById(parseInt($(element).find('li.team-bottom .teamObj').attr('id').substring(5)))[0];
 		var winner = generateWinner(teamTop, teamBottom);
 		$(element).find('li.team-' + winner + ' .teamObj').clone().appendTo($(winnerSlot));
+		
+		if($(winnerSlot).parent().hasClass('round-5')) {
+			var team = findTeamById(parseInt($(element).find('li.team-' + winner + ' .teamObj').attr('id').substring(5)))[0];
+			$('#' + team.team_region + ' .mobile-f4-pick')
+				.empty()
+				.append('<span class="mobile-f4-label">Final Four</span>')
+				.append(teamToDiv(team));
+				
+		}
 	}
 }
 
@@ -180,10 +204,6 @@ function generateWinner(topTeam, bottomTeam) {
 	} else {
 		return "bottom";
 	}
-}
-
-function onMobileF4Assign(input) {
-	
 }
 
 function replacePlayInWithPseudoTeams() {
@@ -363,12 +383,15 @@ function onTeamDropped(team, toRd, validDrop) {
 	for (var i = 1; i <= 7; i++) {
 		var curSlot = slots[i - 1];
 		console.log(curSlot);
-		var oldClass, newClass;
+		var oldClass;
 		if (i <= 4) {
 			oldClass = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curSlot[0]
 					+ ') li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 5) {
 			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
+			$('#' + team.team_region + ' .mobile-f4-pick')
+				.removeClass('receptive')
+				.removeAttr('ondrop, ondragover');
 		} else if (i === 6) {
 			oldClass = '.final ul.championship li.team.team-' + topOrBottom(curSlot);
 		} else if (i === 7) {
@@ -383,8 +406,15 @@ function onTeamDropped(team, toRd, validDrop) {
 				.empty()
 				.removeClass('unset')
 				.addClass('set')
-				.attr('class', newClass)
 				.append(teamToDiv(team));
+			if (i === 5) {
+				$('#' + team.team_region + ' .mobile-f4-pick')
+					.empty()
+					.removeClass('unset')
+					.addClass('set')
+					.append('<span class="mobile-f4-label">Final Four</span>')
+					.append(teamToDiv(team));
+			}
 		}
 	}
 }
