@@ -603,6 +603,9 @@ li.team.receptive {
   .split-container, .champion {width: 90%;margin: 35px 5%;}
   .mobile-f4-pick {display: table;}
   .champion {-webkit-box-ordinal-group:3;-moz-box-ordinal-group:3;-ms-flex-order:3;-webkit-order:3;order:3;}
+  .champion .round-details {padding: 0 5px 0 20px;}
+  .final .fa-trophy {margin: 10px 5px 10px 20px;}
+  .final .fa-trophy .teamObj {left:-105px;}
   .split-container {border-bottom: 1px solid #b6b6b6; padding-bottom: 20px;}
   .hero p.intro {font-size: 24px;}
   .hero h1 {font-size: 3em; margin: 15px 0;}

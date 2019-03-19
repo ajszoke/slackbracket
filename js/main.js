@@ -13,7 +13,34 @@ function teamIsDraggingEvent(ev) {
 	onTeamDrag(team, parseInt(dragFromRd));
 }
 
-function drop(ev) {
+function anyDrop(ev) {
+	ev.preventDefault();
+	var data = $(ev.currentTarget).attr('id');
+	var team = findTeamById(parseInt(data.substring(5)))[0]; // chop the team id out of the div name
+	var confirmedTarget;
+	
+	// handle the drop depending on what the team was dropped on
+	if ($(ev.target).hasClass('team')) { // team dropped on an empty slot
+		confirmedTarget = ev.target;
+	} else if ($(ev.target).hasClass('teamObj')) { // team dropped on an occupied slot
+		confirmedTarget = ev.target.parentNode;
+	} else if ($(ev.target).hasClass('teamName')) {
+		confirmedTarget = ev.target.parentNode.parentNode;
+	} else if ($(ev.target).hasClass('fa-trophy')) { // team picked as tourney winner
+		confirmedTarget = ev.target;
+	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
+		confirmedTarget = ev.target;
+	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
+			($(ev.target).hasClass('mobile-f4-icon'))) {
+		confirmedTarget = ev.target.parentNode;
+	} else {
+		console.log('Invalid drop target ' + $(ev.target));
+	}
+	
+	onTeamDropped(team, 0, false);
+}
+
+function validDrop(ev) {
 	ev.preventDefault();
 	var data = ev.dataTransfer.getData("Text");
 	var team = findTeamById(parseInt(data.substring(5)))[0]; // chop the team id out of the div name
@@ -26,12 +53,20 @@ function drop(ev) {
 	} else if ($(ev.target).hasClass('teamObj')) { // team dropped on an occupied slot
 		confirmedTarget = ev.target.parentNode;
 		var evictedTeam = findTeamById(parseInt($(ev.target).attr('class').substring(5)))[0];
+	} else if ($(ev.target).hasClass('teamName')) {
+		confirmedTarget = ev.target.parentNode.parentNode;
+		var evictedTeam = findTeamById(parseInt($(ev.target.parentNode).attr('class').substring(5)))[0];
 	} else if ($(ev.target).hasClass('fa-trophy')) { // team picked as tourney winner
 		confirmedTarget = ev.target;
+	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
+		confirmedTarget = ev.target;
+	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
+			($(ev.target).hasClass('mobile-f4-icon'))) {
+		confirmedTarget = ev.target.parentNode;
 	} else {
-			console.log('Invalid drop target ' + $(ev.target));
-			droppedOnRd = "0";
-		}
+		console.log('Invalid drop target ' + $(ev.target));
+		droppedOnRd = "0";
+	}
 	
 	// find the chosen round, check for first four rounds first
 	var droppedOnRd = $(confirmedTarget).parents().eq(1).attr('class').substring(12);
@@ -49,7 +84,7 @@ function drop(ev) {
 	}
 	
 	confirmedTarget.appendChild(document.getElementById(data));
-	onTeamDropped(team, parseInt(droppedOnRd));
+	onTeamDropped(team, parseInt(droppedOnRd), true);
 }
 
 function clearTeamForward(team, fromRd) {
@@ -95,7 +130,7 @@ function onGenerate() {
 				advanceAutoWinner(winnerSlot, element);
 			} else if (i === 4) {
 				var leftOrRight, topOrBot;
-				if (index % 2 == 0) {
+				if (region === "East" || region == "South") {
 					leftOrRight = 'l';
 				} else {
 					leftOrRight = 'r';
@@ -212,7 +247,7 @@ function replaceOversizedTeamNames() {
 
 function teamToDiv(team) {
 	return ('<div class="teamObj" id="team_' + team.team_id
-			+ '" draggable="true" ondragstart="teamIsDraggingEvent(event)"><span class="teamName">' + team.team_name + '</span><span class="seed">'
+			+ '" draggable="true" ondragstart="teamIsDraggingEvent(event)" ondragend="anyDrop(event)"><span class="teamName">' + team.team_name + '</span><span class="seed">'
 			+ team.team_seed + '</span></div>');
 }
 
@@ -282,11 +317,11 @@ function findPossibleForwardSlots(team) {
 	
 	// handle the final 4 and champ rounds separately
 	switch (team.team_region) {
-		case "Midwest":
+		case "East":
 			res.push(['l', 0]);
 			res.push(0);
 			break;
-		case "East":
+		case "South":
 			res.push(['l', 1]);
 			res.push(0);
 			break;
@@ -294,7 +329,7 @@ function findPossibleForwardSlots(team) {
 			res.push(['r', 0]);
 			res.push(1);
 			break;
-		case "South":
+		case "Midwest":
 			res.push(['r', 1]);
 			res.push(1);
 			break;
@@ -312,7 +347,7 @@ function findTeamById(id) {
 }
 
 function onTeamClicked(team, roundNo) {
-	
+	console.log('click');
 }
 
 function findNextRdSlot(curRdNth) {
@@ -321,7 +356,7 @@ function findNextRdSlot(curRdNth) {
 	return [nextRdNth, tob];
 }
 
-function onTeamDropped(team, toRd) {
+function onTeamDropped(team, toRd, validDrop) {
 	var rd2Onward = findPossibleForwardSlots(team);
 	var slots = [convertSeedToCoordinate(team.team_seed)].concat(rd2Onward);
 	
@@ -343,7 +378,7 @@ function onTeamDropped(team, toRd) {
 		$(oldClass)
 			.removeClass('receptive')
 			.removeAttr('ondrop, ondragover');
-		if (i <= toRd) {
+		if (i <= toRd && validDrop) {
 			$(oldClass)
 				.empty()
 				.removeClass('unset')
@@ -368,7 +403,7 @@ function onTeamDrag(team, fromRd) {
 			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
 			$('#' + team.team_region + ' .mobile-f4-pick')
 				.attr({
-					ondrop: 'drop(event)',
+					ondrop: 'validDrop(event)',
 					ondragover: 'allowDrop(event)'
 				})
 				.addClass('receptive');
@@ -377,14 +412,14 @@ function onTeamDrag(team, fromRd) {
 		}
 		$(oldClass)
 			.attr({
-				ondrop: 'drop(event)',
+				ondrop: 'validDrop(event)',
 				ondragover: 'allowDrop(event)'
 			})
 			.addClass('receptive');
 	}
 	$('.fa.fa-trophy')
 		.attr({
-			ondrop: 'drop(event)',
+			ondrop: 'validDrop(event)',
 			ondragover: 'allowDrop(event)'
 		})
 		.addClass('receptive');
