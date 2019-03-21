@@ -145,12 +145,12 @@ function onGenerate() {
 				advanceAutoWinner(winnerSlot, element);
 			} else if (i === 4) {
 				var leftOrRight, topOrBot;
-				if (region === "East" || region == "South") {
+				if (region === "East" || region == "West") {
 					leftOrRight = 'l';
 				} else {
 					leftOrRight = 'r';
 				}
-				if (region === "East" || region === "West") {
+				if (region === "East" || region === "South") {
 					topOrBot = "top";
 				} else {
 					topOrBot = "bottom";
@@ -342,11 +342,11 @@ function findPossibleForwardSlots(team) {
 			res.push(0);
 			break;
 		case "South":
-			res.push(['l', 1]);
+			res.push(['r', 0]);
 			res.push(0);
 			break;
 		case "West":
-			res.push(['r', 0]);
+			res.push(['l', 1]);
 			res.push(1);
 			break;
 		case "Midwest":

@@ -1,6 +1,6 @@
 body {
 	font-family: 'Istok Web', sans-serif;
-	background: url("http://picjumbo.com/wp-content/uploads/HNCK2189-1300x866.jpg") no-repeat #000;
+	background: url("https://picjumbo.com/wp-content/uploads/HNCK2189-1300x866.jpg") no-repeat #000;
 	background-size: cover;
 	min-height: 100%;
 	margin: 0;
@@ -635,6 +635,7 @@ li.team.receptive {
 
 }
 
+/*
 @media screen and (max-width: 980px) {
   .container {-webkit-flex-direction:column;-moz-flex-direction:column;flex-direction:column;}
   .split-container, .champion {width: 90%;margin: 35px 5%;}
@@ -663,3 +664,4 @@ li.team.receptive {
   span.mobile-f4-label {font-size: 16px;}
 
 }
+*/
