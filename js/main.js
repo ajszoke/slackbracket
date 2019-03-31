@@ -20,25 +20,6 @@ function anyDrop(ev) {
 	ev.preventDefault();
 	var data = $(ev.currentTarget).attr('id');
 	var team = findTeamById(parseInt(data.substring(5)))[0]; // chop the team id out of the div name
-	var confirmedTarget;
-	
-	// handle the drop depending on what the team was dropped on
-	if ($(ev.target).hasClass('team')) { // team dropped on an empty slot
-		confirmedTarget = ev.target;
-	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
-		confirmedTarget = ev.target;
-	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
-			($(ev.target).hasClass('mobile-f4-icon'))) {
-		confirmedTarget = ev.target.parentNode;
-	} else if ($(ev.target).hasClass('teamObj')) { // team dropped on an occupied slot
-		confirmedTarget = ev.target.parentNode;
-	} else if ($(ev.target).hasClass('teamName')) {
-		confirmedTarget = ev.target.parentNode.parentNode;
-	} else if ($(ev.target).hasClass('fa-trophy')) { // team picked as tourney winner
-		confirmedTarget = ev.target;
-	} else {
-		console.log('Invalid drop target ' + $(ev.target));
-	}
 	
 	onTeamDropped(team, 0, false);
 }
@@ -47,29 +28,30 @@ function validDrop(ev) {
 	ev.preventDefault();
 	var data = ev.dataTransfer.getData("Text");
 	var team = findTeamById(parseInt(data.substring(5)))[0]; // chop the team id out of the div name
+	var target = ev.target;
 	var confirmedTarget;
 	var evictedTeam = "";
 	
 	// handle the drop depending on what the team was dropped on
-	if ($(ev.target).hasClass('team')) { // team dropped on an empty slot
-		confirmedTarget = ev.target;
-	} else if ($(ev.target).hasClass('mobile-f4-pick')) {
-		confirmedTarget = ev.target;
-		var evictedTeam = findTeamById(parseInt($(ev.target).attr('class').substring(5)))[0];
-	} else if (($(ev.target).hasClass('mobile-f4-label')) ||
-			($(ev.target).hasClass('mobile-f4-icon'))) {
-		confirmedTarget = ev.target.parentNode;
-		var evictedTeam = findTeamById(parseInt($(ev.target).attr('class').substring(5)))[0];
-	} else if ($(ev.target).hasClass('teamObj')) { // team dropped on an occupied slot
-		confirmedTarget = ev.target.parentNode;
-		var evictedTeam = findTeamById(parseInt($(ev.target).attr('class').substring(5)))[0];
-	} else if ($(ev.target).hasClass('teamName')) {
-		confirmedTarget = ev.target.parentNode.parentNode;
-		var evictedTeam = findTeamById(parseInt($(ev.target.parentNode).attr('class').substring(5)))[0];
-	} else if ($(ev.target).hasClass('fa-trophy')) { // team picked as tourney winner
-		confirmedTarget = ev.target;
+	if ($(target).hasClass('team')) { // team dropped on an empty slot
+		confirmedTarget = target;
+	} else if ($(target).hasClass('mobile-f4-pick')) {
+		confirmedTarget = target;
+		var evictedTeam = findTeamById(parseInt($(target).attr('class').substring(5)))[0];
+	} else if (($(target).hasClass('mobile-f4-label')) ||
+			($(target).hasClass('mobile-f4-icon'))) {
+		confirmedTarget = target.parentNode;
+		var evictedTeam = findTeamById(parseInt($(target).attr('class').substring(5)))[0];
+	} else if ($(target).hasClass('teamObj')) { // team dropped on an occupied slot
+		confirmedTarget = target.parentNode;
+		var evictedTeam = findTeamById(parseInt($(target).attr('class').substring(5)))[0];
+	} else if ($(target).hasClass('teamName')) {
+		confirmedTarget = target.parentNode.parentNode;
+		var evictedTeam = findTeamById(parseInt($(target.parentNode).attr('class').substring(5)))[0];
+	} else if ($(target).hasClass('fa-trophy')) { // team picked as tourney winner
+		confirmedTarget = target;
 	} else {
-		console.log('Invalid drop target ' + $(ev.target));
+		console.log('Invalid drop target ' + $(target));
 		droppedOnRd = "0";
 	}
 	
@@ -223,7 +205,7 @@ function replacePlayInWithPseudoTeams() {
 			playin_flag: 0,
 			team_alive: 1, // TODO: update
 			team_id: counter--,
-			team_name: t1.team_region + seedNo, // TODO fix
+			team_name: t1.team_region + seedNo,
 			team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win), // weight combined rating by round 1 win chance
 			team_region: t1.team_region,
 			team_seed: parseInt(seedNo)
@@ -431,26 +413,20 @@ function onTeamDrag(team, fromRd) {
 					+ ') li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 3) {
 			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
-			$('#' + team.team_region + ' .mobile-f4-pick')
-				.attr({
-					ondrop: 'validDrop(event)',
-					ondragover: 'allowDrop(event)'
-				})
-				.addClass('receptive');
+			makeSlotReceptive('#' + team.team_region + ' .mobile-f4-pick');
 		} else if (i === 4) {
 			oldClass = '.final .championship li.team.team-' + topOrBottom(curSlot);
 		}
-		$(oldClass)
-			.attr({
+		makeSlotReceptive(oldClass);
+	}
+	makeSlotReceptive('.fa.fa-trophy');
+}
+
+function makeSlotReceptive(slot) {
+	$(slot)
+		.attr({
 				ondrop: 'validDrop(event)',
 				ondragover: 'allowDrop(event)'
-			})
-			.addClass('receptive');
-	}
-	$('.fa.fa-trophy')
-		.attr({
-			ondrop: 'validDrop(event)',
-			ondragover: 'allowDrop(event)'
 		})
 		.addClass('receptive');
 }
