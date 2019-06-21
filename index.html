@@ -10,6 +10,19 @@
 	<link rel="icon" type="image/png" sizes="16x16" href="img/ico/favicon-16x16.png">
 	<link rel="manifest" href="img/ico/site.webmanifest">
 	<link rel="mask-icon" href="img/ico/safari-pinned-tab.svg" color="#5cca87">
+	<link rel="stylesheet" href="libs/mobile-drag-drop/release/default.css">
+	<script src="libs/mobile-drag-drop/release/index.min.js"></script>
+
+	<!--optional import of scroll behaviour-->
+	<script src="libs/mobile-drag-drop/release/scroll-behaviour.min.js"></script>
+
+	<script>
+		// options are optional ;)
+		MobileDragDrop.polyfill({
+			// use this to make use of the scroll behaviour
+			dragImageTranslateOverride: MobileDragDrop.scrollBehaviourDragImageTranslateOverride
+		});
+	</script>
 	<meta name="msapplication-TileColor" content="#5cca87">
 	<meta name="theme-color" content="#ffffff">
 	
@@ -34,8 +47,11 @@
 			<p><strong>customized data-driven bracket forecasting</strong></p>
 			<hr style="width:20%">
 			<p class="use-info">Fill out as much or as little of the bracket as you want, then hit the button below and Slack Bracket will take care of the rest.</p>
-			<button type="button" class="btn" onclick="onGenerate()">Generate</button>
 	    </div>
+		<div id="gen-anchor"></div>
+		<div class="hero-wrap secondary" id="gen-btn-wrapper">
+			<button type="button" class="btn" onclick="onGenerate()">Generate</button>
+		</div>
 	</header>
 
 	<section id="bracket">

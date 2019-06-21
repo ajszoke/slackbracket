@@ -426,6 +426,7 @@ function makeSlotReceptive(slot) {
 	$(slot)
 		.attr({
 				ondrop: 'validDrop(event)',
+				ondragenter: 'event.preventDefault()',
 				ondragover: 'allowDrop(event)'
 		})
 		.addClass('receptive');
@@ -446,9 +447,24 @@ function populateBracket() {
 	});
 }
 
+function sticktothetop() {
+    var window_top = $(window).scrollTop();
+    var top = $('#gen-anchor').offset().top;
+    if (window_top > top) {
+        $('#gen-btn-wrapper').addClass('stick');
+        $('#gen-anchor').height($('#gen-btn-wrapper').outerHeight());
+    } else {
+        $('#gen-btn-wrapper').removeClass('stick');
+        $('#gen-anchor').height(0);
+    }
+}
+
 $(document).ready(function() {
 	
 	$(function() {
+		$(window).scroll(sticktothetop);
+		window.addEventListener( 'touchmove', function() {});
+		sticktothetop();
 		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2019/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",
 			download: true,
