@@ -3,7 +3,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<meta name="viewport" content="width=device-width,initial-scale=1.0">
 	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
-	<link href='https://fonts.googleapis.com/css?family=Holtwood+One+SC|Kaushan+Script|Herr+Von+Muellerhoff|Abel|Istok+Web:400,400i|Roboto+Condensed:700|Roboto:400,900|Spectral:300i|Permanent+Marker' rel='stylesheet' type='text/css'>	
+	<link href='https://fonts.googleapis.com/css?family=Holtwood+One+SC|Kaushan+Script|Herr+Von+Muellerhoff|Abel|Istok+Web:400,400i|Roboto+Condensed:700|Roboto:400,900|Spectral:300i,400|Permanent+Marker' rel='stylesheet' type='text/css'>	
 	<link href="css/style.css" rel="stylesheet">
 	<link rel="apple-touch-icon" sizes="180x180" href="img/ico/apple-touch-icon.png">
 	<link rel="icon" type="image/png" sizes="32x32" href="img/ico/favicon-32x32.png">
@@ -46,8 +46,34 @@
 				<p class="year">&#8239;2019</p>
 			<p><strong>customized data-driven bracket forecasting</strong></p>
 			<hr style="width:20%">
-			<p class="use-info">Fill out as much or as little of the bracket as you want, then hit the button below and Slack Bracket will take care of the rest.</p>
+			<p class="use-info">
+				Fill out as much or as little of the bracket as you want, then hit the button 
+				below and Slack Bracket will take care of the rest.</p>
 	    </div>
+		<div class="container">
+			<div class="wrap-collapsible">
+				<input id="collapsible" class="toggle" type="checkbox">
+				<label for="collapsible" class="lbl-toggle">How it works</label>
+				<div class="collapsible-content">
+					<div class="content-inner" id="explainer-expando">
+						<p>
+							First, drag and drop any team(s) as far in the tournament as you want. When you're done, 
+							just hit the "Generate" button, and Slack Bracket will fill the rest of the bracket out for 
+							you in a statistically accurate way. You can hit the button as many times as you want.
+						</p>
+						<p>
+							Slack Bracket uses the NCAA March Madness Tournament data provided by FiveThirtyEight to 
+							create a relative strength rating for each team. When any two teams play each other, Slack 
+							Bracket looks at the rating for each team. It uses those ratings to find the percentage 
+							chance of each team winning the matchup. Then, using those percentages, it randomly picks a 
+							winner to advance (e.g. a team with a calculated 30% chance of winning will advance 30% of 
+							the time). This means that Slack Bracket will generate a statistically accurate number of 
+							upsets at each level of probability.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
 		<div id="gen-anchor"></div>
 		<div class="hero-wrap secondary" id="gen-btn-wrapper">
 			<button type="button" class="btn" onclick="onGenerate()">Generate</button>
@@ -410,7 +436,7 @@
 	<section class="share">
 		<div class="share-wrap">
 			<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2"></script>
-			<a class="share-icon" href="https://twitter.com/intent/tweet?ref_src=twsrc%5Etfw&text=I%20just%20filled%20out%20some%20(or%20all)%20of%20my%20%23MarchMadness%20bracket%20automatically%20with%20SlackBracket.com!"><i class="fa fa-twitter"></i></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+			<a class="share-icon" href="https://twitter.com/intent/tweet?ref_src=twsrc%5Etfw&text=I%20just%20filled%20out%20my%20%23MarchMadness%20bracket%20automatically%20with%20%23SlackBracket!"><i class="fa fa-twitter"></i></a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 			<a class="share-icon" href="mailto:zoke2556@gmail.com"><i class="fa fa-envelope"></i></a>
 			<a class="share-icon" href="https://github.com/ajszoke/slackbracket"><i class="fa fa-github"></i></a>
 		</div>

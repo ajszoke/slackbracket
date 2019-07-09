@@ -222,22 +222,77 @@ function replacePlayInWithPseudoTeams() {
 }
 
 function replaceOversizedTeamNames() {
-	var dict = {
-		"East16": "NCCU/NDST",
-		"Virginia Commonwealth": "VCU",
-		"Central Florida": "Cen. Florida",
-		"Mississippi State": "Miss. State",
-		"East11": "BEL/TEM",
-		"Louisiana State": "Louisiana St.",
-		"Michigan State": "Michigan St.",
-		"West16": "FDU/PV",
-		"West11": "SJU/ASU",
-		"Northern Kentucky": "N. Kentucky",
-		"Saint Mary's (CA)": "Saint Mary's",
-		"North Carolina": "UNC",
-		"New Mexico State": "NM State",
-		"Abilene Christian": "Abilene Chr."
-	};
+	var windowWidth = window.innerWidth;
+	var dict;
+	
+	if (windowWidth < 450) {
+		dict = {
+			"East16": "play-in",
+			"Virginia Commonwealth": "VCU",
+			"Central Florida": "UCF",
+			"Mississippi State": "Miss.St.",
+			"Virginia Tech": "VA Tech",
+			"Saint Louis": "STL",
+			"Maryland": "UMD",
+			"East11": "play-in",
+			"Louisiana State": "LSU",
+			"Louisville": "L'ville",
+			"Minnesota": "Minn.",
+			"Michigan State": "Mich.St.",
+			"Gonzaga": "'Zags",
+			"West16": "play-in",
+			"Syracuse": "'Cuse",
+			"Marquette": "Marq.",
+			"Murray State": "Murr.St.",
+			"Florida State": "FSU",
+			"Vermont": "Verm.",
+			"West11": "play-in",
+			"Texas Tech": "Tx.Tech",
+			"Northern Kentucky": "N. KY",
+			"Michigan": "Mich.",
+			"Montana": "Mont.",
+			"Virginia": "UVA",
+			"Gardner-Webb": "Gard-W",
+			"Mississippi": "Miss.",
+			"Oklahoma": "Okla.",
+			"Wisconsin": "Wisc.",
+			"Oregon": "Oregon",
+			"Kansas State": "Kans.St.",
+			"UC-Irvine": "UC-Irv.",
+			"Villanova": "'Nova",
+			"Saint Mary's (CA)": "St. Mar.",
+			"Old Dominion": "Old Dom",
+			"Cincinnati": "Cincy",
+			"Tennessee": "Tenn.",
+			"North Carolina": "UNC",
+			"Utah State": "Utah St.",
+			"Washington": "Wash.",
+			"Northeastern": "NEU",
+			"New Mexico State": "NM St.",
+			"Iowa State": "Iowa St.",
+			"Ohio State": "Ohio St.",
+			"Seton Hall": "S. Hall",
+			"Kentucky": "UK",
+			"Abilene Christian": "Ab. Chr."
+		};
+	} else {
+		dict = {
+			"East16": "NCCU/NDST",
+			"Virginia Commonwealth": "VCU",
+			"Central Florida": "Cen. Florida",
+			"Mississippi State": "Miss. State",
+			"East11": "BEL/TEM",
+			"Louisiana State": "Louisiana St.",
+			"Michigan State": "Michigan St.",
+			"West16": "FDU/PV",
+			"West11": "SJU/ASU",
+			"Northern Kentucky": "N. Kentucky",
+			"Saint Mary's (CA)": "Saint Mary's",
+			"North Carolina": "UNC",
+			"New Mexico State": "NM State",
+			"Abilene Christian": "Abilene Chr."
+		};
+	}
 	
 	for (var longName in dict) {
 		var foundTeam = $.grep(teamData, function(team) {
@@ -447,7 +502,7 @@ function populateBracket() {
 	});
 }
 
-function sticktothetop() {
+function stickToTheTop() {
     var window_top = $(window).scrollTop();
     var top = $('#gen-anchor').offset().top;
     if (window_top > top) {
@@ -459,12 +514,18 @@ function sticktothetop() {
     }
 }
 
+function stageExpandoTransition() {
+	var expandedHeight = $("#explainer-expando").scrollHeight;
+	console.log(expandedHeight);
+}
+
 $(document).ready(function() {
 	
 	$(function() {
-		$(window).scroll(sticktothetop);
+		$(window).scroll(stickToTheTop);
 		window.addEventListener( 'touchmove', function() {});
-		sticktothetop();
+		stickToTheTop();
+		stageExpandoTransition();
 		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2019/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",
 			download: true,
