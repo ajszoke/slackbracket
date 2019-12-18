@@ -1,4 +1,5 @@
 var teamData;
+var chaos = 50;
 
 function allowDrop(ev) {
 	ev.preventDefault();
@@ -518,6 +519,10 @@ function stageExpandoTransition() {
 	var expandedHeight = $("#explainer-expando").scrollHeight;
 	console.log(expandedHeight);
 }
+
+$(document).on('input', '#chalk', function() {
+	chaos = $(this).val();
+});
 
 $(document).ready(function() {
 	

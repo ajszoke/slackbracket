@@ -26,6 +26,15 @@
 	<meta name="msapplication-TileColor" content="#5cca87">
 	<meta name="theme-color" content="#ffffff">
 	
+	<script src="/ads.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		if(document.getElementById('adTrackerDetected')){
+			adTrackerDetected = 'No';
+		} else {
+			adTrackerDetected = 'Yes';
+		}
+	</script>
+	
 	<!-- 
 	  -- Created by Andy Szoke 2019 (zoke2556@gmail.com)
 	  -- https://github.com/ajszoke/slackbracket
@@ -45,7 +54,6 @@
 				<h1 id="headline">bracket</h1>
 				<p class="year">&#8239;2019</p>
 			<p><strong>customized data-driven bracket forecasting</strong></p>
-			<hr style="width:20%">
 			<p class="use-info">
 				Fill out as much or as little of the bracket as you want, then hit the button 
 				below and Slack Bracket will take care of the rest.</p>
@@ -70,6 +78,28 @@
 							the time). This means that Slack Bracket will generate a statistically accurate number of 
 							upsets at each level of probability.
 						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="chalk-container">
+			<p id="chalk-title">Chaos Control</p>
+			<p class="use-info" id="chalk-detail">
+				Slide to the left for more predictable outcomes, slide to the right for more upsets, or leave it 
+				untouched for a statistically balanced combination.</p>
+			<div id="chalk-line">
+				<div class="chalkometer">
+					<div class="chalk-label">
+						<p id="chalk-label-left">More chalk</p>
+					</div>
+					<input type="range" min="1" max="100" value="50" class="slider" id="chalk">
+					<datalist id="chalk-ticks">
+						<option>0</option>
+						<option>50</option>
+						<option>100</option>
+					</datalist>
+					<div class="chalk-label">
+						<p id="chalk-label-right">More chaos</p>
 					</div>
 				</div>
 			</div>
