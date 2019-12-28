@@ -182,11 +182,56 @@ function generateWinner(topTeam, bottomTeam) {
 			+ 216640010213000 * y + 4075535163691823) + 1982092801500 * y + 216640010213), (1/3)) - 1172263010
 			/ Math.pow((62961.779 * Math.sqrt(991046400750000 * Math.pow(y, 2) + 216640010213000 * y + 4075535163691823)
 			+ 1982092801500 * y + 216640010213), (1/3)) + 179120);
-	if (topWinProb > Math.random()) {
+	
+	// bound the win probability percent to handle extremely lopsided matchups
+	var winProbPct = Math.max(0.005, topWinProb);
+	winProbPct = Math.min(0.995, winProbPct);
+	
+	var finalProb;
+	var chaosPct = chaos * 0.01;
+	if (chaosPct < 0.5) {
+		finalProb = applyChalk(winProbPct, chaosPct);
+	} else if (chaosPct == 0.5) {
+		finalProb = winProbPct;
+	} else if (chaosPct > 0.5) {
+		finalProb = applyChaos(winProbPct, chaosPct);
+	}
+	
+	if (finalProb > Math.random()) {
 		return "top";
 	} else {
 		return "bottom";
 	}
+}
+
+function applyChaos(winProbPct, chaosInput) {
+	var chaosFactor = 2 * (chaosInput - 0.5);
+	
+	// find the win prob if chaos = 100%
+	var fullChaosWinProb = 0.0079 * Math.tan(Math.PI * (winProbPct - 0.5)) + 0.5;
+	
+	// sanitize probabilities below 0 or above 1 in extreme cases
+	fullChaosWinProb = Math.max(0.01, fullChaosWinProb);
+	fullChaosWinProb = Math.min(0.99, fullChaosWinProb);
+	console.log("fullChaos: " + fullChaosWinProb);
+	
+	// scale the intensity of the "full chaos" adjustment based on the given factor
+	var finalProb = (chaosFactor * fullChaosWinProb) + (1 - chaosFactor) * winProbPct;
+	
+	return finalProb;
+}
+
+function applyChalk(winProbPct, chaosInput) {
+	var chalkFactor = 2 * (0.5 - chaosInput);
+	
+	// find the win prob if chalk = 100%
+	var fullChalkWinProb = 0.31831 * Math.atan(63.291 * ((2 * winProbPct) - 1)) + 0.5;
+	console.log("fullChalk: " + fullChalkWinProb);
+	
+	// scale the intensity of the "full chalk" adjustment based on the given factor
+	var finalProb = (chalkFactor * fullChalkWinProb) + (1 - chalkFactor) * winProbPct;
+	
+	return finalProb;
 }
 
 function replacePlayInWithPseudoTeams() {

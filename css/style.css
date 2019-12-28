@@ -40,7 +40,7 @@ body {
 	font-size: 1.2em;
 }
 .hero-wrap {
-	padding: 3.5em 10px 0 10px;
+	padding: 0.5em 10px 0 10px;
 }
 .hero-wrap.secondary {
 	padding: 2.5em 10px 2.5em 10px;
@@ -181,9 +181,6 @@ body {
 	opacity: 0.7;
 	-webkit-transition: .2s;
 	transition: opacity .2s;
-	display: flex;
-	-webkit-flex-direction: column;
-	flex-direction: column;
 	margin: auto;
 }
 .slider:hover {
