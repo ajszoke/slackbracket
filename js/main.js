@@ -1,5 +1,6 @@
 var teamData;
 var chaos = 50;
+var animation_toggle = false;
 
 function allowDrop(ev) {
 	ev.preventDefault();
@@ -207,15 +208,11 @@ function generateWinner(topTeam, bottomTeam) {
 function applyChaos(winProbPct, chaosInput) {
 	var chaosFactor = 2 * (chaosInput - 0.5);
 	
-	// find the win prob if chaos = 100%
-	var fullChaosWinProb = 0.0079 * Math.tan(Math.PI * (winProbPct - 0.5)) + 0.5;
-	
-	// sanitize probabilities below 0 or above 1 in extreme cases
-	fullChaosWinProb = Math.max(0.01, fullChaosWinProb);
-	fullChaosWinProb = Math.min(0.99, fullChaosWinProb);
-	console.log("fullChaos: " + fullChaosWinProb);
+	// full chaos should mean every matchup is a coin flip
+	var fullChaosWinProb = 0.5;
 	
 	// scale the intensity of the "full chaos" adjustment based on the given factor
+	// TODO pure chaos should always be 50%
 	var finalProb = (chaosFactor * fullChaosWinProb) + (1 - chaosFactor) * winProbPct;
 	
 	return finalProb;
@@ -548,14 +545,32 @@ function populateBracket() {
 	});
 }
 
-function stickToTheTop() {
+function updateStickyElements() {
     var window_top = $(window).scrollTop();
     var top = $('#gen-anchor').offset().top;
-    if (window_top > top) {
-        $('#gen-btn-wrapper').addClass('stick');
-        $('#gen-anchor').height($('#gen-btn-wrapper').outerHeight());
+	var window_y = window.innerHeight;
+	var window_space = window_y - parseInt($('#gen-btn-wrapper').css('height'), 10)
+			- parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
+			- parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);
+	
+    if (window_top > top && !animation_toggle) {
+		var window_bot = window_top + window_y;
+		
+		$('#gen-btn-wrapper').addClass('stick');
+		$('#gen-btn-wrapper').css('top', 0);
+		$('#gen-btn-wrapper').css('bottom', window_space + 'px');
+		
+		$('#gen-btn-wrapper').stop().animate({
+			top: "+=" + window_space,
+			bottom: "0"
+		}, 750, function() {
+			$('#gen-btn-wrapper').css('bottom', 0);
+			$('#gen-btn-wrapper').css('top', '');
+			animation_toggle = true;
+		});
+		
     } else {
-        $('#gen-btn-wrapper').removeClass('stick');
+        //$('#gen-btn-wrapper').removeClass('stick');
         $('#gen-anchor').height(0);
     }
 }
@@ -569,12 +584,16 @@ $(document).on('input', '#chalk', function() {
 	chaos = $(this).val();
 });
 
+window.addEventListener("orientationchange", function() {
+	console.log("the orientation of the device is now " + screen.orientation.angle);
+});
+
 $(document).ready(function() {
 	
 	$(function() {
-		$(window).scroll(stickToTheTop);
+		$(window).scroll(updateStickyElements);
 		window.addEventListener( 'touchmove', function() {});
-		stickToTheTop();
+		updateStickyElements();
 		stageExpandoTransition();
 		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2019/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",

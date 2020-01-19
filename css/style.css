@@ -204,7 +204,17 @@ body {
 	cursor: pointer;
 }
 
-.hero .btn {
+#gen-btn-wrapper {
+	background: #000;
+	padding: 1em 0;
+	text-align: center;
+}
+#gen-btn-wrapper.stick {
+	width: 100%;
+	position: fixed;
+	z-index: 9999;
+}
+#gen-btn-wrapper .btn {
   display: inline-block;
   padding: 10px 16px;
   margin-bottom: 0;
@@ -230,17 +240,7 @@ body {
   font-family: 'Roboto Condensed', sans-serif;
   text-transform: uppercase;
 }
-#gen-btn-wrapper {
-	background: #000;
-	padding: 1em 0;
-}
-#gen-btn-wrapper.stick {
-	width: 100%;
-	margin-top: 0;
-	position: fixed;
-	top: 0;
-	z-index: 9999;
-}
+
 #bracket {
 	overflow: hidden;
 	background-color: #e1e1e1;
@@ -770,6 +770,46 @@ li.team.receptive {
   }
 }
 
+@-webkit-keyframes onGenBtnSticky {
+  0% {
+    top: 0;
+  }
+
+  100% {
+    bottom: 0; 
+  }
+}
+
+@keyframes onGenBtnSticky {
+  0% {
+    top: 0;
+  }
+  
+  100% {
+    bottom: 0;
+  }
+}
+
+@-webkit-keyframes onGenBtnUnsticky {
+  0% {
+    bottom: 0;
+  }
+
+  100% {
+    top: 0;
+  }
+}
+
+@keyframes onGenBtnUnsticky {
+  0% {
+    bottom: inherit;
+  }
+  
+  100% {
+    bottom: 0;
+  }
+}
+
 .share-icon {color: #fff; opacity: 0.35; }
 .share-icon:hover { opacity:1;  -webkit-animation: grow 0.5s; animation: grow 0.5s;}
 .date {font-size: 10px; letter-spacing: 2px;font-family: 'Istok Web', sans-serif;color:#3F915F;}
@@ -816,7 +856,7 @@ li.team.receptive {
 
 @media screen and (max-width: 550px) {
 	.mobile-f4-icon {background-image: url("../img/plusicon-md.png");}
-	header.hero .container {padding-bottom: 2.5em;}
+	.hero p.use-info {display: none;}
 	section#bracket .container {margin: 35px 2.5% 0 0;}
 	.split-container {width: 100%; margin: 0;}
 	.team {font-size: 14px; padding-left: 24px;}
@@ -829,7 +869,7 @@ li.team.receptive {
   .hero h1 {font-size: 2.15em; letter-spacing: 0;margin:0; }
   .hero p.intro {font-size: 1.15em;margin-bottom: -10px;}
   .round-details {font-size: 90%;}
-  .hero-wrap {padding: 2.5em;}
+  .hero-wrap {padding: 2.5em 2.5em 0 2.5em;}
   .hero p.year {margin: 5px 0 10px; font-size: 18px;}
   span.mobile-f4-label {font-size: 16px;}
   .mobile-f4-icon {background-image: url("../img/plusicon-sm.png");}
