@@ -574,14 +574,12 @@ function updateStickyElements() {
 			$('#gen-btn-wrapper').css('bottom', 0);
 			$('#gen-btn-wrapper').css('top', '');
 			animation_toggle = true;
-		});
 
-		setTimeout(function () {
 			$('#regiontab').css('display', 'flex');
 			$('#regiontab').stop().animate({
 				bottom: gen_banner_height
 			}, 750)
-		}, 1000);
+		});
 
 	} else {
 		//$('#gen-btn-wrapper').removeClass('stick');
