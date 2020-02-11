@@ -204,6 +204,55 @@ body {
 	cursor: pointer;
 }
 
+ /* Style the tab */
+.tab {
+	border: 1px solid #333;
+	background-color: #222;
+	margin: 0;
+	padding: 0;
+    display: none;
+    justify-content: space-around;
+	width: 100%;
+	position: fixed;
+	z-index: 10;
+	bottom: 0px;
+}
+
+/* Style the buttons that are used to open the tab content */
+.tab button {
+  background-color: inherit;
+  color: #fff;
+  font-size: 14px;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+.tab button .fa {
+  color: #FF8940;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+  display: none;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+} 
+
 #gen-btn-wrapper {
 	background: #000;
 	padding: 1em 0;

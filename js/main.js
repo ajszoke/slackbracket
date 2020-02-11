@@ -156,6 +156,10 @@ function onGenerate() {
 	advanceAutoWinner(winnerSlot, 'ul.matchup.round-6');
 }
 
+function navToSection(event, region) {
+	$('html,body').animate({scrollTop: $('#' + region).offset().top},'slow');
+}
+
 function advanceAutoWinner(winnerSlot, element) {
 	if ($(winnerSlot).hasClass('unset')) {
 		$(winnerSlot).empty();
@@ -549,9 +553,12 @@ function updateStickyElements() {
     var window_top = $(window).scrollTop();
     var top = $('#gen-anchor').offset().top;
 	var window_y = window.innerHeight;
+	var gen_banner_height = parseInt($('#gen-btn-wrapper').css('height'), 10)
+	+ parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
+	+ parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);
 	var window_space = window_y - parseInt($('#gen-btn-wrapper').css('height'), 10)
-			- parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
-			- parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);
+	- parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
+	- parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);;
 	
     if (window_top > top && !animation_toggle) {
 		var window_bot = window_top + window_y;
@@ -568,6 +575,13 @@ function updateStickyElements() {
 			$('#gen-btn-wrapper').css('top', '');
 			animation_toggle = true;
 		});
+
+		setTimeout(function() {
+			$('#regiontab').css('display', 'flex');
+			$('#regiontab').stop().animate({
+				bottom: gen_banner_height
+			}, 750)
+		}, 1000);
 		
     } else {
         //$('#gen-btn-wrapper').removeClass('stick');

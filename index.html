@@ -119,6 +119,28 @@
 		</div>
 		<div id="gen-anchor"></div>
 	</header>
+
+	 <!-- Tab links -->
+	<div class="tab" id="regiontab">
+		<button class="tablinks" onclick="navToSection(event, 'east-anchor')">
+			<span class="tabitem">East</span>
+		</button>
+		<button class="tablinks" onclick="navToSection(event, 'west-anchor')">
+			<span class="tabitem">West</span>
+		</button>
+		<button class="tablinks" onclick="navToSection(event, 'south-anchor')">
+			<span class="tabitem">South</span>
+		</button>
+		<button class="tablinks" onclick="navToSection(event, 'midwest-anchor')">
+			<span class="tabitem">Midwest</span>
+		</button>
+		<button class="tablinks" onclick="navToSection(event, 'champ-anchor')">
+			<div class="tabitem">
+				<div class="fa fa-trophy unset"></div>
+			</div>
+		</button>
+	</div>
+
 	<div class="hero-wrap secondary" id="gen-btn-wrapper">
 			<button type="button" class="btn" onclick="onGenerate()">Generate</button>
 	</div>
@@ -126,6 +148,7 @@
 	<section id="bracket">
 		<div class="container">
 			<div class="split-container left">
+				<div id="east-anchor"></div>
 				<div class="split split-section">
 					<div class="round-details region">east<br/></div>
 				</div>
@@ -208,6 +231,7 @@
 					</div>	<!-- END e8 -->	
 				</div>
 				<div class="split split-section">
+					<div id="west-anchor"></div>
 					<div class="round-details region">west<br/></div>
 				</div>
 				<div class="split split-section bottom" id="West">
@@ -286,7 +310,8 @@
 				</div>
 			</div>
 
-		<div class="champion">
+			<div class="champion">
+				<div id="champ-anchor"></div>
 			<div class="semis-l">
 				<div class="round-details">final 4<br/><span class="date">april 6</span></div>		
 				<ul class ="matchup championship round-5">
@@ -313,6 +338,7 @@
 
 		<div class="split-container right">
 			<div class="split split-section">
+				<div id="south-anchor"></div>
 				<div class="round-details region">south<br/></div>
 			</div>
 			<div class="split split-section top" id="South">
@@ -395,6 +421,7 @@
 				</div>	<!-- END ROUND ONE -->          				
 			</div>
 			<div class="split split-section">
+				<div id="midwest-anchor"></div>
 				<div class="round-details region">midwest<br/></div>
 			</div>
 			<div class="split split-section bottom" id="Midwest">
