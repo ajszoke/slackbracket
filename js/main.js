@@ -1,6 +1,11 @@
 var teamData;
 var chaos = 50;
 var animation_toggle = false;
+var isMobile = false;
+
+var gen_banner_height = parseInt($('#gen-btn-wrapper').css('height'), 10)
+		+ parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
+		+ parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);
 
 function allowDrop(ev) {
 	ev.preventDefault();
@@ -560,7 +565,7 @@ function updateStickyElements() {
 		- parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
 		- parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);;
 
-	if (window_top > top && !animation_toggle) {
+	if (window_top > top && !animation_toggle && window.innerWidth < 420) {
 		var window_bot = window_top + window_y;
 
 		$('#gen-btn-wrapper').addClass('stick');
@@ -592,6 +597,12 @@ function stageExpandoTransition() {
 	console.log(expandedHeight);
 }
 
+function formatMobile() {
+	$('ul.matchup.championship.round-6').append($('.main-trophy'));
+	$('.champion').css('padding-bottom', 35 + gen_banner_height);
+	$('.main-trophy').css('margin-top', 30);
+}
+
 $(document).on('input', '#chalk', function () {
 	chaos = $(this).val();
 });
@@ -607,6 +618,9 @@ $(document).ready(function () {
 		window.addEventListener('touchmove', function () { });
 		updateStickyElements();
 		stageExpandoTransition();
+		if (window.innerWidth < 980) {
+			formatMobile();
+		}
 		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2019/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",
 			download: true,
