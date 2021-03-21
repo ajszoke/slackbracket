@@ -27,6 +27,7 @@ function anyDrop(ev) {
 }
 
 function validDrop(ev) {
+	console.log(ev)
 	ev.preventDefault();
 	var data = ev.dataTransfer.getData("Text");
 	var team = findTeamById(parseInt(data.substring(5)))[0]; // chop the team id out of the div name
@@ -170,11 +171,11 @@ function advanceAutoWinner(winnerSlot, element) {
 
 		if ($(winnerSlot).parent().hasClass('round-5')) {
 			var team = findTeamById(parseInt($(element).find('li.team-' + winner + ' .teamObj').attr('id').substring(5)))[0];
-			$('#' + team.team_region + ' .mobile-f4-pick')
+			var thisDiv = '#' + team.team_region + ' .mobile-f4-pick';
+			$(thisDiv)
 				.empty()
-				.append('<span class="mobile-f4-label">Final Four</span>')
-				.append(teamToDiv(team));
-
+				.append('<span class="mobile-f4-label">Final Four</span>');
+			teamToDiv(thisDiv, team);
 		}
 	}
 }
@@ -235,6 +236,16 @@ function applyChalk(winProbPct, chaosInput) {
 	return finalProb;
 }
 
+function enableChalkReset() {
+	$("#chalk-reset").css("display", "inherit");
+}
+
+function resetChalk() {
+	$("#chalk-reset").css("display", "none");
+	$("#chalk").val(50);
+	chaos = 50;
+}
+
 function replacePlayInWithPseudoTeams() {
 	var counter = -1;
 	var playinTeams = $.grep(teamData, function (team) {
@@ -266,78 +277,88 @@ function replacePlayInWithPseudoTeams() {
 	teamData = $.grep(teamData, function (team) {
 		return team.playin_flag != 1;
 	});
+	console.log(playinTeams)
+	console.log(teamData)
 }
 
 function replaceOversizedTeamNames() {
 	var windowWidth = window.innerWidth;
 	var dict;
 
-	if (windowWidth < 450) {
+	if (windowWidth < 760) {
 		dict = {
 			"East16": "play-in",
 			"Virginia Commonwealth": "VCU",
-			"Central Florida": "UCF",
-			"Mississippi State": "Miss.St.",
-			"Virginia Tech": "VA Tech",
-			"Saint Louis": "STL",
-			"Maryland": "UMD",
 			"East11": "play-in",
 			"Louisiana State": "LSU",
-			"Louisville": "L'ville",
-			"Minnesota": "Minn.",
-			"Michigan State": "Mich.St.",
-			"Gonzaga": "'Zags",
 			"West16": "play-in",
-			"Syracuse": "'Cuse",
-			"Marquette": "Marq.",
-			"Murray State": "Murr.St.",
-			"Florida State": "FSU",
-			"Vermont": "Verm.",
 			"West11": "play-in",
-			"Texas Tech": "Tx.Tech",
-			"Northern Kentucky": "N. KY",
-			"Michigan": "Mich.",
-			"Montana": "Mont.",
-			"Virginia": "UVA",
-			"Gardner-Webb": "Gard-W",
-			"Mississippi": "Miss.",
-			"Oklahoma": "Okla.",
-			"Wisconsin": "Wisc.",
-			"Oregon": "Oregon",
-			"Kansas State": "Kans.St.",
-			"UC-Irvine": "UC-Irv.",
-			"Villanova": "'Nova",
-			"Saint Mary's (CA)": "St. Mar.",
-			"Old Dominion": "Old Dom",
-			"Cincinnati": "Cincy",
-			"Tennessee": "Tenn.",
 			"North Carolina": "UNC",
-			"Utah State": "Utah St.",
-			"Washington": "Wash.",
-			"Northeastern": "NEU",
-			"New Mexico State": "NM St.",
-			"Iowa State": "Iowa St.",
-			"Ohio State": "Ohio St.",
-			"Seton Hall": "S. Hall",
-			"Kentucky": "UK",
-			"Abilene Christian": "Ab. Chr."
+			"Abilene Christian": "Ab.Chr.",
+			"UC-Santa Barbara": "S.Barb.",
+			"Southern California": "So.Cal.",
+			"Eastern Washington": "E.Wash.",
+			"North Carolina-Greensboro": "UNCG",
+			"St. Bonaventure": "St.Bon.",
+			"Oklahoma State": "Okla.St.",
+			"San Diego State": "SDSU",
+			"Morehead State": "Morehead",
+			"Cleveland State": "Cleveland",
+			"Grand Canyon": "G.Can.",
+			"Georgetown": "G-Town",
+			"Florida State": "FSU",
+			"Brigham Young": "BYU",
+			"Connecticut": "UConn",
+			"Wisconsin": "Wisc.",
+			"North Texas": "N.Tex.",
+			"Virginia Tech": "VT",
+			"Oral Roberts": "O.Rob.",
+			"Georgia Tech": "Ga.Tech",
+			"Oregon State": "Oreg.St.",
+			"West Virginia": "W.Virg.",
+			"Gonzaga": "'Zaga",
+			"Oklahoma": "Okla.",
+			"Missouri": "Mizzou",
+			"Creighton": "Creigh.",
+			"Michigan": "Mich.",
+			"Colorado": "Col.",
+			"Maryland": "UMD",
+			"Alabama": "'Bama",
+			"Hartford": "Hart.",
+			"Villanova": "'Nova",
+			"Winthrop": "Winth.",
+			"Texas Tech": "Tx.Tech",
+			"Utah State": "UT St.",
+			"Arkansas": "Ark.",
+			"Ohio State": "OSU",
+			"Loyola (IL)": "Loyola",
+			"Tennessee": "Tenn.",
+			"Syracuse": "'Cuse",
+			"Morehead": "Moreh.",
+			"Clemson": "Clem.",
+			"Houston": "Hou.",
+			"Cleveland": "Cleve."
 		};
 	} else {
 		dict = {
-			"East16": "NCCU/NDST",
+			"East16": "MSM/TSU",
 			"Virginia Commonwealth": "VCU",
-			"Central Florida": "Cen. Florida",
-			"Mississippi State": "Miss. State",
-			"East11": "BEL/TEM",
+			"East11": "Mich.St/UCLA",
 			"Louisiana State": "Louisiana St.",
-			"Michigan State": "Michigan St.",
-			"West16": "FDU/PV",
-			"West11": "SJU/ASU",
-			"Northern Kentucky": "N. Kentucky",
-			"Saint Mary's (CA)": "Saint Mary's",
+			"West16": "NSU/App.St.",
+			"West11": "Wichita/Drake",
 			"North Carolina": "UNC",
-			"New Mexico State": "NM State",
-			"Abilene Christian": "Abilene Chr."
+			"Abilene Christian": "Abilene Chr.",
+			"UC-Santa Barbara": "Santa Barb.",
+			"Southern California": "So. Cal.",
+			"Eastern Washington": "E. Washington",
+			"Louisiana State": "Louisiana St.",
+			"North Carolina-Greensboro": "UNCG",
+			"St. Bonaventure": "St. Bon",
+			"Oklahoma State": "Okla. St.",
+			"San Diego State": "San Diego St.",
+			"Morehead State": "Morehead St.",
+			"Cleveland State": "Cleveland St."
 		};
 	}
 
@@ -349,10 +370,20 @@ function replaceOversizedTeamNames() {
 	}
 }
 
-function teamToDiv(team) {
-	return ('<div class="teamObj" id="team_' + team.team_id
+function teamToDiv(parent, team) {
+	var newDiv = '<div class="teamObj" id="team_' + team.team_id
 		+ '" draggable="true" ondragstart="teamIsDraggingEvent(event)" ondragend="anyDrop(event)"><span class="teamName">' + team.team_name + '</span><span class="seed">'
-		+ team.team_seed + '</span></div>');
+		+ team.team_seed + '</span></div>';
+	if (parent == null) {
+		return newDiv;
+	} else {
+		var round = $(parent).parents().eq(1).attr('class').substring(12);
+		console.log(round);
+		$(parent).append(newDiv)
+		// .click(function () {
+				// onTeamClicked(team, round);
+			// });
+	}
 }
 
 function topOrBottom(sel) {
@@ -421,7 +452,7 @@ function findPossibleForwardSlots(team) {
 
 	// handle the final 4 and champ rounds separately
 	switch (team.team_region) {
-		case "East":
+		case "West":
 			res.push(['l', 0]);
 			res.push(0);
 			break;
@@ -429,7 +460,7 @@ function findPossibleForwardSlots(team) {
 			res.push(['r', 0]);
 			res.push(0);
 			break;
-		case "West":
+		case "East":
 			res.push(['l', 1]);
 			res.push(1);
 			break;
@@ -451,7 +482,9 @@ function findTeamById(id) {
 }
 
 function onTeamClicked(team, roundNo) {
-	console.log('click');
+	console.log(team)
+	console.log(roundNo)
+	// onTeamDropped(team, roundNo + 1, true);
 }
 
 function findNextRdSlot(curRdNth) {
@@ -466,7 +499,6 @@ function onTeamDropped(team, toRd, validDrop) {
 
 	for (var i = 1; i <= 7; i++) {
 		var curSlot = slots[i - 1];
-		console.log(curSlot);
 		var oldClass;
 		if (i <= 4) {
 			oldClass = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curSlot[0]
@@ -489,15 +521,16 @@ function onTeamDropped(team, toRd, validDrop) {
 			$(oldClass)
 				.empty()
 				.removeClass('unset')
-				.addClass('set')
-				.append(teamToDiv(team));
+				.addClass('set');
+			teamToDiv(oldClass, team);
 			if (i === 5) {
-				$('#' + team.team_region + ' .mobile-f4-pick')
+				var thisClass = '#' + team.team_region + ' .mobile-f4-pick';
+				$(thisClass)
 					.empty()
 					.removeClass('unset')
 					.addClass('set')
-					.append('<span class="mobile-f4-label">Final Four</span>')
-					.append(teamToDiv(team));
+					.append('<span class="mobile-f4-label">Final Four</span>');
+				teamToDiv(thisClass, team);
 			}
 		}
 	}
@@ -539,7 +572,7 @@ function populateBracket() {
 		var coord = convertSeedToCoordinate(team.team_seed);
 		var slot = '#' + team.team_region + ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-'
 			+ topOrBottom(coord[1]);
-		$(slot).html(teamToDiv(team));
+		$(slot).html(teamToDiv(null, team));
 		var test = $(slot).parents().eq(1).attr('class');
 		var teamDiv = slot + " #team_" + team.team_id;
 		$(teamDiv)
@@ -550,46 +583,32 @@ function populateBracket() {
 }
 
 function updateStickyElements() {
-	var window_top = $(window).scrollTop();
-	var top = $('#gen-anchor').offset().top;
-	var window_y = window.innerHeight;
-	var gen_banner_height = parseInt($('#gen-btn-wrapper').css('height'), 10)
-		+ parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
-		+ parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);
-	var window_space = window_y - parseInt($('#gen-btn-wrapper').css('height'), 10)
-		- parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
-		- parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);;
+	if (window.innerWidth <= 980) {
+		var window_top = $(window).scrollTop();
+		var top = $('#gen-anchor').offset().top;
+		var gen_banner_height = parseInt($('#gen-btn-wrapper').css('height'), 10)
+			+ 2 * parseInt($('#gen-btn-wrapper').css('padding-top'), 10);
 
-	if (window_top > top && !animation_toggle) {
-		var window_bot = window_top + window_y;
-
-		$('#gen-btn-wrapper').addClass('stick');
-		$('#gen-btn-wrapper').css('top', 0);
-		$('#gen-btn-wrapper').css('bottom', window_space + 'px');
-
-		$('#gen-btn-wrapper').stop().animate({
-			top: "+=" + window_space,
-			bottom: "0"
-		}, 750, function () {
-			$('#gen-btn-wrapper').css('bottom', 0);
-			$('#gen-btn-wrapper').css('top', '');
+		if (window_top > top && !animation_toggle) {
+			$('#gen-btn-wrapper').css('position', 'fixed');
+			$('#gen-btn-wrapper').css('bottom', -gen_banner_height + 'px');
 			animation_toggle = true;
 
-			$('#regiontab').css('display', 'flex');
-			$('#regiontab').stop().animate({
-				bottom: gen_banner_height
-			}, 750)
-		});
+			$('#gen-btn-wrapper').animate({
+				bottom: 0
+			}, 750, function () {
 
-	} else {
-		//$('#gen-btn-wrapper').removeClass('stick');
-		$('#gen-anchor').height(0);
+				$('#regiontab').css('display', 'flex');
+				$('#regiontab').css('bottom', 0);
+				$('#regiontab').animate({
+					bottom: gen_banner_height + 'px'
+				}, 750)
+			});
+
+		} else {
+			$('#gen-anchor').height(0);
+		}
 	}
-}
-
-function stageExpandoTransition() {
-	var expandedHeight = $("#explainer-expando").scrollHeight;
-	console.log(expandedHeight);
 }
 
 $(document).on('input', '#chalk', function () {
@@ -601,13 +620,18 @@ window.addEventListener("orientationchange", function () {
 });
 
 $(document).ready(function () {
-
-	$(function () {
-		$(window).scroll(updateStickyElements);
+	let lowerF4Html = '<div class="semis-r"><ul class="matchup championship round-5"><li class="team team-top unset"></li><li class="team team-bottom unset"></li></ul></div>'
+	if (window.innerWidth < 980) {
+		$("#mob-f4-2-anchor").append(lowerF4Html);
+	} else {
+		$("#desktop-f4-2-anchor").append('<div class="round-details">final 4<br /><span class="date">april 3</span></div>');
+		$("#desktop-f4-2-anchor").append(lowerF4Html);
+	}
+	resetChalk();
+	$(window).scroll(updateStickyElements);
 		window.addEventListener('touchmove', function () { });
 		updateStickyElements();
-		stageExpandoTransition();
-		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2019/fivethirtyeight_ncaa_forecasts.csv", {
+		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2021/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",
 			download: true,
 			header: true,
@@ -615,7 +639,7 @@ $(document).ready(function () {
 			skipEmptyLines: "greedy",
 			complete: function (results) {
 				results.data = $.grep(results.data, function (line) {
-					return line.gender === 'mens' && line.forecast_date === '2019-03-17';
+					return line.gender === 'mens' && line.forecast_date === '2021-03-14';
 				});
 				console.log(results);
 				teamData = results.data;
@@ -624,5 +648,4 @@ $(document).ready(function () {
 				populateBracket();
 			}
 		});
-	});
 });

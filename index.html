@@ -60,7 +60,7 @@
 	  -- https://codepen.io/jbeason/pen/Wbaedb
 	  -->
 
-	<title>Slack Bracket 2019</title>
+	<title>Slack Bracket 2021</title>
 </head>
 
 <body>
@@ -68,8 +68,8 @@
 		<div class="hero-wrap">
 			<p class="intro" id="intro">slack</p>
 			<h1 id="headline">bracket</h1>
-			<p class="year">&#8239;2019</p>
-			<p><strong>customized data-driven bracket forecasting</strong></p>
+			<p class="year">&#8239;2021</p>
+			<p><strong>customized data‑driven bracket forecasting</strong></p>
 			<p class="use-info">
 				Fill out as much or as little of the bracket as you want, then hit the button
 				below and Slack Bracket will take care of the rest.</p>
@@ -85,21 +85,32 @@
 							just hit the "Generate" button, and Slack Bracket will fill the rest of the bracket out for
 							you in a statistically accurate way. You can hit the button as many times as you want.
 						</p>
-						<p>
-							Slack Bracket uses the NCAA March Madness Tournament data provided by FiveThirtyEight to
-							create a relative strength rating for each team. When any two teams play each other, Slack
-							Bracket looks at the rating for each team. It uses those ratings to find the percentage
-							chance of each team winning the matchup. Then, using those percentages, it randomly picks a
-							winner to advance (e.g. a team with a calculated 30% chance of winning will advance 30% of
-							the time). This means that Slack Bracket will generate a statistically accurate number of
-							upsets at each level of probability.
-						</p>
+						<div class="container">
+							<div class="wrap-collapsible">
+								<input id="inner-collapsible" class="toggle" type="checkbox">
+								<label for="inner-collapsible" class="lbl-toggle">Methodology</label>
+								<div class="collapsible-content">
+									<div class="content-inner" id="explainer-inner-expando">
+										<p>
+											Slack Bracket uses the NCAA March Madness Tournament data provided by FiveThirtyEight to
+											create a relative strength rating for each team. When any two teams play each other, Slack
+											Bracket looks at the rating for each team. It uses those ratings to find the percentage
+											chance of each team winning the matchup. Then, using those percentages, it randomly picks a
+											winner to advance (e.g. a team with a calculated 30% chance of winning will advance 30% of
+											the time). This means that Slack Bracket will generate a statistically accurate number of
+											upsets at each level of probability.
+										</p>
+									</div>
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div class="chalk-container">
 			<p id="chalk-title">Chaos Control</p>
+			<div id="chalk-reset" onClick="resetChalk()">↺</div>
 			<p class="use-info" id="chalk-detail">
 				Slide to the left for more predictable outcomes, slide to the right for more upsets, or leave it
 				untouched for a statistically balanced combination.</p>
@@ -108,7 +119,7 @@
 					<div class="chalk-label">
 						<p id="chalk-label-left">More chalk</p>
 					</div>
-					<input type="range" min="1" max="100" value="50" class="slider" id="chalk">
+					<input type="range" min="1" max="100" value="50" class="slider" id="chalk" onInput="enableChalkReset()">
 					<datalist id="chalk-ticks">
 						<option>0</option>
 						<option>50</option>
@@ -120,16 +131,15 @@
 				</div>
 			</div>
 		</div>
-		<div id="gen-anchor"></div>
 	</header>
 
 	<!-- Tab links -->
 	<div class="tab" id="regiontab">
-		<button class="tablinks" onclick="navToSection(event, 'east-anchor')">
-			<span class="tabitem">East</span>
-		</button>
 		<button class="tablinks" onclick="navToSection(event, 'west-anchor')">
 			<span class="tabitem">West</span>
+		</button>
+		<button class="tablinks" onclick="navToSection(event, 'east-anchor')">
+			<span class="tabitem">East</span>
 		</button>
 		<button class="tablinks" onclick="navToSection(event, 'south-anchor')">
 			<span class="tabitem">South</span>
@@ -147,98 +157,99 @@
 	<div class="hero-wrap secondary" id="gen-btn-wrapper">
 		<button type="button" class="btn" onclick="onGenerate()">Generate</button>
 	</div>
+	<div id="gen-anchor"></div>
 
 	<section id="bracket">
 		<div class="container">
 			<div class="split-container left">
+			<div class="split split-section">
+					<div id="west-anchor"></div>
+					<div class="round-details region">west<br /></div>
+				</div>
+				<div class="split split-section bottom" id="West">
+					<div class="round round-1">
+						<div class="round-details">Round 1<br /><span class="date">March 19‑20</span></div>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top set"></li>
+							<li class="team team-bottom set"></li>
+						</ul>
+					</div> <!-- END ROUND ONE -->
+					<div class="round round-2">
+						<div class="round-details">Round 2<br /><span class="date">March 21‑22</span></div>
+						<ul class="matchup">
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
+						</ul>
+					</div> <!-- END ROUND TWO -->
+					<div class="round round-3">
+						<div class="round-details">sweet 16<br /><span class="date">March 27‑28</span></div>
+						<ul class="matchup">
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
+						</ul>
+						<ul class="matchup">
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
+						</ul>
+					</div> <!-- END ROUND THREE -->
+					<div class="round round-4">
+						<div class="round-details">elite 8<br /><span class="date">March 29‑30</span></div>
+						<ul class="matchup">
+							<li class="team team-top unset"></li>
+							<li class="team team-bottom unset"></li>
+						</ul>
+						<ul class="mobile-f4-pick unset">
+							<span class="mobile-f4-label">Final Four</span>
+							<div class="mobile-f4-icon"></div>
+						</ul>
+					</div> <!-- END e8 -->
+				</div>
 				<div id="east-anchor"></div>
 				<div class="split split-section">
 					<div class="round-details region">east<br /></div>
 				</div>
 				<div class="split split-section top" id="East">
 					<div class="round round-1">
-						<div class="round-details">Round 1<br /><span class="date">March 21-22</span></div>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top set"></li>
-							<li class="team team-bottom set"></li>
-						</ul>
-					</div> <!-- END ROUND ONE -->
-					<div class="round round-2">
-						<div class="round-details">Round 2<br /><span class="date">March 23-24</span></div>
-						<ul class="matchup">
-							<li class="team team-top unset"></li>
-							<li class="team team-bottom unset"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top unset"></li>
-							<li class="team team-bottom unset"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top unset"></li>
-							<li class="team team-bottom unset"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top unset"></li>
-							<li class="team team-bottom unset"></li>
-						</ul>
-					</div> <!-- END ROUND TWO -->
-					<div class="round round-3">
-						<div class="round-details">sweet 16<br /><span class="date">March 28-29</span></div>
-						<ul class="matchup">
-							<li class="team team-top unset"></li>
-							<li class="team team-bottom unset"></li>
-						</ul>
-						<ul class="matchup">
-							<li class="team team-top unset"></li>
-							<li class="team team-bottom unset"></li>
-						</ul>
-					</div> <!-- END ROUND THREE -->
-					<div class="round round-4">
-						<div class="mobile-f4-pick unset">
-							<span class="mobile-f4-label">Final Four</span>
-							<div class="mobile-f4-icon"></div>
-						</div>
-						<div class="round-details">elite 8<br /><span class="date">March 28-29</span></div>
-						<ul class="matchup">
-							<li class="team team-top unset"></li>
-							<li class="team team-bottom unset"></li>
-						</ul>
-					</div> <!-- END e8 -->
-				</div>
-				<div class="split split-section">
-					<div id="west-anchor"></div>
-					<div class="round-details region">west<br /></div>
-				</div>
-				<div class="split split-section bottom" id="West">
-					<div class="round round-1">
 						<ul class="matchup">
 							<li class="team team-top set"></li>
 							<li class="team team-bottom set"></li>
@@ -301,13 +312,13 @@
 						</ul>
 					</div> <!-- END ROUND THREE -->
 					<div class="round round-4">
-						<div class="mobile-f4-pick unset">
-							<span class="mobile-f4-label">Final Four</span>
-							<div class="mobile-f4-icon"></div>
-						</div>
 						<ul class="matchup">
 							<li class="team team-top unset"></li>
 							<li class="team team-bottom unset"></li>
+						</ul>
+						<ul class="mobile-f4-pick unset">
+							<span class="mobile-f4-label">Final Four</span>
+							<div class="mobile-f4-icon"></div>
 						</ul>
 					</div> <!-- END e8 -->
 				</div>
@@ -316,27 +327,22 @@
 			<div class="champion">
 				<div id="champ-anchor"></div>
 				<div class="semis-l">
-					<div class="round-details">final 4<br /><span class="date">april 6</span></div>
+					<div class="round-details">final 4<br /><span class="date">april 3</span></div>
 					<ul class="matchup championship round-5">
 						<li class="team team-top unset"></li>
 						<li class="team team-bottom unset"></li>
 					</ul>
 				</div>
+				<div id="mob-f4-2-anchor"></div>
 				<div class="final">
 					<div class="fa fa-trophy unset"></div>
-					<div class="round-details">championship <br /><span class="date">april 8</span></div>
+					<div class="round-details">championship <br /><span class="date">april 5</span></div>
 					<ul class="matchup championship round-6">
 						<li class="team team-top unset"></li>
 						<li class="team team-bottom unset"></li>
 					</ul>
 				</div>
-				<div class="round-details">final 4<br /><span class="date">april 6</span></div>
-				<div class="semis-r">
-					<ul class="matchup championship round-5">
-						<li class="team team-top unset"></li>
-						<li class="team team-bottom unset"></li>
-					</ul>
-				</div>
+				<div id="desktop-f4-2-anchor"></div>
 			</div>
 
 			<div class="split-container right">
@@ -346,18 +352,18 @@
 				</div>
 				<div class="split split-section top" id="South">
 					<div class="round round-4">
-						<div class="round-details">elite 8<br /><span class="date">March 28-29</span></div>
-						<div class="mobile-f4-pick unset">
-							<span class="mobile-f4-label">Final Four</span>
-							<div class="mobile-f4-icon"></div>
-						</div>
+						<div class="round-details">elite 8<br /><span class="date">March 29‑30</span></div>
 						<ul class="matchup">
 							<li class="team team-top unset"></li>
 							<li class="team team-bottom unset"></li>
 						</ul>
+						<ul class="mobile-f4-pick unset">
+							<span class="mobile-f4-label">Final Four</span>
+							<div class="mobile-f4-icon"></div>
+						</ul>
 					</div> <!-- END e8 -->
 					<div class="round round-3">
-						<div class="round-details">sweet 16<br /><span class="date">March 28-29</span></div>
+						<div class="round-details">sweet 16<br /><span class="date">March 27‑28</span></div>
 						<ul class="matchup">
 							<li class="team team-top unset"></li>
 							<li class="team team-bottom unset"></li>
@@ -369,7 +375,7 @@
 					</div> <!-- END ROUND THREE -->
 
 					<div class="round round-2">
-						<div class="round-details">Round 2<br /><span class="date">March 23-24</span></div>
+						<div class="round-details">Round 2<br /><span class="date">March 21‑22</span></div>
 						<ul class="matchup">
 							<li class="team team-top unset"></li>
 							<li class="team team-bottom unset"></li>
@@ -388,7 +394,7 @@
 						</ul>
 					</div> <!-- END ROUND TWO -->
 					<div class="round round-1">
-						<div class="round-details">Round 1<br /><span class="date">March 21-22</span></div>
+						<div class="round-details">Round 1<br /><span class="date">March 19‑20</span></div>
 						<ul class="matchup">
 							<li class="team team-top set"></li>
 							<li class="team team-bottom set"></li>
@@ -429,13 +435,13 @@
 				</div>
 				<div class="split split-section bottom" id="Midwest">
 					<div class="round round-4">
-						<div class="mobile-f4-pick unset">
-							<span class="mobile-f4-label">Final Four</span>
-							<div class="mobile-f4-icon"></div>
-						</div>
 						<ul class="matchup">
 							<li class="team team-top unset"></li>
 							<li class="team team-bottom unset"></li>
+						</ul>
+						<ul class="mobile-f4-pick unset">
+							<span class="mobile-f4-label">Final Four</span>
+							<div class="mobile-f4-icon"></div>
 						</ul>
 					</div> <!-- END ELITE 8 -->
 					<div class="round round-3">
@@ -518,13 +524,14 @@
 			<a class="share-icon" href="https://github.com/ajszoke/slackbracket"><i class="fa fa-github"></i></a>
 		</div>
 		<div class="footer">
-			<p>Beta version created by Andy Szoke, 2019.</p>
+			<p>Beta version created by Andy Szoke, 2021.</p>
 			<p>Design based on <a href="https://codepen.io/jbeason/pen/Wbaedb">Flexbox Madness</a> by Joe Beason.
 				Prediction data provided by <a
 					href="https://fivethirtyeight.com/features/how-our-march-madness-predictions-work-2/">FiveThirtyEight</a>.
 			</p>
-			<p>Donations are welcome in Paypal <a href="https://www.paypal.me/slackbracket">here</a>, or in bitcoin at:
+			<p>If this site helps you win your office pool, tips are welcome in Paypal <a href="https://www.paypal.me/slackbracket">here</a>, or in bitcoin at:
 				3Nej8eESs213wuowoAcAxYT6wytLH7mUPF</p>
+			<p>Please send feedback and bug reports to the <a href="https://github.com/ajszoke/slackbracket">Github repo.</a></p>
 		</div>
 	</section>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
