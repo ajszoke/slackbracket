@@ -1,0 +1,41 @@
+SLACK BRACKET 2021
+	hosting (0.75/0.75)
+		0.25 TLS
+		0.50 slack-bracket redirect
+		0 convert to production
+	backend (7.50/8.50)
+		X	0.50 relaunch site
+		X	0.50 create db
+		1.50 connect site to db
+		1.00 create team short names table
+		2.00 pull tables on page load
+		programmatically update table
+			0.25 csv to sql function
+			0.75 538 api bot
+			2.00 insert values bot
+	frontend (11.00/11.00)
+		chaos control
+			0.75 tick marks
+			0.50 reset functionality
+		bracket
+			0.75 team box resize
+			0 team box cursor
+			0.50 investigate missing F4/champ teams
+		mobile
+			0.50 chaos control explainer
+			1.50 F4/section tracker
+			0.25 invert champ sections
+			0.75 fix generate sticky
+		social media
+			1.00 all links working
+			6.00 bracket image sharing generator?
+		misc
+			0.75 "how it works" smooth
+			?? paypal integration
+			0.50 SEO
+			1.25 beta tag
+			0 2021 header date/page title
+			2.00 bracket printing functionality?
+			
+	TODO 19.25
+	DONE  1.00
