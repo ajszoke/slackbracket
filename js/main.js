@@ -1,6 +1,11 @@
 var teamData;
 var chaos = 50;
 var animation_toggle = false;
+var isMobile = false;
+
+var gen_banner_height = parseInt($('#gen-btn-wrapper').css('height'), 10)
+		+ parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
+		+ parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);
 
 function allowDrop(ev) {
 	ev.preventDefault();
@@ -609,6 +614,12 @@ function updateStickyElements() {
 			$('#gen-anchor').height(0);
 		}
 	}
+}
+
+function formatMobile() {
+	$('ul.matchup.championship.round-6').append($('.main-trophy'));
+	$('.champion').css('padding-bottom', 35 + gen_banner_height);
+	$('.main-trophy').css('margin-top', 30);
 }
 
 $(document).on('input', '#chalk', function () {

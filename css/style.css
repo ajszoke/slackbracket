@@ -208,6 +208,13 @@ body {
 	border-radius: 25px;
 	background: #FF8940;
 	cursor: pointer;
+	z-index: 99;
+}
+.slider-inner-tick {
+	width: 2px;
+	height: 40px;
+	background: #d3d3d3;
+	margin: auto;
 }
 
 .slider::-moz-range-thumb {
@@ -401,7 +408,8 @@ body {
 .champion .fa-trophy .teamObj span.seed {
 	display: none;
 }
-.round {
+.round,
+.mob-round {
 	display: block;
 	float: left;
 	display: -webkit-box;
@@ -414,7 +422,9 @@ body {
 	width: 95%;
 	width: 30.8333%\9;
 }
-.split-section {
+.split-section,
+.mob.e8,
+.mob.f4 {
 	display: flex;
 	position: relative;
 	min-height: 40px;
@@ -818,7 +828,22 @@ li.team.receptive {
 .share-icon:hover { opacity:1;  -webkit-animation: grow 0.5s; animation: grow 0.5s;}
 .date {font-size: 12px; letter-spacing: 2px;font-family: 'Istok Web', sans-serif;color:#3F915F;}
 
+.mob-round {
+	margin: 0 1.25%;
+}
 
+.mob-f4-detail {
+	margin-top: 35px;
+}
+
+
+.tabitem .fa .teamObj span.seed {
+	display: none;
+}
+
+@media screen and (min-width: 981px) {
+	.champion .mob.e8, .mob-e8-detail, .mob-f4-round {display: none;}
+}
 
 @media screen and (min-width: 981px) and (max-width: 1099px) {
   .container {margin: 0 1%;}
@@ -828,8 +853,8 @@ li.team.receptive {
   .hero p.intro {font-size: 28px;}
   .hero p.year {margin: 5px 0 10px;}
 
+  .desktop {display: none;}
 }
-
 
 @media screen and (max-width: 980px) {
   .container {-webkit-flex-direction:column;-moz-flex-direction:column;flex-direction:column;}
@@ -863,7 +888,6 @@ li.team.receptive {
 }
 
 @media screen and (max-width: 550px) {
-	.mobile-f4-icon {background-image: url("../img/plusicon-md.png");}
 	.hero p.use-info {display: none;}
 	section#bracket .container {margin: 35px 2.5% 0 0;}
 	.split-container {width: 100%; margin: 0;}
@@ -871,7 +895,7 @@ li.team.receptive {
 	.seed {font-size: 14px;}
 }
 
-@media screen and (max-width: 400px) {
+@media screen and (max-width: 420px) {
   .round {width:21%;}
   .set {-webkit-flex-grow:1;-moz-flex-grow:1;flex-grow:1;}
   .hero h1 {font-size: 2.15em; letter-spacing: 0;margin:0; }
@@ -879,6 +903,8 @@ li.team.receptive {
   .round-details {font-size: 90%;}
   .hero-wrap {padding: 2.5em 2.5em 0 2.5em;}
   .hero p.year {margin: 5px 0 10px; font-size: 18px;}
-  span.mobile-f4-label {font-size: 16px;}
-  .mobile-f4-icon {background-image: url("../img/plusicon-sm.png");}
 }
+
+@media screen and (max-height: 660px) {
+	p.subtitle {display: none;}
+  }
