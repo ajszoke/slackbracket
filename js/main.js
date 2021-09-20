@@ -11,18 +11,58 @@ function allowDrop(ev) {
 	ev.preventDefault();
 }
 
+/**
+ * Captures team dragging events. Highlights the possible drop cells ahead of
+ * the team's current cell and makes them receptive to recieve the drop.
+ */
 function teamIsDraggingEvent(ev) {
+	var oldClass;
 	var tid = ev.target.id;
-	ev.dataTransfer.setData("Text", tid);
 	var team = findTeamById(parseInt(tid.substring(5)))[0];
+	var slots = findPossibleForwardSlots(team);
+	ev.dataTransfer.setData("Text", tid);
 
 	var dragFromRd = $(ev.target).parents().eq(2).attr('class').substring(12);
 	if (dragFromRd == "") {
 		dragFromRd = 5;
 	}
-	onTeamDrag(team, parseInt(dragFromRd));
+	var fromRd = parseInt(dragFromRd);
+
+	// iterate ahead of the current round and make the target slots receptive
+	for (var i = fromRd - 1; i <= 4; i++) {
+		var curSlot = slots[i];
+		if (i <= 2) {
+			oldClass = '#' + team.team_region + ' .round.round-' + (i + 2) + ' ul.matchup:nth-of-type(' + curSlot[0]
+				+ ') li.team.team-' + topOrBottom(curSlot[1]);
+		} else if (i === 3) {
+			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
+			makeSlotReceptive('#' + team.team_region + ' .mobile-f4-pick');
+		} else if (i === 4) {
+			oldClass = '.final .championship li.team.team-' + topOrBottom(curSlot);
+		}
+		makeSlotReceptive(oldClass);
+	}
+	makeSlotReceptive('.fa.fa-trophy');
 }
 
+/**
+ * Modify a given slot to have "droppable" CSS elements, and to add handling
+ * for a team to be dropped onto it.
+ */
+function makeSlotReceptive(slot) {
+	$(slot)
+		.attr({
+			ondrop: 'validDrop(event)',
+			ondragenter: 'event.preventDefault()',
+			ondragover: 'allowDrop(event)'
+		})
+		.addClass('receptive');
+}
+
+/**
+ * Captures a mouse-release event while dragging a team that was not dropped
+ * onto a valid slot.
+ */
 function anyDrop(ev) {
 	ev.preventDefault();
 	var data = $(ev.currentTarget).attr('id');
@@ -31,6 +71,10 @@ function anyDrop(ev) {
 	onTeamDropped(team, 0, false);
 }
 
+/**
+ * Captures events where a team is dropped on an acceptable slot. Fills the
+ * team through the path to the slot, replacing existing teams if needed.
+ */
 function validDrop(ev) {
 	ev.preventDefault();
 	var data = ev.dataTransfer.getData("Text");
@@ -79,49 +123,102 @@ function validDrop(ev) {
 	}
 
 	if (evictedTeam != "") {
-		clearTeamForward(team, droppedOnRd);
+		// team has been found occupying the target slot. Evict that team from
+		// the slot, as well as all slots further down the bracket
+		var curSlot;
+		var slots = findPossibleForwardSlots(team);
+
+		for (var i = droppedOnRd; i <= 7; i++) {
+			var curCoord = slots[i - 2];
+			if (i <= 4) {
+				curSlot = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curCoord[0]
+					+ ') li.team.team-' + topOrBottom(curCoord[1]);
+			} else if (i === 5) {
+				curSlot = '.champion .semis-' + curCoord[0] + ' li.team.team-' + topOrBottom(curCoord[1]);
+				$('#' + team.team_region + ' .mobile-f4-pick')
+					.empty()
+					.removeClass('set')
+					.addClass('unset')
+					.append('<span class="mobile-f4-label">Final Four</span><div class="mobile-f4-icon"></div>')
+			} else if (i === 6) {
+				curSlot = '.final ul.championship li.team.team-' + topOrBottom(curCoord);
+			} else if (i === 7) {
+				curSlot = '.fa.fa-trophy';
+			}
+
+			if ($(curSlot).children('#team_' + team.team_id) != null) {
+				$(curSlot)
+					.empty()
+					.removeClass('set receptive')
+					.addClass('unset');
+			} else {
+				break;
+			}
+		}
 	}
 
 	confirmedTarget.appendChild(document.getElementById(data));
 	onTeamDropped(team, parseInt(droppedOnRd), true);
 }
 
-function clearTeamForward(team, fromRd) {
-	var curSlot;
-	var slots = findPossibleForwardSlots(team);
+/**
+ * Handles a user-drop event. If the selected team was dropped onto a valid
+ * slot, fill that team through the bracket to the selected slot.
+ * @param {Object} team a Team object
+ * @param {number} toRd the round number to promote the team to
+ * @param {boolean} validDrop whether the initial drop was successful
+ */
+function onTeamDropped(team, toRd, validDrop) {
+	var rd2Onward = findPossibleForwardSlots(team);
+	var slots = [convertSeedToCoordinate(team.team_seed)].concat(rd2Onward);
 
-	for (var i = fromRd; i <= 7; i++) {
-		var curCoord = slots[i - 2];
+	for (var i = 1; i <= 7; i++) {
+		var curSlot = slots[i - 1];
+		console.log(curSlot);
+		var oldClass;
 		if (i <= 4) {
-			curSlot = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curCoord[0]
-				+ ') li.team.team-' + topOrBottom(curCoord[1]);
+			oldClass = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curSlot[0]
+				+ ') li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 5) {
-			curSlot = '.champion .semis-' + curCoord[0] + ' li.team.team-' + topOrBottom(curCoord[1]);
+			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
 			$('#' + team.team_region + ' .mobile-f4-pick')
-				.empty()
-				.removeClass('set')
-				.addClass('unset')
-				.append('<span class="mobile-f4-label">Final Four</span><div class="mobile-f4-icon"></div>')
+				.removeClass('receptive')
+				.removeAttr('ondrop, ondragover');
 		} else if (i === 6) {
-			curSlot = '.final ul.championship li.team.team-' + topOrBottom(curCoord);
+			oldClass = '.final ul.championship li.team.team-' + topOrBottom(curSlot);
 		} else if (i === 7) {
-			curSlot = '.fa.fa-trophy';
+			oldClass = '.fa.fa-trophy';
 		}
 
-		if ($(curSlot).children('#team_' + team.team_id) != null) {
-			$(curSlot)
+		$(oldClass)
+			.removeClass('receptive')
+			.removeAttr('ondrop, ondragover');
+		if (i <= toRd && validDrop) {
+			$(oldClass)
 				.empty()
-				.removeClass('set receptive')
-				.addClass('unset');
-		} else {
-			break;
+				.removeClass('unset')
+				.addClass('set')
+				.append(teamToDiv(team));
+			if (i === 5) {
+				$('#' + team.team_region + ' .mobile-f4-pick')
+					.empty()
+					.removeClass('unset')
+					.addClass('set')
+					.append('<span class="mobile-f4-label">Final Four</span>')
+					.append(teamToDiv(team));
+			}
 		}
-
 	}
 }
 
+/**
+ * Called when the Generate button is clicked in the header. Fill all slots in
+ * the bracket that have not been given a user-selected team.
+ */
 function onGenerate() {
-	for (var i = 1; i <= 4; i++) { // generate winners through final 4
+
+	// generate winners through final 4
+	for (var i = 1; i <= 4; i++) {
 		var numMatches = Math.pow(2, (4 - i));
 		$('.round-' + i + ' ul.matchup').each(function (index, element) {
 			// first, look forward and make sure the next round slot is unset
@@ -129,8 +226,8 @@ function onGenerate() {
 			var winnerCoord = findNextRdSlot((index % numMatches) + 1);
 			var winnerSlot;
 			if (i < 4) {
-				winnerSlot = '#' + region + ' .round-' + (i + 1) + ' ul.matchup:nth-of-type(' + winnerCoord[0] + ') li.team.team-'
-					+ topOrBottom(winnerCoord[1]);
+				winnerSlot = '#' + region + ' .round-' + (i + 1) + ' ul.matchup:nth-of-type(' + winnerCoord[0]
+					+ ') li.team.team-' + topOrBottom(winnerCoord[1]);
 				advanceAutoWinner(winnerSlot, element);
 			} else if (i === 4) {
 				var leftOrRight, topOrBot;
@@ -161,20 +258,81 @@ function onGenerate() {
 	advanceAutoWinner(winnerSlot, 'ul.matchup.round-6');
 }
 
-function navToSection(event, region) {
-	$('html,body').animate({ scrollTop: $('#' + region).offset().top }, 'slow');
-}
-
-function advanceAutoWinner(winnerSlot, element) {
+/**
+ * Method used by onGenerate(). Given a target slot and a matchup, parse the
+ * matchup teams, determine a winner and move the winner to the next slot
+ * @param {Object} winnerSlot the target slot to advance the winning team to
+ * @param {Object} matchupElement the matchup object containing the two
+ * competing teams
+ */
+function advanceAutoWinner(winnerSlot, matchupElement) {
 	if ($(winnerSlot).hasClass('unset')) {
 		$(winnerSlot).empty();
-		var teamTop = findTeamById(parseInt($(element).find('li.team-top .teamObj').attr('id').substring(5)))[0];
-		var teamBottom = findTeamById(parseInt($(element).find('li.team-bottom .teamObj').attr('id').substring(5)))[0];
-		var winner = generateWinner(teamTop, teamBottom);
-		$(element).find('li.team-' + winner + ' .teamObj').clone().appendTo($(winnerSlot));
+		var topTeam = findTeamById(parseInt($(matchupElement).find('li.team-top .teamObj').attr('id')
+				.substring(5)))[0];
+		var bottomTeam = findTeamById(parseInt($(matchupElement).find('li.team-bottom .teamObj').attr('id')
+				.substring(5)))[0];
+		
+		var winner;
+		var y = topTeam.team_rating - bottomTeam.team_rating;
+
+		// below equation found by fitting a team's 538 expected win curve to their
+		// 538 rating difference with their opponent
+		var powFactor = Math.pow((
+					62961.779 * Math.sqrt(991046400750000 * Math.pow(y, 2)
+					+ 216640010213000 * y + 4075535163691823) + 1982092801500 * y + 216640010213
+				), (1 / 3));
+		var topWinProb = .00000275096 * (
+					4.6415888 * powFactor
+					- 1172263010 / powFactor
+					+ 179120
+				);
+
+		// bound the win probability percent to handle extremely lopsided matchups
+		var winProbPct = Math.min(0.995, Math.max(0.005, topWinProb));
+
+		var finalProb;
+		var chaosPct = chaos * 0.01;
+		if (chaosPct < 0.5) {
+			// tilted towards chaos / more random outcomes
+			var chaosFactor = 2 * (chaosPct - 0.5);
+
+			// full chaos should mean every matchup is a coin flip
+			var fullChaosWinProb = 0.5;
+
+			// scale the intensity of the "full chaos" adjustment based on the given factor
+			// TODO pure chaos should always be 50%
+			finalProb = (chaosFactor * fullChaosWinProb) + (1 - chaosFactor) * winProbPct;
+		
+		} else if (chaosPct == 0.5) {
+
+			// default setting: statistically balanced amount of chaos
+			finalProb = winProbPct;
+		
+		} else if (chaosPct > 0.5) {
+
+			// tilted towards chalk / more predictable outcomes
+			var chalkFactor = 2 * (0.5 - chaosPct);
+
+			// find the win prob if chalk = 100%
+			var fullChalkWinProb = 0.31831 * Math.atan(63.291 * ((2 * winProbPct) - 1)) + 0.5;
+
+			// scale the intensity of the "full chalk" adjustment based on the given factor
+			finalProb = (chalkFactor * fullChalkWinProb) + (1 - chalkFactor) * winProbPct;
+
+		}
+
+		if (finalProb > Math.random()) {
+			winner = "top";
+		} else {
+			winner = "bottom";
+		}
+		
+		$(matchupElement).find('li.team-' + winner + ' .teamObj').clone().appendTo($(winnerSlot));
 
 		if ($(winnerSlot).parent().hasClass('round-5')) {
-			var team = findTeamById(parseInt($(element).find('li.team-' + winner + ' .teamObj').attr('id').substring(5)))[0];
+			var team = findTeamById(parseInt($(matchupElement).find('li.team-' + winner + ' .teamObj').attr('id')
+					.substring(5)))[0];
 			$('#' + team.team_region + ' .mobile-f4-pick')
 				.empty()
 				.append('<span class="mobile-f4-label">Final Four</span>')
@@ -184,62 +342,20 @@ function advanceAutoWinner(winnerSlot, element) {
 	}
 }
 
-function generateWinner(topTeam, bottomTeam) {
-	var y = topTeam.team_rating - bottomTeam.team_rating;
-
-	// below equation found by fitting a team's 538 expected win curve to their 538 rating difference with their opponent
-	var topWinProb = .00000275096 * (4.6415888 * Math.pow((62961.779 * Math.sqrt(991046400750000 * Math.pow(y, 2)
-		+ 216640010213000 * y + 4075535163691823) + 1982092801500 * y + 216640010213), (1 / 3)) - 1172263010
-		/ Math.pow((62961.779 * Math.sqrt(991046400750000 * Math.pow(y, 2) + 216640010213000 * y + 4075535163691823)
-			+ 1982092801500 * y + 216640010213), (1 / 3)) + 179120);
-
-	// bound the win probability percent to handle extremely lopsided matchups
-	var winProbPct = Math.max(0.005, topWinProb);
-	winProbPct = Math.min(0.995, winProbPct);
-
-	var finalProb;
-	var chaosPct = chaos * 0.01;
-	if (chaosPct < 0.5) {
-		finalProb = applyChalk(winProbPct, chaosPct);
-	} else if (chaosPct == 0.5) {
-		finalProb = winProbPct;
-	} else if (chaosPct > 0.5) {
-		finalProb = applyChaos(winProbPct, chaosPct);
-	}
-
-	if (finalProb > Math.random()) {
-		return "top";
-	} else {
-		return "bottom";
-	}
+/**
+ * Method for mobile clients. Called when a user clicks a region button in the
+ * bottom navbar. Animate a window scroll to the requested region.
+ */
+function navToSection(region) {
+	$('html,body').animate({ scrollTop: $('#' + region).offset().top }, 'slow');
 }
 
-function applyChaos(winProbPct, chaosInput) {
-	var chaosFactor = 2 * (chaosInput - 0.5);
-
-	// full chaos should mean every matchup is a coin flip
-	var fullChaosWinProb = 0.5;
-
-	// scale the intensity of the "full chaos" adjustment based on the given factor
-	// TODO pure chaos should always be 50%
-	var finalProb = (chaosFactor * fullChaosWinProb) + (1 - chaosFactor) * winProbPct;
-
-	return finalProb;
-}
-
-function applyChalk(winProbPct, chaosInput) {
-	var chalkFactor = 2 * (0.5 - chaosInput);
-
-	// find the win prob if chalk = 100%
-	var fullChalkWinProb = 0.31831 * Math.atan(63.291 * ((2 * winProbPct) - 1)) + 0.5;
-	console.log("fullChalk: " + fullChalkWinProb);
-
-	// scale the intensity of the "full chalk" adjustment based on the given factor
-	var finalProb = (chalkFactor * fullChalkWinProb) + (1 - chalkFactor) * winProbPct;
-
-	return finalProb;
-}
-
+/**
+ * Function to replace play-in teams with a "pseudo-team" representing the
+ * winner of the play-in team, weighted by the average of each team's strength
+ * and by each team's likelihood to win the matchup. Called on page init,
+ * separated for readability.
+ */
 function replacePlayInWithPseudoTeams() {
 	var counter = -1;
 	var playinTeams = $.grep(teamData, function (team) {
@@ -258,7 +374,8 @@ function replacePlayInWithPseudoTeams() {
 			team_alive: 1, // TODO: update
 			team_id: counter--,
 			team_name: t1.team_region + seedNo,
-			team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win), // weight combined rating by round 1 win chance
+			// weight combined rating by round 1 win chance
+			team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win),
 			team_region: t1.team_region,
 			team_seed: parseInt(seedNo)
 		};
@@ -273,6 +390,10 @@ function replacePlayInWithPseudoTeams() {
 	});
 }
 
+/**
+ * Replace team names, as returned by the 538 API, with a more compact form.
+ * Called on page init, separated for readability.
+ */
 function replaceOversizedTeamNames() {
 	var windowWidth = window.innerWidth;
 	var dict;
@@ -281,7 +402,6 @@ function replaceOversizedTeamNames() {
 		dict = {
 			"East16": "play-in",
 			"Virginia Commonwealth": "VCU",
-			"Central Florida": "UCF",
 			"Mississippi State": "Miss.St.",
 			"Virginia Tech": "VA Tech",
 			"Saint Louis": "STL",
@@ -329,15 +449,14 @@ function replaceOversizedTeamNames() {
 		};
 	} else {
 		dict = {
-			"East16": "NCCU/NDST",
+			"East16": "TXSO/MSM",
 			"Virginia Commonwealth": "VCU",
-			"Central Florida": "Cen. Florida",
 			"Mississippi State": "Miss. State",
-			"East11": "BEL/TEM",
+			"East11": "UCLA/MSU",
 			"Louisiana State": "Louisiana St.",
 			"Michigan State": "Michigan St.",
-			"West16": "FDU/PV",
-			"West11": "SJU/ASU",
+			"West16": "NSU/ASU",
+			"West11": "DU/Wich.",
 			"Northern Kentucky": "N. Kentucky",
 			"Saint Mary's (CA)": "Saint Mary's",
 			"North Carolina": "UNC",
@@ -350,16 +469,27 @@ function replaceOversizedTeamNames() {
 		var foundTeam = $.grep(teamData, function (team) {
 			return team.team_name === longName;
 		})[0];
-		foundTeam.team_name = dict[longName];
+		if (foundTeam != null) {
+			foundTeam.team_name = dict[longName];
+		}
 	}
 }
 
+/**
+ * Given a Team object, return an HTML div that can be placed into an arbitrary
+ * matchup slot.
+ */
 function teamToDiv(team) {
 	return ('<div class="teamObj" id="team_' + team.team_id
-		+ '" draggable="true" ondragstart="teamIsDraggingEvent(event)" ondragend="anyDrop(event)"><span class="teamName">' + team.team_name + '</span><span class="seed">'
-		+ team.team_seed + '</span></div>');
+			+ '" draggable="true" ondragstart="teamIsDraggingEvent(event)" ondragend="anyDrop(event)">'
+			+ '<span class="teamName">' + team.team_name + '</span><span class="seed">'
+			+ team.team_seed + '</span></div>');
 }
 
+/**
+ * Returns an HTML-friendly representation of which side of the matchup a team
+ * should be placed in, represented by the sel int
+ */
 function topOrBottom(sel) {
 	switch (sel) {
 		case 0:
@@ -371,6 +501,10 @@ function topOrBottom(sel) {
 	}
 }
 
+/**
+ * Given a team's seed, return the team's starting coordinate on the bracket in
+ * the form [matchupNumber, topOrBottomPosition]
+ */
 function convertSeedToCoordinate(seed) {
 	switch (seed) {
 		case 1:
@@ -411,10 +545,14 @@ function convertSeedToCoordinate(seed) {
 	}
 }
 
+/**
+ * Given a Team object, find the slots on the board that the team can possibly
+ * be promoted to. Return the result as an array with objects of the form
+ * [matchupNumber, topOrBottomPosition].
+ */
 function findPossibleForwardSlots(team) {
 	var r1Coord = convertSeedToCoordinate(team.team_seed);
 	var curRdNth = r1Coord[0];
-	var tob;
 	var res = [];
 
 	// handle the regional rounds first
@@ -432,11 +570,11 @@ function findPossibleForwardSlots(team) {
 			break;
 		case "South":
 			res.push(['r', 0]);
-			res.push(0);
+			res.push(1);
 			break;
 		case "West":
 			res.push(['l', 1]);
-			res.push(1);
+			res.push(0);
 			break;
 		case "Midwest":
 			res.push(['r', 1]);
@@ -449,111 +587,38 @@ function findPossibleForwardSlots(team) {
 	return res;
 }
 
-function findTeamById(id) {
-	return $.grep(teamData, function (team) {
-		return team.team_id === id;
-	});
-}
-
-function onTeamClicked(team, roundNo) {
-	console.log('click');
-}
-
+/**
+ * Given the nth-of-type number of the selected matchup, return an array
+ * representing the slot in the next round to advance the winner to, in the
+ * form [matchupNumber, topOrBottomPosition].
+ */
 function findNextRdSlot(curRdNth) {
 	var tob = (curRdNth - 1) % 2;
 	var nextRdNth = Math.ceil(curRdNth / 2);
 	return [nextRdNth, tob];
 }
 
-function onTeamDropped(team, toRd, validDrop) {
-	var rd2Onward = findPossibleForwardSlots(team);
-	var slots = [convertSeedToCoordinate(team.team_seed)].concat(rd2Onward);
-
-	for (var i = 1; i <= 7; i++) {
-		var curSlot = slots[i - 1];
-		console.log(curSlot);
-		var oldClass;
-		if (i <= 4) {
-			oldClass = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curSlot[0]
-				+ ') li.team.team-' + topOrBottom(curSlot[1]);
-		} else if (i === 5) {
-			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
-			$('#' + team.team_region + ' .mobile-f4-pick')
-				.removeClass('receptive')
-				.removeAttr('ondrop, ondragover');
-		} else if (i === 6) {
-			oldClass = '.final ul.championship li.team.team-' + topOrBottom(curSlot);
-		} else if (i === 7) {
-			oldClass = '.fa.fa-trophy';
-		}
-
-		$(oldClass)
-			.removeClass('receptive')
-			.removeAttr('ondrop, ondragover');
-		if (i <= toRd && validDrop) {
-			$(oldClass)
-				.empty()
-				.removeClass('unset')
-				.addClass('set')
-				.append(teamToDiv(team));
-			if (i === 5) {
-				$('#' + team.team_region + ' .mobile-f4-pick')
-					.empty()
-					.removeClass('unset')
-					.addClass('set')
-					.append('<span class="mobile-f4-label">Final Four</span>')
-					.append(teamToDiv(team));
-			}
-		}
-	}
-}
-
-function onTeamDrag(team, fromRd) {
-	var slots = findPossibleForwardSlots(team);
-	var curRd = fromRd + 1;
-	var oldClass;
-
-	for (var i = fromRd - 1; i <= 4; i++) {
-		var curSlot = slots[i];
-		if (i <= 2) {
-			oldClass = '#' + team.team_region + ' .round.round-' + (i + 2) + ' ul.matchup:nth-of-type(' + curSlot[0]
-				+ ') li.team.team-' + topOrBottom(curSlot[1]);
-		} else if (i === 3) {
-			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
-			makeSlotReceptive('#' + team.team_region + ' .mobile-f4-pick');
-		} else if (i === 4) {
-			oldClass = '.final .championship li.team.team-' + topOrBottom(curSlot);
-		}
-		makeSlotReceptive(oldClass);
-	}
-	makeSlotReceptive('.fa.fa-trophy');
-}
-
-function makeSlotReceptive(slot) {
-	$(slot)
-		.attr({
-			ondrop: 'validDrop(event)',
-			ondragenter: 'event.preventDefault()',
-			ondragover: 'allowDrop(event)'
-		})
-		.addClass('receptive');
-}
-
-function populateBracket() {
-	teamData.forEach(function (team) {
-		var coord = convertSeedToCoordinate(team.team_seed);
-		var slot = '#' + team.team_region + ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-'
-			+ topOrBottom(coord[1]);
-		$(slot).html(teamToDiv(team));
-		var test = $(slot).parents().eq(1).attr('class');
-		var teamDiv = slot + " #team_" + team.team_id;
-		$(teamDiv)
-			.click(function () {
-				onTeamClicked(team, 1);
-			});
+/**
+ * Retrieve a full Team object by team ID.
+ */
+function findTeamById(id) {
+	return $.grep(teamData, function (team) {
+		return team.team_id === id;
 	});
 }
 
+/**
+ * TODO: advance a given team forward one round.
+ */
+function onTeamClicked(team, roundNo) {
+	console.log('click'); 
+}
+
+/**
+ * Called on mobile when the page is scrolled. Determine whether the Generate
+ * button has scrolled above the top of the window. Perform CSS animations
+ * to re-insert the button as a new footer, 
+ */
 function updateStickyElements() {
 	var window_top = $(window).scrollTop();
 	var top = $('#gen-anchor').offset().top;
@@ -566,7 +631,6 @@ function updateStickyElements() {
 		- parseInt($('#gen-btn-wrapper').css('padding-bottom'), 10);;
 
 	if (window_top > top && !animation_toggle && window.innerWidth < 420) {
-		var window_bot = window_top + window_y;
 
 		$('#gen-btn-wrapper').addClass('stick');
 		$('#gen-btn-wrapper').css('top', 0);
@@ -592,11 +656,6 @@ function updateStickyElements() {
 	}
 }
 
-function stageExpandoTransition() {
-	var expandedHeight = $("#explainer-expando").scrollHeight;
-	console.log(expandedHeight);
-}
-
 function formatMobile() {
 	$('ul.matchup.championship.round-6').append($('.main-trophy'));
 	$('.champion').css('padding-bottom', 35 + gen_banner_height);
@@ -617,11 +676,11 @@ $(document).ready(function () {
 		$(window).scroll(updateStickyElements);
 		window.addEventListener('touchmove', function () { });
 		updateStickyElements();
-		stageExpandoTransition();
 		if (window.innerWidth < 980) {
 			formatMobile();
 		}
-		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2019/fivethirtyeight_ncaa_forecasts.csv", {
+		// TODO: replace API call with internal data retrieval to prevent DDOSing 538 at scale
+		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2021/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",
 			download: true,
 			header: true,
@@ -629,13 +688,26 @@ $(document).ready(function () {
 			skipEmptyLines: "greedy",
 			complete: function (results) {
 				results.data = $.grep(results.data, function (line) {
-					return line.gender === 'mens' && line.forecast_date === '2019-03-17';
+					return line.gender === 'mens' && line.forecast_date === '2021-03-20';
 				});
 				console.log(results);
 				teamData = results.data;
 				replacePlayInWithPseudoTeams();
 				replaceOversizedTeamNames();
-				populateBracket();
+
+				// populate the bracket
+				teamData.forEach(function (team) {
+					var coord = convertSeedToCoordinate(team.team_seed);
+					var slot = '#' + team.team_region + ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-'
+						+ topOrBottom(coord[1]);
+					$(slot).html(teamToDiv(team));
+					var test = $(slot).parents().eq(1).attr('class');
+					var teamDiv = slot + " #team_" + team.team_id;
+					$(teamDiv)
+						.click(function () {
+							onTeamClicked(team, 1);
+						});
+				});
 			}
 		});
 	});
