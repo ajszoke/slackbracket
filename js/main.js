@@ -351,131 +351,6 @@ function navToSection(region) {
 }
 
 /**
- * Function to replace play-in teams with a "pseudo-team" representing the
- * winner of the play-in team, weighted by the average of each team's strength
- * and by each team's likelihood to win the matchup. Called on page init,
- * separated for readability.
- */
-function replacePlayInWithPseudoTeams() {
-	var counter = -1;
-	var playinTeams = $.grep(teamData, function (team) {
-		return team.playin_flag === 1;
-	});
-	while (playinTeams.length > 0) {
-		var t1 = playinTeams[0];
-		var seedNo = t1.team_seed.slice(0, 2);
-		var t2 = $.grep(playinTeams.slice(1), function (team) {
-			return (seedNo === team.team_seed.slice(0, 2) && t1.team_region === team.team_region);
-		})[0];
-		var combTeam = {
-			gender: "mens",
-			forecast_date: t1.forecast_date,
-			playin_flag: 0,
-			team_alive: 1, // TODO: update
-			team_id: counter--,
-			team_name: t1.team_region + seedNo,
-			// weight combined rating by round 1 win chance
-			team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win),
-			team_region: t1.team_region,
-			team_seed: parseInt(seedNo)
-		};
-		teamData.push(combTeam);
-		playinTeams.shift();
-		playinTeams = $.grep(playinTeams, function (team) {
-			return (team != t2);
-		});
-	}
-	teamData = $.grep(teamData, function (team) {
-		return team.playin_flag != 1;
-	});
-}
-
-/**
- * Replace team names, as returned by the 538 API, with a more compact form.
- * Called on page init, separated for readability.
- */
-function replaceOversizedTeamNames() {
-	var windowWidth = window.innerWidth;
-	var dict;
-
-	if (windowWidth < 450) {
-		dict = {
-			"East16": "play-in",
-			"Virginia Commonwealth": "VCU",
-			"Mississippi State": "Miss.St.",
-			"Virginia Tech": "VA Tech",
-			"Saint Louis": "STL",
-			"Maryland": "UMD",
-			"East11": "play-in",
-			"Louisiana State": "LSU",
-			"Louisville": "L'ville",
-			"Minnesota": "Minn.",
-			"Michigan State": "Mich.St.",
-			"Gonzaga": "'Zags",
-			"West16": "play-in",
-			"Syracuse": "'Cuse",
-			"Marquette": "Marq.",
-			"Murray State": "Murr.St.",
-			"Florida State": "FSU",
-			"Vermont": "Verm.",
-			"West11": "play-in",
-			"Texas Tech": "Tx.Tech",
-			"Northern Kentucky": "N. KY",
-			"Michigan": "Mich.",
-			"Montana": "Mont.",
-			"Virginia": "UVA",
-			"Gardner-Webb": "Gard-W",
-			"Mississippi": "Miss.",
-			"Oklahoma": "Okla.",
-			"Wisconsin": "Wisc.",
-			"Oregon": "Oregon",
-			"Kansas State": "Kans.St.",
-			"UC-Irvine": "UC-Irv.",
-			"Villanova": "'Nova",
-			"Saint Mary's (CA)": "St. Mar.",
-			"Old Dominion": "Old Dom",
-			"Cincinnati": "Cincy",
-			"Tennessee": "Tenn.",
-			"North Carolina": "UNC",
-			"Utah State": "Utah St.",
-			"Washington": "Wash.",
-			"Northeastern": "NEU",
-			"New Mexico State": "NM St.",
-			"Iowa State": "Iowa St.",
-			"Ohio State": "Ohio St.",
-			"Seton Hall": "S. Hall",
-			"Kentucky": "UK",
-			"Abilene Christian": "Ab. Chr."
-		};
-	} else {
-		dict = {
-			"East16": "TXSO/MSM",
-			"Virginia Commonwealth": "VCU",
-			"Mississippi State": "Miss. State",
-			"East11": "UCLA/MSU",
-			"Louisiana State": "Louisiana St.",
-			"Michigan State": "Michigan St.",
-			"West16": "NSU/ASU",
-			"West11": "DU/Wich.",
-			"Northern Kentucky": "N. Kentucky",
-			"Saint Mary's (CA)": "Saint Mary's",
-			"North Carolina": "UNC",
-			"New Mexico State": "NM State",
-			"Abilene Christian": "Abilene Chr."
-		};
-	}
-
-	for (var longName in dict) {
-		var foundTeam = $.grep(teamData, function (team) {
-			return team.team_name === longName;
-		})[0];
-		if (foundTeam != null) {
-			foundTeam.team_name = dict[longName];
-		}
-	}
-}
-
-/**
  * Given a Team object, return an HTML div that can be placed into an arbitrary
  * matchup slot.
  */
@@ -680,7 +555,7 @@ $(document).ready(function () {
 			formatMobile();
 		}
 		// TODO: replace API call with internal data retrieval to prevent DDOSing 538 at scale
-		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2021/fivethirtyeight_ncaa_forecasts.csv", {
+		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2022/fivethirtyeight_ncaa_forecasts.csv", {
 			delimiter: ",",
 			download: true,
 			header: true,
@@ -688,12 +563,154 @@ $(document).ready(function () {
 			skipEmptyLines: "greedy",
 			complete: function (results) {
 				results.data = $.grep(results.data, function (line) {
-					return line.gender === 'mens' && line.forecast_date === '2021-03-20';
+					return line.gender === 'mens' && line.forecast_date === '2022-03-13';
 				});
 				console.log(results);
 				teamData = results.data;
-				replacePlayInWithPseudoTeams();
-				replaceOversizedTeamNames();
+				
+				{ // replace play-in with pseudo teams
+					var counter = -1;
+					var playinTeams = $.grep(teamData, function (team) {
+						return team.playin_flag === 1;
+					});
+					while (playinTeams.length > 0) {
+						var t1 = playinTeams[0];
+						var seedNo = t1.team_seed.slice(0, 2);
+						var t2 = $.grep(playinTeams.slice(1), function (team) {
+							return (seedNo === team.team_seed.slice(0, 2) && t1.team_region === team.team_region);
+						})[0];
+						var combTeam = {
+							gender: "mens",
+							forecast_date: t1.forecast_date,
+							playin_flag: 0,
+							team_alive: 1, // TODO: update
+							team_id: counter--,
+							team_name: t1.team_region + seedNo,
+							// weight combined rating by round 1 win chance
+							team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win),
+							team_region: t1.team_region,
+							team_seed: parseInt(seedNo)
+						};
+						teamData.push(combTeam);
+						playinTeams.shift();
+						playinTeams = $.grep(playinTeams, function (team) {
+							return (team != t2);
+						});
+					}
+					teamData = $.grep(teamData, function (team) {
+						return team.playin_flag != 1;
+					});
+				}
+
+				{ // replace oversized team names
+					{
+						var windowWidth = window.innerWidth;
+						var dict;
+					
+						if (windowWidth < 460) {
+							dict = {
+								"South16": "WRST/BRY",
+								"East12": "IND/WYO",
+								"West11": "ND/RUTG",
+								"Midwest16": "TXS/AMCC",
+								"Virginia Commonwealth": "VCU",
+								"Mississippi State": "Miss.St.",
+								"Virginia Tech": "VA Tech",
+								"Saint Louis": "STL",
+								"Maryland": "UMD",
+								"Louisiana State": "LSU",
+								"Louisville": "L'ville",
+								"Minnesota": "Minn.",
+								"Michigan State": "Mich.St.",
+								"Gonzaga": "'Zags",
+								"West16": "play-in",
+								"Syracuse": "'Cuse",
+								"Marquette": "Marq.",
+								"Murray State": "Murr.St.",
+								"Florida State": "FSU",
+								"Vermont": "Verm.",
+								"Texas Tech": "Tx.Tech",
+								"Northern Kentucky": "N. KY",
+								"Michigan": "Mich.",
+								"Montana": "Mont.",
+								"Virginia": "UVA",
+								"Gardner-Webb": "Gard-W",
+								"Mississippi": "Miss.",
+								"Oklahoma": "Okla.",
+								"Wisconsin": "Wisc.",
+								"Oregon": "Oregon",
+								"Kansas State": "Kans.St.",
+								"UC-Irvine": "UC-Irv.",
+								"Villanova": "'Nova",
+								"Saint Mary's (CA)": "St. Mar.",
+								"Old Dominion": "Old Dom",
+								"Cincinnati": "Cincy",
+								"Tennessee": "Tenn.",
+								"North Carolina": "UNC",
+								"Utah State": "Utah St.",
+								"Washington": "Wash.",
+								"Northeastern": "NEU",
+								"New Mexico State": "NM St.",
+								"Iowa State": "Iowa St.",
+								"Ohio State": "Ohio St.",
+								"Seton Hall": "S. Hall",
+								"Cal State Fullerton": "CSF",
+								"Kentucky": "UK",
+								"Abilene Christian": "Ab. Chr.",
+								"Georgia State": "GA St.",
+								"Montana State": "Mont.St.",
+								"Alabama-Birmingham": "AL-Birm.",
+								"Norfolk State": "Norf. St.",
+								"Saint Mary's": "St. Mary's",
+								"San Francisco": "San Fran",
+								"Saint Peter's": "St. Pet.",
+								"Boise State": "BSU",
+								"Connecticut": "UConn",
+								"Texas Christian": "TCU",
+								"Chattanooga": "Chat.",
+								"Colorado State": "Col.St.",
+								"San Diego State": "SD St.",
+								"Providence": "Prov.",
+								"South Dakota State": "S.Dak.St.",
+								"Southern California": "USC",
+								"Jacksonville State": "Jax.St."
+							};
+						} else {
+							dict = {
+								"South16": "WRST/BRY",
+								"East12": "IND/WYO",
+								"West11": "ND/RUTG",
+								"Midwest16": "TXS/AMCC",
+								"Virginia Commonwealth": "VCU",
+								"Virginia Tech": "VA Tech",
+								"Mississippi State": "Miss. State",
+								"East11": "UCLA/MSU",
+								"Louisiana State": "Louisiana St.",
+								"Michigan State": "Michigan St.",
+								"Northern Kentucky": "N. Kentucky",
+								"Saint Mary's (CA)": "Saint Mary's",
+								"North Carolina": "UNC",
+								"New Mexico State": "NM State",
+								"Abilene Christian": "Abilene Chr.",
+								"Cal State Fullerton": "Cal St. Full.",
+								"Alabama-Birmingham": "AL-Birm.",
+								"San Diego State": "San Diego St",
+								"South Dakota State": "S.Dak. St",
+								"Southern California": "S. Cal.",
+								"Jacksonville State": "Jax. St"
+							};
+						}
+					
+						for (var longName in dict) {
+							var foundTeam = $.grep(teamData, function (team) {
+								return team.team_name === longName;
+							})[0];
+							if (foundTeam != null) {
+								foundTeam.team_name = dict[longName];
+							}
+						}
+					}
+				}
 
 				// populate the bracket
 				teamData.forEach(function (team) {
