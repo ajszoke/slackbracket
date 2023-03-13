@@ -534,6 +534,7 @@ li.team.set {
 	background-color: #fff;
 	font-weight: 500;
 	opacity: 1;
+	cursor: grab;
 }
 li.team.unset {
 	background-color: #e3e3e3;

@@ -1,7 +1,133 @@
+const REGION_1_NAME = "South"
+const REGION_2_NAME = "East"
+const REGION_3_NAME = "Midwest"
+const REGION_4_NAME = "West"
+const R64_DATE_LABEL = "March 16-17"
+const R32_DATE_LABEL = "March 18-19"
+const S16_DATE_LABEL = "March 23-24"
+const E8_DATE_LABEL = "March 25-26"
+const F4_DATE_LABEL = "April 1"
+const SHIP_DATE_LABEL = "April 3"
+
 var teamData;
 var chaos = 50;
 var animation_toggle = false;
 var isMobile = false;
+var teamAbbreviations;
+
+var xhr = new XMLHttpRequest();
+
+$(document).ready(function () {
+	
+	$(window).scroll(updateStickyElements);
+	window.addEventListener('touchmove', function () { });
+	updateStickyElements();
+	if (window.innerWidth < 980) {
+		formatMobile();
+	}
+
+	$('#region-1-label').text(REGION_1_NAME);
+	$('#region-2-label').text(REGION_2_NAME);
+	$('#region-3-label').text(REGION_3_NAME);
+	$('#region-4-label').text(REGION_4_NAME);
+	$('#region-1-tab').text(REGION_1_NAME);
+	$('#region-2-tab').text(REGION_2_NAME);
+	$('#region-3-tab').text(REGION_3_NAME);
+	$('#region-4-tab').text(REGION_4_NAME);
+	$('.r64-date-label').text(R64_DATE_LABEL)
+	$('.r32-date-label').text(R32_DATE_LABEL)
+	$('.s16-date-label').text(S16_DATE_LABEL)
+	$('.e8-date-label').text(E8_DATE_LABEL)
+	$('.f4-date-label').text(F4_DATE_LABEL)
+	$('.ship-date-label').text(SHIP_DATE_LABEL)
+
+	fetch('https://slackbracket.s3.amazonaws.com/team-abbreviations.json')
+	.then(res => res.json())
+	.then(json => {
+		teamAbbreviations = json;
+		Papa.parse("https://slackbracket.s3.amazonaws.com/fivethirtyeight_ncaa_forecasts.csv", {
+			delimiter: ",",
+			download: true,
+			header: true,
+			dynamicTyping: true,
+			skipEmptyLines: "greedy",
+			complete: function (results) {
+				results.data = $.grep(results.data, function (line) {
+					return line.gender === 'mens' && line.forecast_date === '2023-03-12';
+				});
+				console.log(results);
+				teamData = results.data;
+				
+				// replace play-in with pseudo teams
+				var counter = -1;
+				var playinTeams = $.grep(teamData, function (team) {
+					return team.playin_flag === 1;
+				});
+				while (playinTeams.length > 0) {
+					var t1 = playinTeams[0];
+					var seedNo = t1.team_seed.slice(0, 2);
+					var t2 = $.grep(playinTeams.slice(1), function (team) {
+						return (seedNo === team.team_seed.slice(0, 2) && t1.team_region === team.team_region);
+					})[0];
+					var combTeam = {
+						gender: "mens",
+						forecast_date: t1.forecast_date,
+						playin_flag: 0,
+						team_alive: 1, // TODO: update
+						team_id: counter--,
+						team_name: t1.team_region + seedNo,
+						// weight combined rating by round 1 win chance
+						team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win),
+						team_region: t1.team_region,
+						team_seed: parseInt(seedNo)
+					};
+					teamData.push(combTeam);
+					playinTeams.shift();
+					playinTeams = $.grep(playinTeams, function (team) {
+						return (team != t2);
+					});
+				}
+				teamData = $.grep(teamData, function (team) {
+					return team.playin_flag != 1;
+				});
+
+
+				// replace oversized team names
+				var windowWidth = window.innerWidth;
+				var dict;
+			
+				console.log(teamAbbreviations);
+				if (windowWidth < 460) {
+					dict = teamAbbreviations['small-abbrevs'];
+				} else {
+					dict = teamAbbreviations['full-abbrevs'];
+				}
+			
+				for (var longName in dict) {
+					var foundTeam = $.grep(teamData, function (team) {
+						return team.team_name === longName;
+					})[0];
+					if (foundTeam != null) {
+						foundTeam.team_name = dict[longName];
+					}
+				}
+
+				// populate the bracket
+				teamData.forEach(function (team) {
+					team['regionLabel'] = regionNameToDivID(team.team_region);
+					var coord = convertSeedToCoordinate(team.team_seed);
+					var slot = '#' + team.regionLabel
+						+ ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-' + topOrBottom(coord[1]);
+					$(slot).html(teamToDiv(team));
+					var teamDiv = slot + " #team_" + team.team_id;
+					$(teamDiv).click(function () {
+						onTeamClicked(team, 1);
+					});
+				});
+			}
+		});
+	});
+});
 
 var gen_banner_height = parseInt($('#gen-btn-wrapper').css('height'), 10)
 		+ parseInt($('#gen-btn-wrapper').css('padding-top'), 10)
@@ -32,11 +158,11 @@ function teamIsDraggingEvent(ev) {
 	for (var i = fromRd - 1; i <= 4; i++) {
 		var curSlot = slots[i];
 		if (i <= 2) {
-			oldClass = '#' + team.team_region + ' .round.round-' + (i + 2) + ' ul.matchup:nth-of-type(' + curSlot[0]
-				+ ') li.team.team-' + topOrBottom(curSlot[1]);
+			oldClass = '#' + team.regionLabel + ' .round.round-' + (i + 2)
+				+ ' ul.matchup:nth-of-type(' + curSlot[0] + ') li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 3) {
 			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
-			makeSlotReceptive('#' + team.team_region + ' .mobile-f4-pick');
+			makeSlotReceptive('#' + team.regionLabel + ' .mobile-f4-pick');
 		} else if (i === 4) {
 			oldClass = '.final .championship li.team.team-' + topOrBottom(curSlot);
 		}
@@ -131,11 +257,11 @@ function validDrop(ev) {
 		for (var i = droppedOnRd; i <= 7; i++) {
 			var curCoord = slots[i - 2];
 			if (i <= 4) {
-				curSlot = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curCoord[0]
-					+ ') li.team.team-' + topOrBottom(curCoord[1]);
+				curSlot = '#' + team.regionLabel + ' .round.round-' + i + ' ul.matchup:nth-of-type('
+					+ curCoord[0] + ') li.team.team-' + topOrBottom(curCoord[1]);
 			} else if (i === 5) {
 				curSlot = '.champion .semis-' + curCoord[0] + ' li.team.team-' + topOrBottom(curCoord[1]);
-				$('#' + team.team_region + ' .mobile-f4-pick')
+				$('#' + team.regionLabel + ' .mobile-f4-pick')
 					.empty()
 					.removeClass('set')
 					.addClass('unset')
@@ -174,14 +300,13 @@ function onTeamDropped(team, toRd, validDrop) {
 
 	for (var i = 1; i <= 7; i++) {
 		var curSlot = slots[i - 1];
-		console.log(curSlot);
 		var oldClass;
 		if (i <= 4) {
-			oldClass = '#' + team.team_region + ' .round.round-' + i + ' ul.matchup:nth-of-type(' + curSlot[0]
-				+ ') li.team.team-' + topOrBottom(curSlot[1]);
+			oldClass = '#' + team.regionLabel + ' .round.round-' + i + ' ul.matchup:nth-of-type('
+				+ curSlot[0] + ') li.team.team-' + topOrBottom(curSlot[1]);
 		} else if (i === 5) {
 			oldClass = '.champion .semis-' + curSlot[0] + ' li.team.team-' + topOrBottom(curSlot[1]);
-			$('#' + team.team_region + ' .mobile-f4-pick')
+			$('#' + team.regionLabel + ' .mobile-f4-pick')
 				.removeClass('receptive')
 				.removeAttr('ondrop, ondragover');
 		} else if (i === 6) {
@@ -200,7 +325,7 @@ function onTeamDropped(team, toRd, validDrop) {
 				.addClass('set')
 				.append(teamToDiv(team));
 			if (i === 5) {
-				$('#' + team.team_region + ' .mobile-f4-pick')
+				$('#' + team.regionLabel + ' .mobile-f4-pick')
 					.empty()
 					.removeClass('unset')
 					.addClass('set')
@@ -231,12 +356,12 @@ function onGenerate() {
 				advanceAutoWinner(winnerSlot, element);
 			} else if (i === 4) {
 				var leftOrRight, topOrBot;
-				if (region === "East" || region == "West") {
+				if (region === "region-1" || region == "region-2") {
 					leftOrRight = 'l';
 				} else {
 					leftOrRight = 'r';
 				}
-				if (region === "East" || region === "South") {
+				if (region === "region-1" || region === "region-3") {
 					topOrBot = "top";
 				} else {
 					topOrBot = "bottom";
@@ -333,7 +458,7 @@ function advanceAutoWinner(winnerSlot, matchupElement) {
 		if ($(winnerSlot).parent().hasClass('round-5')) {
 			var team = findTeamById(parseInt($(matchupElement).find('li.team-' + winner + ' .teamObj').attr('id')
 					.substring(5)))[0];
-			$('#' + team.team_region + ' .mobile-f4-pick')
+			$('#' + team.regionLabel + ' .mobile-f4-pick')
 				.empty()
 				.append('<span class="mobile-f4-label">Final Four</span>')
 				.append(teamToDiv(team));
@@ -420,6 +545,19 @@ function convertSeedToCoordinate(seed) {
 	}
 }
 
+function regionNameToDivID(name) {
+	switch (name) {
+		case REGION_1_NAME:
+			return "region-1";
+		case REGION_2_NAME:
+			return "region-2";
+		case REGION_3_NAME:
+			return "region-3";
+		case REGION_4_NAME:
+			return "region-4";
+	}
+}
+
 /**
  * Given a Team object, find the slots on the board that the team can possibly
  * be promoted to. Return the result as an array with objects of the form
@@ -439,19 +577,19 @@ function findPossibleForwardSlots(team) {
 
 	// handle the final 4 and champ rounds separately
 	switch (team.team_region) {
-		case "East":
+		case REGION_1_NAME:
 			res.push(['l', 0]);
 			res.push(0);
 			break;
-		case "South":
-			res.push(['r', 0]);
-			res.push(1);
-			break;
-		case "West":
+		case REGION_2_NAME:
 			res.push(['l', 1]);
 			res.push(0);
 			break;
-		case "Midwest":
+		case REGION_3_NAME:
+			res.push(['r', 0]);
+			res.push(1);
+			break;
+		case REGION_4_NAME:
 			res.push(['r', 1]);
 			res.push(1);
 			break;
@@ -543,189 +681,4 @@ $(document).on('input', '#chalk', function () {
 
 window.addEventListener("orientationchange", function () {
 	console.log("the orientation of the device is now " + screen.orientation.angle);
-});
-
-$(document).ready(function () {
-
-	$(function () {
-		$(window).scroll(updateStickyElements);
-		window.addEventListener('touchmove', function () { });
-		updateStickyElements();
-		if (window.innerWidth < 980) {
-			formatMobile();
-		}
-		// TODO: replace API call with internal data retrieval to prevent DDOSing 538 at scale
-		Papa.parse("https://projects.fivethirtyeight.com/march-madness-api/2022/fivethirtyeight_ncaa_forecasts.csv", {
-			delimiter: ",",
-			download: true,
-			header: true,
-			dynamicTyping: true,
-			skipEmptyLines: "greedy",
-			complete: function (results) {
-				results.data = $.grep(results.data, function (line) {
-					return line.gender === 'mens' && line.forecast_date === '2022-03-13';
-				});
-				console.log(results);
-				teamData = results.data;
-				
-				{ // replace play-in with pseudo teams
-					var counter = -1;
-					var playinTeams = $.grep(teamData, function (team) {
-						return team.playin_flag === 1;
-					});
-					while (playinTeams.length > 0) {
-						var t1 = playinTeams[0];
-						var seedNo = t1.team_seed.slice(0, 2);
-						var t2 = $.grep(playinTeams.slice(1), function (team) {
-							return (seedNo === team.team_seed.slice(0, 2) && t1.team_region === team.team_region);
-						})[0];
-						var combTeam = {
-							gender: "mens",
-							forecast_date: t1.forecast_date,
-							playin_flag: 0,
-							team_alive: 1, // TODO: update
-							team_id: counter--,
-							team_name: t1.team_region + seedNo,
-							// weight combined rating by round 1 win chance
-							team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win),
-							team_region: t1.team_region,
-							team_seed: parseInt(seedNo)
-						};
-						teamData.push(combTeam);
-						playinTeams.shift();
-						playinTeams = $.grep(playinTeams, function (team) {
-							return (team != t2);
-						});
-					}
-					teamData = $.grep(teamData, function (team) {
-						return team.playin_flag != 1;
-					});
-				}
-
-				{ // replace oversized team names
-					{
-						var windowWidth = window.innerWidth;
-						var dict;
-					
-						if (windowWidth < 460) {
-							dict = {
-								"South16": "WRST/BRY",
-								"East12": "IND/WYO",
-								"West11": "ND/RUTG",
-								"Midwest16": "TXS/AMCC",
-								"Virginia Commonwealth": "VCU",
-								"Mississippi State": "Miss.St.",
-								"Virginia Tech": "VA Tech",
-								"Saint Louis": "STL",
-								"Maryland": "UMD",
-								"Louisiana State": "LSU",
-								"Louisville": "L'ville",
-								"Minnesota": "Minn.",
-								"Michigan State": "Mich.St.",
-								"Gonzaga": "'Zags",
-								"West16": "play-in",
-								"Syracuse": "'Cuse",
-								"Marquette": "Marq.",
-								"Murray State": "Murr.St.",
-								"Florida State": "FSU",
-								"Vermont": "Verm.",
-								"Texas Tech": "Tx.Tech",
-								"Northern Kentucky": "N. KY",
-								"Michigan": "Mich.",
-								"Montana": "Mont.",
-								"Virginia": "UVA",
-								"Gardner-Webb": "Gard-W",
-								"Mississippi": "Miss.",
-								"Oklahoma": "Okla.",
-								"Wisconsin": "Wisc.",
-								"Oregon": "Oregon",
-								"Kansas State": "Kans.St.",
-								"UC-Irvine": "UC-Irv.",
-								"Villanova": "'Nova",
-								"Saint Mary's (CA)": "St. Mar.",
-								"Old Dominion": "Old Dom",
-								"Cincinnati": "Cincy",
-								"Tennessee": "Tenn.",
-								"North Carolina": "UNC",
-								"Utah State": "Utah St.",
-								"Washington": "Wash.",
-								"Northeastern": "NEU",
-								"New Mexico State": "NM St.",
-								"Iowa State": "Iowa St.",
-								"Ohio State": "Ohio St.",
-								"Seton Hall": "S. Hall",
-								"Cal State Fullerton": "CSF",
-								"Kentucky": "UK",
-								"Abilene Christian": "Ab. Chr.",
-								"Georgia State": "GA St.",
-								"Montana State": "Mont.St.",
-								"Alabama-Birmingham": "AL-Birm.",
-								"Norfolk State": "Norf. St.",
-								"Saint Mary's": "St. Mary's",
-								"San Francisco": "San Fran",
-								"Saint Peter's": "St. Pet.",
-								"Boise State": "BSU",
-								"Connecticut": "UConn",
-								"Texas Christian": "TCU",
-								"Chattanooga": "Chat.",
-								"Colorado State": "Col.St.",
-								"San Diego State": "SD St.",
-								"Providence": "Prov.",
-								"South Dakota State": "S.Dak.St.",
-								"Southern California": "USC",
-								"Jacksonville State": "Jax.St."
-							};
-						} else {
-							dict = {
-								"South16": "WRST/BRY",
-								"East12": "IND/WYO",
-								"West11": "ND/RUTG",
-								"Midwest16": "TXS/AMCC",
-								"Virginia Commonwealth": "VCU",
-								"Virginia Tech": "VA Tech",
-								"Mississippi State": "Miss. State",
-								"East11": "UCLA/MSU",
-								"Louisiana State": "Louisiana St.",
-								"Michigan State": "Michigan St.",
-								"Northern Kentucky": "N. Kentucky",
-								"Saint Mary's (CA)": "Saint Mary's",
-								"North Carolina": "UNC",
-								"New Mexico State": "NM State",
-								"Abilene Christian": "Abilene Chr.",
-								"Cal State Fullerton": "Cal St. Full.",
-								"Alabama-Birmingham": "AL-Birm.",
-								"San Diego State": "San Diego St",
-								"South Dakota State": "S.Dak. St",
-								"Southern California": "S. Cal.",
-								"Jacksonville State": "Jax. St"
-							};
-						}
-					
-						for (var longName in dict) {
-							var foundTeam = $.grep(teamData, function (team) {
-								return team.team_name === longName;
-							})[0];
-							if (foundTeam != null) {
-								foundTeam.team_name = dict[longName];
-							}
-						}
-					}
-				}
-
-				// populate the bracket
-				teamData.forEach(function (team) {
-					var coord = convertSeedToCoordinate(team.team_seed);
-					var slot = '#' + team.team_region + ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-'
-						+ topOrBottom(coord[1]);
-					$(slot).html(teamToDiv(team));
-					var test = $(slot).parents().eq(1).attr('class');
-					var teamDiv = slot + " #team_" + team.team_id;
-					$(teamDiv)
-						.click(function () {
-							onTeamClicked(team, 1);
-						});
-				});
-			}
-		});
-	});
 });
