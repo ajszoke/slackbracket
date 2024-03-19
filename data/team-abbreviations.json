@@ -1,9 +1,9 @@
 {
     "small-abbrevs": {
-        "South16": "A&M/SEMS",
-        "East16": "TSU/FD",
-        "West11": "ASU/Nev.",
-        "Midwest11": "MS/Pitt.",
+        "South10": "BSU/CO",
+        "Midwest16": "MSU/Gram",
+        "Midwest10": "UVA/CSU",
+        "West16": "How/Wag",
         "Virginia Commonwealth": "VCU",
         "Mississippi State": "Miss.St.",
         "Virginia Tech": "VA Tech",
@@ -75,14 +75,13 @@
         "Kennesaw State": "Kennesaw"
     },
     "full-abbrevs": {
-        "South16": "A&M/SEMS",
-        "East16": "TSU/FD",
-        "West11": "ASU/Nev.",
-        "Midwest11": "MS/Pitt.",
+        "South10": "BSU/CO",
+        "Midwest16": "MSU/Gram",
+        "Midwest10": "UVA/CSU",
+        "West16": "How/Wag",
         "Virginia Commonwealth": "VCU",
         "Virginia Tech": "VA Tech",
         "Mississippi State": "Miss. State",
-        "East11": "UCLA/MSU",
         "Louisiana State": "Louisiana St.",
         "Michigan State": "Michigan St.",
         "Northern Kentucky": "N. Kentucky",

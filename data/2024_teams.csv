@@ -1,0 +1,69 @@
+team_name,team_rating,playin_flag,team_region,team_seed
+Connecticut,0.971230578,0,East,1
+Iowa St.,0.95824467,0,East,2
+Illinois,0.922117128,0,East,3
+Auburn,0.957381883,0,East,4
+San Diego St.,0.879054127,0,East,5
+BYU,0.906821792,0,East,6
+Washington St.,0.855628846,0,East,7
+FAU,0.816469933,0,East,8
+Northwestern,0.871721227,0,East,9
+Drake,0.828397686,0,East,10
+Duquesne,0.7608517,0,East,11
+UAB,0.663131515,0,East,12
+Yale,0.744100759,0,East,13
+Morehead St.,0.589138136,0,East,14
+South Dakota State,0.583350405,0,East,15
+Stetson,0.356003524,0,East,16
+North Carolina,0.930531735,0,West,1
+Arizona,0.952559609,0,West,2
+Baylor,0.910358311,0,West,3
+Alabama,0.912776122,0,West,4
+Saint Mary's,0.919846094,0,West,5
+Clemson,0.8646062,0,West,6
+Dayton,0.854894632,0,West,7
+Mississippi St.,0.877120969,0,West,8
+Michigan St.,0.898261985,0,West,9
+Nevada,0.863032738,0,West,10
+New Mexico,0.892883587,0,West,11
+Grand Canyon,0.773251405,0,West,12
+Charleston,0.701521368,0,West,13
+Colgate,0.512529072,0,West,14
+Long Beach St.,0.431266262,0,West,15
+Howard,0.291106331,1,West,16
+Wagner,0.240027492,1,West,16
+Houston,0.978547447,0,South,1
+Marquette,0.932875955,0,South,2
+Kentucky,0.893477289,0,South,3
+Duke,0.927128208,0,South,4
+Wisconsin,0.901973856,0,South,5
+Texas Tech,0.884609649,0,South,6
+Florida,0.895136102,0,South,7
+Nebraska,0.899769261,0,South,8
+Texas A&M,0.849807475,0,South,9
+Boise St.,0.853835381,1,South,10
+Colorado,0.88642942,1,South,10
+North Carolina State,0.798005754,0,South,11
+James Madison,0.777783027,0,South,12
+Vermont,0.659492055,0,South,13
+Oakland,0.585139759,0,South,14
+Western KY,0.593394779,0,South,15
+Longwood,0.476131837,0,South,16
+Purdue,0.964466927,0,Midwest,1
+Tennessee,0.93830088,0,Midwest,2
+Creighton,0.928843164,0,Midwest,3
+Kansas,0.91141731,0,Midwest,4
+Gonzaga,0.914921152,0,Midwest,5
+South Carolina,0.842317041,0,Midwest,6
+Texas,0.900631578,0,Midwest,7
+Utah St.,0.814595934,0,Midwest,8
+TCU,0.869279466,0,Midwest,9
+Virginia,0.814925518,1,Midwest,10
+Colorado St.,0.845951822,1,Midwest,10
+Oregon,0.814964217,0,Midwest,11
+McNeese,0.75178207,0,Midwest,12
+Samford,0.731524123,0,Midwest,13
+Akron,0.59580803,0,Midwest,14
+Saint Peter's,0.403705928,0,Midwest,15
+Grambling St.,0.280513587,1,Midwest,16
+Montana St.,0.418924946,1,Midwest,16

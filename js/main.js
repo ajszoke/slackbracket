@@ -1,13 +1,13 @@
-const REGION_1_NAME = "South"
-const REGION_2_NAME = "East"
-const REGION_3_NAME = "Midwest"
-const REGION_4_NAME = "West"
-const R64_DATE_LABEL = "March 16-17"
-const R32_DATE_LABEL = "March 18-19"
-const S16_DATE_LABEL = "March 23-24"
-const E8_DATE_LABEL = "March 25-26"
-const F4_DATE_LABEL = "April 1"
-const SHIP_DATE_LABEL = "April 3"
+const REGION_1_NAME = "East"
+const REGION_2_NAME = "West"
+const REGION_3_NAME = "South"
+const REGION_4_NAME = "Midwest"
+const R64_DATE_LABEL = "March 21-22"
+const R32_DATE_LABEL = "March 23-24"
+const S16_DATE_LABEL = "March 28-29"
+const E8_DATE_LABEL = "March 30-31"
+const F4_DATE_LABEL = "April 6"
+const SHIP_DATE_LABEL = "April 8"
 
 var teamData;
 var chaos = 50;
@@ -45,39 +45,33 @@ $(document).ready(function () {
 	.then(res => res.json())
 	.then(json => {
 		teamAbbreviations = json;
-		Papa.parse("https://slackbracket.s3.amazonaws.com/fivethirtyeight_ncaa_forecasts.csv", {
+		Papa.parse("https://slackbracket.s3.amazonaws.com/2024_teams.csv", {
 			delimiter: ",",
 			download: true,
 			header: true,
 			dynamicTyping: true,
 			skipEmptyLines: "greedy",
 			complete: function (results) {
-				results.data = $.grep(results.data, function (line) {
-					return line.gender === 'mens' && line.forecast_date === '2023-03-12';
-				});
 				console.log(results);
 				teamData = results.data;
 				
 				// replace play-in with pseudo teams
-				var counter = -1;
 				var playinTeams = $.grep(teamData, function (team) {
 					return team.playin_flag === 1;
 				});
 				while (playinTeams.length > 0) {
 					var t1 = playinTeams[0];
-					var seedNo = t1.team_seed.slice(0, 2);
+					var seedNo = t1.team_seed;
 					var t2 = $.grep(playinTeams.slice(1), function (team) {
-						return (seedNo === team.team_seed.slice(0, 2) && t1.team_region === team.team_region);
+						return (seedNo === team.team_seed && t1.team_region === team.team_region);
 					})[0];
 					var combTeam = {
 						gender: "mens",
 						forecast_date: t1.forecast_date,
 						playin_flag: 0,
 						team_alive: 1, // TODO: update
-						team_id: counter--,
 						team_name: t1.team_region + seedNo,
-						// weight combined rating by round 1 win chance
-						team_rating: (t1.team_rating * t1.rd1_win) + (t2.team_rating * t2.rd1_win),
+						team_rating: (t1.team_rating + t2.team_rating) / 2,
 						team_region: t1.team_region,
 						team_seed: parseInt(seedNo)
 					};
@@ -115,6 +109,7 @@ $(document).ready(function () {
 				// populate the bracket
 				teamData.forEach(function (team) {
 					team['regionLabel'] = regionNameToDivID(team.team_region);
+					team['team_id'] = team.team_region + team.team_seed;
 					var coord = convertSeedToCoordinate(team.team_seed);
 					var slot = '#' + team.regionLabel
 						+ ' .round-1 ul.matchup:nth-of-type(' + coord[0] + ') .team-' + topOrBottom(coord[1]);
@@ -393,32 +388,26 @@ function onGenerate() {
 function advanceAutoWinner(winnerSlot, matchupElement) {
 	if ($(winnerSlot).hasClass('unset')) {
 		$(winnerSlot).empty();
-		var topTeam = findTeamById(parseInt($(matchupElement).find('li.team-top .teamObj').attr('id')
-				.substring(5)))[0];
-		var bottomTeam = findTeamById(parseInt($(matchupElement).find('li.team-bottom .teamObj').attr('id')
-				.substring(5)))[0];
+		var topTeam = findTeamById($(matchupElement).find('li.team-top .teamObj').attr('id').substring(5))[0];
+		var bottomTeam = findTeamById($(matchupElement).find('li.team-bottom .teamObj').attr('id').substring(5))[0];
 		
 		var winner;
-		var y = topTeam.team_rating - bottomTeam.team_rating;
 
-		// below equation found by fitting a team's 538 expected win curve to their
-		// 538 rating difference with their opponent
-		var powFactor = Math.pow((
-					62961.779 * Math.sqrt(991046400750000 * Math.pow(y, 2)
-					+ 216640010213000 * y + 4075535163691823) + 1982092801500 * y + 216640010213
-				), (1 / 3));
-		var topWinProb = .00000275096 * (
-					4.6415888 * powFactor
-					- 1172263010 / powFactor
-					+ 179120
-				);
+		// calculate the chances of the top-coord team beating the bottom-coord team,
+		// using derived Elo ratings as intermediate
+		var topElo = probabilityToEloOffset(topTeam.team_rating);
+		var botElo = probabilityToEloOffset(bottomTeam.team_rating);
+		var topEloAdvantage = topElo - botElo;
+		var topWinProb = 1 / (1 + 10 ** (-topEloAdvantage / 400));
+		
+		
 
 		// bound the win probability percent to handle extremely lopsided matchups
-		var winProbPct = Math.min(0.995, Math.max(0.005, topWinProb));
+		var winProbPct = Math.min(0.999, Math.max(0.001, topWinProb));
 
 		var finalProb;
 		var chaosPct = chaos * 0.01;
-		if (chaosPct < 0.5) {
+		if (chaosPct > 0.5) {
 			// tilted towards chaos / more random outcomes
 			var chaosFactor = 2 * (chaosPct - 0.5);
 
@@ -434,7 +423,7 @@ function advanceAutoWinner(winnerSlot, matchupElement) {
 			// default setting: statistically balanced amount of chaos
 			finalProb = winProbPct;
 		
-		} else if (chaosPct > 0.5) {
+		} else if (chaosPct < 0.5) {
 
 			// tilted towards chalk / more predictable outcomes
 			var chalkFactor = 2 * (0.5 - chaosPct);
@@ -444,8 +433,12 @@ function advanceAutoWinner(winnerSlot, matchupElement) {
 
 			// scale the intensity of the "full chalk" adjustment based on the given factor
 			finalProb = (chalkFactor * fullChalkWinProb) + (1 - chalkFactor) * winProbPct;
-
+			
+			
+			console.log(finalProb);
 		}
+		
+		
 
 		if (finalProb > Math.random()) {
 			winner = "top";
@@ -456,15 +449,23 @@ function advanceAutoWinner(winnerSlot, matchupElement) {
 		$(matchupElement).find('li.team-' + winner + ' .teamObj').clone().appendTo($(winnerSlot));
 
 		if ($(winnerSlot).parent().hasClass('round-5')) {
-			var team = findTeamById(parseInt($(matchupElement).find('li.team-' + winner + ' .teamObj').attr('id')
+			/* var team = findTeamById(parseInt($(matchupElement).find('li.team-' + winner + ' .teamObj').attr('id')
 					.substring(5)))[0];
 			$('#' + team.regionLabel + ' .mobile-f4-pick')
 				.empty()
 				.append('<span class="mobile-f4-label">Final Four</span>')
-				.append(teamToDiv(team));
+				.append(teamToDiv(team));  FIXME */
 
 		}
 	}
+}
+
+/*
+ * Given a decimal probability that a given team beats an average-strength team,
+ * translate that probability into an Elo rating offset from 1500.
+ */
+function probabilityToEloOffset(prob) {
+	return 173.7 * Math.log10(-prob/(prob-1));
 }
 
 /**
@@ -480,7 +481,7 @@ function navToSection(region) {
  * matchup slot.
  */
 function teamToDiv(team) {
-	return ('<div class="teamObj" id="team_' + team.team_id
+	return ('<div class="teamObj" id="team_' + team.team_region + team.team_seed
 			+ '" draggable="true" ondragstart="teamIsDraggingEvent(event)" ondragend="anyDrop(event)">'
 			+ '<span class="teamName">' + team.team_name + '</span><span class="seed">'
 			+ team.team_seed + '</span></div>');
