@@ -139,7 +139,7 @@ function allowDrop(ev) {
 function teamIsDraggingEvent(ev) {
 	var oldClass;
 	var tid = ev.target.id;
-	var team = findTeamById(parseInt(tid.substring(5)))[0];
+	var team = findTeamById(tid.substring(5))[0];
 	var slots = findPossibleForwardSlots(team);
 	ev.dataTransfer.setData("Text", tid);
 
@@ -187,7 +187,7 @@ function makeSlotReceptive(slot) {
 function anyDrop(ev) {
 	ev.preventDefault();
 	var data = $(ev.currentTarget).attr('id');
-	var team = findTeamById(parseInt(data.substring(5)))[0]; // chop the team id out of the div name
+	var team = findTeamById(data.substring(5))[0]; // chop the team id out of the div name
 
 	onTeamDropped(team, 0, false);
 }
@@ -199,7 +199,7 @@ function anyDrop(ev) {
 function validDrop(ev) {
 	ev.preventDefault();
 	var data = ev.dataTransfer.getData("Text");
-	var team = findTeamById(parseInt(data.substring(5)))[0]; // chop the team id out of the div name
+	var team = findTeamById(data.substring(5))[0]; // chop the team id out of the div name
 	var target = ev.target;
 	var confirmedTarget;
 	var evictedTeam = "";
@@ -209,17 +209,17 @@ function validDrop(ev) {
 		confirmedTarget = target;
 	} else if ($(target).hasClass('mobile-f4-pick')) {
 		confirmedTarget = target;
-		var evictedTeam = findTeamById(parseInt($(target).attr('class').substring(5)))[0];
+		var evictedTeam = findTeamById($(target).attr('class').substring(5))[0];
 	} else if (($(target).hasClass('mobile-f4-label')) ||
 		($(target).hasClass('mobile-f4-icon'))) {
 		confirmedTarget = target.parentNode;
-		var evictedTeam = findTeamById(parseInt($(target).attr('class').substring(5)))[0];
+		var evictedTeam = findTeamById($(target).attr('class').substring(5))[0];
 	} else if ($(target).hasClass('teamObj')) { // team dropped on an occupied slot
 		confirmedTarget = target.parentNode;
-		var evictedTeam = findTeamById(parseInt($(target).attr('class').substring(5)))[0];
+		var evictedTeam = findTeamById($(target).attr('class').substring(5))[0];
 	} else if ($(target).hasClass('teamName')) {
 		confirmedTarget = target.parentNode.parentNode;
-		var evictedTeam = findTeamById(parseInt($(target.parentNode).attr('class').substring(5)))[0];
+		var evictedTeam = findTeamById($(target.parentNode).attr('class').substring(5))[0];
 	} else if ($(target).hasClass('fa-trophy')) { // team picked as tourney winner
 		confirmedTarget = target;
 	} else {
