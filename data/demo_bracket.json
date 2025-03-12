@@ -1,0 +1,514 @@
+[
+  {
+    "team": "Duke",
+    "region": "East",
+    "seed": 1,
+    "elo": 2089.303,
+    "conference": "ACC",
+    "homeCourt": 83.04591
+  },
+  {
+    "team": "Houston",
+    "region": "Midwest",
+    "seed": 1,
+    "elo": 2074.552,
+    "conference": "Big 12",
+    "homeCourt": 84.47469
+  },
+  {
+    "team": "Auburn",
+    "region": "West",
+    "seed": 1,
+    "elo": 2049.707,
+    "conference": "SEC",
+    "homeCourt": 67.584
+  },
+  {
+    "team": "Florida",
+    "region": "South",
+    "seed": 1,
+    "elo": 2040.319,
+    "conference": "SEC",
+    "homeCourt": 62.82391
+  },
+  {
+    "team": "Alabama",
+    "region": "West",
+    "seed": 2,
+    "elo": 2031.764,
+    "conference": "SEC",
+    "homeCourt": 100.502
+  },
+  {
+    "team": "Michigan St.",
+    "region": "East",
+    "seed": 2,
+    "elo": 2009.002,
+    "conference": "Big Ten",
+    "homeCourt": 81.57139
+  },
+  {
+    "team": "St. John's",
+    "region": "Midwest",
+    "seed": 2,
+    "elo": 1987.206,
+    "conference": "Big East",
+    "homeCourt": 43.39108
+  },
+  {
+    "team": "Tennessee",
+    "region": "South",
+    "seed": 2,
+    "elo": 1977.244,
+    "conference": "SEC",
+    "homeCourt": 86.19893
+  },
+  {
+    "team": "Texas Tech",
+    "region": "West",
+    "seed": 3,
+    "elo": 1952.853,
+    "conference": "Big 12",
+    "homeCourt": 80.30434
+  },
+  {
+    "team": "Gonzaga",
+    "region": "East",
+    "seed": 3,
+    "elo": 1952.656,
+    "conference": "WCC",
+    "homeCourt": 71.56569
+  },
+  {
+    "team": "Louisville",
+    "region": "Midwest",
+    "seed": 3,
+    "elo": 1950.435,
+    "conference": "ACC",
+    "homeCourt": 66.29934
+  },
+  {
+    "team": "Maryland",
+    "region": "South",
+    "seed": 3,
+    "elo": 1940.398,
+    "conference": "Big Ten",
+    "homeCourt": 74.57055
+  },
+  {
+    "team": "Saint Mary's (CA)",
+    "region": "East",
+    "seed": 4,
+    "elo": 1936.807,
+    "conference": "WCC",
+    "homeCourt": 51.3288
+  },
+  {
+    "team": "Clemson",
+    "region": "West",
+    "seed": 4,
+    "elo": 1916.291,
+    "conference": "ACC",
+    "homeCourt": 81.81437
+  },
+  {
+    "team": "Kansas",
+    "region": "South",
+    "seed": 4,
+    "elo": 1911.125,
+    "conference": "Big 12",
+    "homeCourt": 89.09142
+  },
+  {
+    "team": "Arizona",
+    "region": "Midwest",
+    "seed": 4,
+    "elo": 1906.818,
+    "conference": "Big 12",
+    "homeCourt": 83.74467
+  },
+  {
+    "team": "UConn",
+    "region": "West",
+    "seed": 5,
+    "elo": 1899.5,
+    "conference": "Big East",
+    "homeCourt": 54.18959
+  },
+  {
+    "team": "Iowa St.",
+    "region": "East",
+    "seed": 5,
+    "elo": 1895.161,
+    "conference": "Big 12",
+    "homeCourt": 77.82376
+  },
+  {
+    "team": "Texas A&M",
+    "region": "South",
+    "seed": 5,
+    "elo": 1892.981,
+    "conference": "SEC",
+    "homeCourt": 66.2533
+  },
+  {
+    "team": "BYU",
+    "region": "Midwest",
+    "seed": 5,
+    "elo": 1884.394,
+    "conference": "Big 12",
+    "homeCourt": 98.47079
+  },
+  {
+    "team": "Wisconsin",
+    "region": "East",
+    "seed": 6,
+    "elo": 1863.745,
+    "conference": "Big Ten",
+    "homeCourt": 76.58871
+  },
+  {
+    "team": "UCLA",
+    "region": "Midwest",
+    "seed": 6,
+    "elo": 1863.713,
+    "conference": "Big Ten",
+    "homeCourt": 77.12961
+  },
+  {
+    "team": "Illinois",
+    "region": "South",
+    "seed": 6,
+    "elo": 1861.005,
+    "conference": "Big Ten",
+    "homeCourt": 71.86468
+  },
+  {
+    "team": "Ole Miss",
+    "region": "West",
+    "seed": 6,
+    "elo": 1857.475,
+    "conference": "SEC",
+    "homeCourt": 73.00755
+  },
+  {
+    "team": "VCU",
+    "region": "West",
+    "seed": 7,
+    "elo": 1857.215,
+    "conference": "A-10",
+    "homeCourt": 71.68198
+  },
+  {
+    "team": "Drake",
+    "region": "East",
+    "seed": 7,
+    "elo": 1854.651,
+    "conference": "MVC",
+    "homeCourt": 59.36783
+  },
+  {
+    "team": "Marquette",
+    "region": "South",
+    "seed": 7,
+    "elo": 1851.853,
+    "conference": "Big East",
+    "homeCourt": 67.61778
+  },
+  {
+    "team": "Kentucky",
+    "region": "Midwest",
+    "seed": 7,
+    "elo": 1851.058,
+    "conference": "SEC",
+    "homeCourt": 82.12686
+  },
+  {
+    "team": "New Mexico",
+    "region": "Midwest",
+    "seed": 8,
+    "elo": 1848.354,
+    "conference": "MWC",
+    "homeCourt": 89.07415
+  },
+  {
+    "team": "UC San Diego",
+    "region": "East",
+    "seed": 8,
+    "elo": 1844.898,
+    "conference": "Big West",
+    "homeCourt": 59.54225
+  },
+  {
+    "team": "Baylor",
+    "region": "South",
+    "seed": 8,
+    "elo": 1836.109,
+    "conference": "Big 12",
+    "homeCourt": 47.48352
+  },
+  {
+    "team": "Memphis",
+    "region": "West",
+    "seed": 8,
+    "elo": 1834.618,
+    "conference": "AAC",
+    "homeCourt": 86.32083
+  },
+  {
+    "team": "Purdue",
+    "region": "West",
+    "seed": 9,
+    "elo": 1833.051,
+    "conference": "Big Ten",
+    "homeCourt": 109.2156
+  },
+  {
+    "team": "Xavier",
+    "region": "Midwest",
+    "seed": 9,
+    "elo": 1832.013,
+    "conference": "Big East",
+    "homeCourt": 84.81494
+  },
+  {
+    "team": "Arkansas",
+    "region": "East",
+    "seed": 9,
+    "elo": 1828.403,
+    "conference": "SEC",
+    "homeCourt": 85.48567
+  },
+  {
+    "team": "Creighton",
+    "region": "South",
+    "seed": 9,
+    "elo": 1827.128,
+    "conference": "Big East",
+    "homeCourt": 74.16709
+  },
+  {
+    "team": "Colorado St.",
+    "region": "West",
+    "seed": 10,
+    "elo": 1819.753,
+    "conference": "MWC",
+    "homeCourt": 60.36858
+  },
+  {
+    "team": "Georgia",
+    "region": "Midwest",
+    "seed": 10,
+    "elo": 1815.588,
+    "conference": "SEC",
+    "homeCourt": 58.92334
+  },
+  {
+    "team": "North Carolina",
+    "region": "East",
+    "seed": 10,
+    "elo": 1814.202,
+    "conference": "ACC",
+    "homeCourt": 64.50067
+  },
+  {
+    "team": "Michigan",
+    "region": "South",
+    "seed": 10,
+    "elo": 1812.236,
+    "conference": "Big Ten",
+    "homeCourt": 74.46034
+  },
+  {
+    "team": "Oregon",
+    "region": "Midwest",
+    "seed": 11,
+    "elo": 1810.116,
+    "conference": "Big Ten",
+    "homeCourt": 51.82573
+  },
+  {
+    "team": "Missouri",
+    "region": "East",
+    "seed": 11,
+    "elo": 1803.644,
+    "conference": "SEC",
+    "homeCourt": 85.52576
+  },
+  {
+    "team": "Indiana",
+    "region": "West",
+    "seed": 11,
+    "elo": 1792.548,
+    "conference": "Big Ten",
+    "homeCourt": 86.79526
+  },
+  {
+    "team": "San Diego St.",
+    "region": "South",
+    "seed": 11,
+    "elo": 1790.632,
+    "conference": "MWC",
+    "homeCourt": 62.84991
+  },
+  {
+    "team": "Boise St.",
+    "region": "Midwest",
+    "seed": 12,
+    "elo": 1775.204,
+    "conference": "MWC",
+    "homeCourt": 67.10416
+  },
+  {
+    "team": "Mississippi St.",
+    "region": "South",
+    "seed": 12,
+    "elo": 1771.446,
+    "conference": "SEC",
+    "homeCourt": 65.56918
+  },
+  {
+    "team": "Liberty",
+    "region": "East",
+    "seed": 12,
+    "elo": 1760.209,
+    "conference": "CUSA",
+    "homeCourt": 51.31514
+  },
+  {
+    "team": "Yale",
+    "region": "West",
+    "seed": 12,
+    "elo": 1754.658,
+    "conference": "Ivy",
+    "homeCourt": 53.00887
+  },
+  {
+    "team": "Wake Forest",
+    "region": "Midwest",
+    "seed": 13,
+    "elo": 1754.622,
+    "conference": "ACC",
+    "homeCourt": 75.85943
+  },
+  {
+    "team": "High Point",
+    "region": "West",
+    "seed": 13,
+    "elo": 1753.002,
+    "conference": "Big South",
+    "homeCourt": 64.58089
+  },
+  {
+    "team": "Dayton",
+    "region": "East",
+    "seed": 13,
+    "elo": 1749.489,
+    "conference": "A-10",
+    "homeCourt": 89.27766
+  },
+  {
+    "team": "Villanova",
+    "region": "South",
+    "seed": 13,
+    "elo": 1746.929,
+    "conference": "Big East",
+    "homeCourt": 61.80666
+  },
+  {
+    "team": "UC Irvine",
+    "region": "South",
+    "seed": 14,
+    "elo": 1744.086,
+    "conference": "Big West",
+    "homeCourt": 50.66346
+  },
+  {
+    "team": "Northwestern",
+    "region": "West",
+    "seed": 14,
+    "elo": 1742.7,
+    "conference": "Big Ten",
+    "homeCourt": 25.67289
+  },
+  {
+    "team": "Utah St.",
+    "region": "East",
+    "seed": 14,
+    "elo": 1739.857,
+    "conference": "MWC",
+    "homeCourt": 94.38869
+  },
+  {
+    "team": "Ohio St.",
+    "region": "Midwest",
+    "seed": 14,
+    "elo": 1738.357,
+    "conference": "Big Ten",
+    "homeCourt": 71.84576
+  },
+  {
+    "team": "Oklahoma",
+    "region": "East",
+    "seed": 15,
+    "elo": 1736.698,
+    "conference": "SEC",
+    "homeCourt": 86.2571
+  },
+  {
+    "team": "SMU",
+    "region": "Midwest",
+    "seed": 15,
+    "elo": 1735.086,
+    "conference": "ACC",
+    "homeCourt": 53.83228
+  },
+  {
+    "team": "Santa Clara",
+    "region": "West",
+    "seed": 15,
+    "elo": 1731.439,
+    "conference": "WCC",
+    "homeCourt": 26.22042
+  },
+  {
+    "team": "San Francisco",
+    "region": "South",
+    "seed": 15,
+    "elo": 1728.765,
+    "conference": "WCC",
+    "homeCourt": 50.82576
+  },
+  {
+    "team": "George Mason",
+    "region": "East",
+    "seed": 16,
+    "elo": 1725.851,
+    "conference": "A-10",
+    "homeCourt": 59.43953
+  },
+  {
+    "team": "Penn St.",
+    "region": "South",
+    "seed": 16,
+    "elo": 1718.627,
+    "conference": "Big Ten",
+    "homeCourt": 66.05668
+  },
+  {
+    "team": "Rutgers",
+    "region": "West",
+    "seed": 16,
+    "elo": 1718.259,
+    "conference": "Big Ten",
+    "homeCourt": 46.59946
+  },
+  {
+    "team": "North Texas",
+    "region": "Midwest",
+    "seed": 16,
+    "elo": 1714.791,
+    "conference": "AAC",
+    "homeCourt": 39.88673
+  }
+]
