@@ -3,11 +3,14 @@ import { motion } from 'framer-motion'
 
 export default function TeamCard({ team }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-4 hover:shadow-xl transition">
-      <h3 className="text-xl font-bold">{team.team} ({team.seed})</h3>
-      <p className="text-gray-600">{team.conference}</p>
-      <p>Elo: {team.elo.toFixed(1)}</p>
-      <p>Home Court: {team.homeCourt.toFixed(1)}</p>
-    </div>
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      className="p-4 rounded-xl shadow-md bg-white dark:bg-gray-800 cursor-pointer"
+    >
+      <h3 className="text-lg font-semibold">{team.seed}. {team.team}</h3>
+      <div className="text-sm text-gray-600 dark:text-gray-300">{team.conference}</div>
+      <div className="text-sm">Elo: <strong>{team.elo.toFixed(1)}</strong></div>
+      <div className="text-sm">Home Court: {team.homeCourt.toFixed(1)}</div>
+    </motion.div>
   )
 }
