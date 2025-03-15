@@ -3,9 +3,9 @@ import json
 import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-bracket_json_path = os.path.join(script_dir, '../data/demo_bracket.json')
+bracket_json_path = os.path.join(script_dir, '../data/demo_bracket_womens.json')
 distances_csv_path = os.path.join(script_dir, '../data/school_venue_distances.csv')
-elo_csv_path = os.path.join(script_dir, '../data/data-nO2M0.csv')
+elo_csv_path = os.path.join(script_dir, '../data/data-tQGLh.csv')
 
 # Load data sources
 demo_bracket = pd.read_json(bracket_json_path)
@@ -40,7 +40,7 @@ for _, row in demo_bracket.iterrows():
     integrated_bracket.append(integrated_team)
 
 # Export fully integrated JSON
-output_path = os.path.join(script_dir, '../data/demo_bracket_full.json')
+output_path = os.path.join(script_dir, '../data/demo_bracket_full_women.json')
 with open(output_path, 'w') as f:
     json.dump(integrated_bracket, f, indent=2)
 
