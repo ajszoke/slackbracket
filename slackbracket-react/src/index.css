@@ -32,6 +32,8 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  color: #333;
 }
 
 h1 {
