@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "Slackbracket Autofill",
+  "description": "Apply Slackbracket picks into bracket challenge sites.",
+  "version": "0.1.0",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://fantasy.espn.com/*",
+    "https://www.cbssports.com/*"
+  ],
+  "action": {
+    "default_title": "Slackbracket Autofill",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://fantasy.espn.com/*", "https://www.cbssports.com/*"],
+      "js": ["src/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "slackbracket",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @slackbracket/web",
+    "build": "npm run build -w @slackbracket/web",
+    "lint": "npm run lint -w @slackbracket/web",
+    "lint:fix": "npm run lint:fix -w @slackbracket/web",
+    "typecheck": "npm run typecheck -w @slackbracket/web",
+    "test": "npm run test -w @slackbracket/domain",
+    "format:check": "npx prettier --check \"apps/web/**/*.{ts,tsx,js,jsx,json,css,md}\" \"packages/domain/src/**/*.{ts,js}\"",
+    "format:write": "npx prettier --write \"apps/web/**/*.{ts,tsx,js,jsx,json,css,md}\" \"packages/domain/src/**/*.{ts,js}\""
+  }
+}

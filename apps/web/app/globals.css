@@ -1,0 +1,40 @@
+:root {
+  color-scheme: dark;
+  --bg: #0b1020;
+  --card: #121a30;
+  --muted: #7785a2;
+  --text: #eff4ff;
+  --accent: #7c4dff;
+  --good: #22c55e;
+  --warn: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background: radial-gradient(circle at 20% 20%, #182542 0%, var(--bg) 48%);
+  color: var(--text);
+  font-family: Inter, Segoe UI, system-ui, sans-serif;
+}
+
+button {
+  font: inherit;
+}
+
+.container {
+  width: min(1100px, 96vw);
+  margin: 0 auto;
+  padding: 1rem 0 3rem;
+}
+
+.card {
+  background: color-mix(in srgb, var(--card) 92%, #fff 8%);
+  border: 1px solid color-mix(in srgb, var(--card) 75%, #fff 25%);
+  border-radius: 14px;
+  padding: 0.9rem;
+}

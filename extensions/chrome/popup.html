@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Slackbracket Autofill</title>
+    <style>
+      body { font-family: sans-serif; width: 320px; margin: 0; padding: 12px; background: #0d1530; color: #eef4ff; }
+      textarea { width: 100%; min-height: 120px; margin: 8px 0; }
+      button { width: 100%; padding: 8px; border: 0; border-radius: 8px; background: #7c4dff; color: white; }
+    </style>
+  </head>
+  <body>
+    <h3>Autofill from Slackbracket</h3>
+    <p>Paste normalized picks JSON, then click Apply.</p>
+    <textarea id="payload" placeholder='{"R1-East-1":"east-1-duke"}'></textarea>
+    <button id="apply">Apply Picks</button>
+    <script src="./src/popup.js"></script>
+  </body>
+</html>
