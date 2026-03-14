@@ -1,5 +1,13 @@
+/* ============================================
+   SLACKBRACKET DESIGN SYSTEM
+   Neon glassmorphism dark theme
+   ============================================ */
+
 :root {
   color-scheme: dark;
+
+  /* Core palette */
+  --bg-deep: #050a18;
   --bg: #0b1020;
   --card: #121a30;
   --muted: #7785a2;
@@ -7,8 +15,33 @@
   --accent: #7c4dff;
   --good: #22c55e;
   --warn: #f59e0b;
+  --danger: #ef4444;
+
+  /* Region neon colors */
+  --region-east: #00f0ff;
+  --region-west: #ff006e;
+  --region-south: #39ff14;
+  --region-midwest: #ffd700;
+  --region-finalfour: #7c4dff;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(18, 26, 48, 0.75);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+
+  /* Glow */
+  --glow-sm: 0 0 8px;
+  --glow-md: 0 0 16px;
+  --glow-lg: 0 0 32px;
+
+  /* Motion */
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ============================================
+   RESET & BASE
+   ============================================ */
 * {
   box-sizing: border-box;
 }
@@ -17,24 +50,227 @@ html,
 body {
   padding: 0;
   margin: 0;
-  background: radial-gradient(circle at 20% 20%, #182542 0%, var(--bg) 48%);
+  background: var(--bg);
   color: var(--text);
-  font-family: Inter, Segoe UI, system-ui, sans-serif;
+  font-family: "Space Grotesk", Inter, "Segoe UI", system-ui, sans-serif;
+}
+
+/* Atmospheric background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 15%, rgba(0, 240, 255, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 20%, rgba(255, 0, 110, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(124, 77, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 70%, rgba(57, 255, 20, 0.03) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 button {
   font: inherit;
 }
 
-.container {
-  width: min(1100px, 96vw);
-  margin: 0 auto;
-  padding: 1rem 0 3rem;
-}
-
+/* ============================================
+   CARD (glassmorphism)
+   ============================================ */
 .card {
-  background: color-mix(in srgb, var(--card) 92%, #fff 8%);
-  border: 1px solid color-mix(in srgb, var(--card) 75%, #fff 25%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
   border-radius: 14px;
   padding: 0.9rem;
+  transition:
+    border-color 0.2s var(--ease-smooth),
+    box-shadow 0.2s var(--ease-smooth);
+}
+
+.card:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+button {
+  padding: 0.4rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  color: var(--text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    transform 0.1s,
+    box-shadow 0.15s;
+}
+
+button:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+.btn-active {
+  background: color-mix(in srgb, var(--accent) 40%, transparent 60%);
+  border-color: var(--accent);
+  box-shadow: var(--glow-sm) color-mix(in srgb, var(--accent) 25%, transparent 75%);
+}
+
+.btn-muted {
+  background: rgba(18, 26, 48, 0.5);
+  border-color: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+}
+
+/* ============================================
+   PROGRESS BAR
+   ============================================ */
+progress {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  border: none;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+progress::-webkit-progress-bar {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+
+progress::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--accent), #00f0ff);
+  border-radius: 2px;
+  box-shadow: var(--glow-sm) color-mix(in srgb, var(--accent) 40%, transparent 60%);
+}
+
+progress::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--accent), #00f0ff);
+  border-radius: 2px;
+}
+
+/* ============================================
+   RANGE SLIDER (Chaos Meter)
+   ============================================ */
+input[type="range"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #1e40af, #7c4dff, #f59e0b, #ef4444);
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text);
+  border: 2px solid var(--accent);
+  cursor: pointer;
+  box-shadow: var(--glow-sm) color-mix(in srgb, var(--accent) 50%, transparent 50%);
+  transition:
+    box-shadow 0.15s,
+    transform 0.1s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: var(--glow-md) color-mix(in srgb, var(--accent) 60%, transparent 40%);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--text);
+  border: 2px solid var(--accent);
+  cursor: pointer;
+}
+
+/* ============================================
+   LINKS
+   ============================================ */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+a:hover {
+  color: #9d7bff;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  75% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -20,9 +20,10 @@ import {
   resolveTeamForSource,
   type GameNode
 } from "../lib/tournament";
+import { useBracketLayout } from "../lib/useBracketLayout";
 
+import { BracketShell } from "./bracket/BracketShell";
 import { ChaosMeter } from "./ChaosMeter";
-import { MatchupCard } from "./MatchupCard";
 import { OddsPanel } from "./OddsPanel";
 import { SocialSharePanel } from "./SocialSharePanel";
 import { TutorialOverlay } from "./TutorialOverlay";
@@ -31,14 +32,6 @@ type LivePayload = {
   updatedAt: number;
   results: Array<{ matchupId: string; winnerId: string; status: "live" | "final" }>;
 };
-
-const REGION_TABS: Array<"East" | "West" | "South" | "Midwest" | "FinalFour"> = [
-  "East",
-  "West",
-  "South",
-  "Midwest",
-  "FinalFour"
-];
 
 function asMatchups(nodes: GameNode[], lockedByMatchup: Record<string, string>): Matchup[] {
   return nodes.map((node) => ({
@@ -84,6 +77,7 @@ export function BracketApp() {
     [teams]
   );
   const games = useMemo(() => buildGameTree(teams), [teams]);
+  const bracketLayout = useBracketLayout(games);
 
   useEffect(() => {
     const liveResults = liveData?.results ?? [];
@@ -120,10 +114,6 @@ export function BracketApp() {
     }
   }, [store.bracketType, hydratePicks]);
 
-  const visibleGames = useMemo(
-    () => games.filter((game) => game.region === store.selectedRegion),
-    [games, store.selectedRegion]
-  );
   const resolvedGames = useMemo(
     () =>
       lockCompletedGames(
@@ -136,6 +126,12 @@ export function BracketApp() {
       ),
     [games, store.lockedByMatchup, liveData]
   );
+
+  const lockedMap = useMemo(
+    () => Object.fromEntries(resolvedGames.filter((g) => g.lockedWinnerId).map((g) => [g.id, g.lockedWinnerId!])),
+    [resolvedGames]
+  );
+
   const picksCount = Object.keys(store.picksByMatchup).length;
   const totalGames = 63;
   const completion = Math.min(100, Math.round((picksCount / totalGames) * 100));
@@ -215,88 +211,69 @@ export function BracketApp() {
   };
 
   if (isLoading) {
-    return <main className="container">Loading bracket data...</main>;
+    return <main style={{ padding: "2rem", textAlign: "center", color: "var(--muted)" }}>Loading bracket data...</main>;
   }
 
   return (
-    <main className="container">
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-        <h1 style={{ marginBottom: 0 }}>Slackbracket</h1>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={() => store.setBracketType("men")}>Men</button>
-          <button onClick={() => store.setBracketType("women")}>Women</button>
+    <main>
+      {/* Hero Header — controls consolidated above the bracket */}
+      <header style={{ padding: "1rem 1rem 0", maxWidth: 1400, margin: "0 auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
+          <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "0.05em" }}>
+            Slackbracket
+          </h1>
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <button
+              onClick={() => store.setBracketType("men")}
+              className={store.bracketType === "men" ? "btn-active" : "btn-muted"}
+            >
+              Men
+            </button>
+            <button
+              onClick={() => store.setBracketType("women")}
+              className={store.bracketType === "women" ? "btn-active" : "btn-muted"}
+            >
+              Women
+            </button>
+          </div>
         </div>
-      </header>
 
-      <section className="card" style={{ marginTop: 10 }}>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
           <button onClick={quickGenerate}>Quick Generate</button>
-          <button onClick={() => store.setMode("guided")}>Guided Custom</button>
           <button onClick={() => store.autoFillRemaining(games, teamsById)}>Fill the Rest</button>
           <button onClick={() => temporal.undo()}>Undo</button>
           <button onClick={() => temporal.redo()}>Redo</button>
           <button onClick={store.resetAll}>Reset</button>
+          <span style={{ color: "var(--muted)", fontSize: "0.85rem", marginLeft: "auto" }}>
+            {picksCount}/{totalGames} picks
+          </span>
         </div>
-        <p style={{ marginBottom: 4 }}>
-          You have picked {picksCount} of {totalGames} games.
-        </p>
-        <progress value={completion} max={100} style={{ width: "100%" }} />
-      </section>
 
-      <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr", marginTop: 12 }}>
-        <ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} />
-        <OddsPanel
-          summary={{ ...oddsSummary, exactProbability: liveProbability, oneIn: oneIn(liveProbability) }}
-          filled={picksCount}
-          total={totalGames}
-          mostLikelyProbability={mostLikelyProbability}
-          leastLikelyProbability={leastLikelyProbability}
-        />
-        <SocialSharePanel shareUrl={shareUrl} oneIn={oneIn(oddsSummary.exactProbability)} />
-      </div>
+        <progress value={completion} max={100} style={{ width: "100%", height: 4, marginBottom: 8 }} />
 
-      <nav style={{ margin: "12px 0", display: "flex", gap: 8, overflowX: "auto" }}>
-        {REGION_TABS.map((region) => (
-          <button
-            key={region}
-            onClick={() => store.setRegion(region)}
-            style={{
-              borderRadius: 999,
-              border: "1px solid #3f4f77",
-              background: store.selectedRegion === region ? "var(--accent)" : "#1a2440",
-              color: "white",
-              padding: "0.35rem 0.7rem"
-            }}
-          >
-            {region}
-          </button>
-        ))}
-      </nav>
+        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", marginBottom: 12 }}>
+          <ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} />
+          <OddsPanel
+            summary={{ ...oddsSummary, exactProbability: liveProbability, oneIn: oneIn(liveProbability) }}
+            filled={picksCount}
+            total={totalGames}
+            mostLikelyProbability={mostLikelyProbability}
+            leastLikelyProbability={leastLikelyProbability}
+          />
+          <SocialSharePanel shareUrl={shareUrl} oneIn={oneIn(oddsSummary.exactProbability)} />
+        </div>
+      </header>
 
-      <section
-        style={{
-          display: "grid",
-          gap: 10,
-          gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))"
-        }}
-      >
-        {visibleGames.map((game) => {
-          const teamA = resolveTeamForSource(game.sourceA, store.picksByMatchup, teamsById);
-          const teamB = resolveTeamForSource(game.sourceB, store.picksByMatchup, teamsById);
-          const lock = resolvedGames.find((entry) => entry.id === game.id)?.lockedWinnerId ?? undefined;
-          return (
-            <MatchupCard
-              key={game.id}
-              game={game}
-              teamA={teamA}
-              teamB={teamB}
-              pickedId={store.picksByMatchup[game.id]}
-              lockedId={lock}
-              onPick={(teamId) => store.pick(game.id, teamId)}
-            />
-          );
-        })}
-      </section>
+      {/* Bracket */}
+      <BracketShell
+        layout={bracketLayout}
+        picksByMatchup={store.picksByMatchup}
+        lockedByMatchup={lockedMap}
+        teamsById={teamsById}
+        onPick={(matchupId, teamId) => store.pick(matchupId, teamId)}
+        selectedRegion={store.selectedRegion}
+        onRegionChange={store.setRegion}
+      />
 
       <TutorialOverlay
         step={store.tutorialStep}

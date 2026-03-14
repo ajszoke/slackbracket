@@ -1,0 +1,446 @@
+/* ============================================
+   BRACKET LAYOUT — Flexbox bracket with CSS connector lines
+   Based on proven ESPN/CBS patterns + Jakub Hájek codepen
+   ============================================ */
+
+/* --- Region Colors --- */
+:root {
+  --region-east: #00f0ff;
+  --region-west: #ff006e;
+  --region-south: #39ff14;
+  --region-midwest: #ffd700;
+  --region-finalfour: #7c4dff;
+}
+
+/* ============================================
+   FULL BRACKET SHELL (Desktop)
+   ============================================ */
+.bracket-shell {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 0.5rem 2rem;
+}
+
+.bracket-full {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 1100px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Each half: left-region + final-four-slot + right-region */
+.bracket-half {
+  display: flex;
+  align-items: stretch;
+}
+
+.bracket-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0 0.75rem;
+  min-width: 160px;
+}
+
+.bracket-championship {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 0;
+}
+
+.bracket-championship__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ============================================
+   REGION BRACKET
+   ============================================ */
+.bracket-region {
+  display: flex;
+  flex: 1;
+}
+
+.bracket-region--rtl {
+  flex-direction: row-reverse;
+}
+
+.bracket-region__label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--region-color, var(--muted));
+  font-weight: 700;
+  text-align: center;
+  padding-bottom: 0.4rem;
+  opacity: 0.7;
+}
+
+/* ============================================
+   ROUND COLUMN
+   ============================================ */
+.bracket-round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  flex: 1;
+  min-width: 0;
+}
+
+/* ============================================
+   BRACKET ITEM — wrapper for each matchup, handles connectors
+   ============================================ */
+.bracket-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  position: relative;
+  padding: 0.3rem 0.6rem;
+  flex: 1;
+}
+
+/* --- Outgoing connectors (item → next round) --- */
+@media (min-width: 768px) {
+  /* LTR: connectors go right */
+  .bracket-region:not(.bracket-region--rtl) .bracket-item::after {
+    position: absolute;
+    right: 0;
+    content: "";
+    display: block;
+    width: 0.6rem;
+    height: 50%;
+    border-right: 2px solid var(--region-color, var(--accent));
+    opacity: 0.25;
+  }
+
+  .bracket-region:not(.bracket-region--rtl) .bracket-item:nth-child(odd)::after {
+    top: 50%;
+    border-top: 2px solid var(--region-color, var(--accent));
+    border-top-right-radius: 4px;
+  }
+
+  .bracket-region:not(.bracket-region--rtl) .bracket-item:nth-child(even)::after {
+    bottom: 50%;
+    border-bottom: 2px solid var(--region-color, var(--accent));
+    border-bottom-right-radius: 4px;
+  }
+
+  /* RTL: connectors go left */
+  .bracket-region--rtl .bracket-item::after {
+    position: absolute;
+    left: 0;
+    content: "";
+    display: block;
+    width: 0.6rem;
+    height: 50%;
+    border-left: 2px solid var(--region-color, var(--accent));
+    opacity: 0.25;
+  }
+
+  .bracket-region--rtl .bracket-item:nth-child(odd)::after {
+    top: 50%;
+    border-top: 2px solid var(--region-color, var(--accent));
+    border-top-left-radius: 4px;
+  }
+
+  .bracket-region--rtl .bracket-item:nth-child(even)::after {
+    bottom: 50%;
+    border-bottom: 2px solid var(--region-color, var(--accent));
+    border-bottom-left-radius: 4px;
+  }
+
+  /* --- Incoming connectors (matchup ← previous round) --- */
+  .bracket-region:not(.bracket-region--rtl) .bracket-round:not(:first-child) .bracket-matchup::before {
+    position: absolute;
+    left: -0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    content: "";
+    display: block;
+    width: 0.6rem;
+    height: 2px;
+    background: var(--region-color, var(--accent));
+    opacity: 0.25;
+  }
+
+  .bracket-region--rtl .bracket-round:not(:first-child) .bracket-matchup::before {
+    position: absolute;
+    right: -0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    content: "";
+    display: block;
+    width: 0.6rem;
+    height: 2px;
+    background: var(--region-color, var(--accent));
+    opacity: 0.25;
+  }
+
+  /* Hide outgoing connectors on last round of region */
+  .bracket-round:last-child .bracket-item::after {
+    display: none;
+  }
+}
+
+/* ============================================
+   BRACKET MATCHUP — the actual game card
+   ============================================ */
+.bracket-matchup {
+  position: relative;
+  background: rgba(18, 26, 48, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: 3px solid var(--region-color, var(--accent));
+  border-radius: 8px;
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.bracket-matchup:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 12px rgba(var(--region-color-rgb, 124, 77, 255), 0.15);
+}
+
+.bracket-matchup--locked {
+  opacity: 0.7;
+}
+
+.bracket-matchup--locked::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 16, 32, 0.3);
+  pointer-events: none;
+  border-radius: 8px;
+}
+
+/* --- Team Row --- */
+.bracket-matchup__team {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  padding: 0.3rem 0.4rem;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.75rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.bracket-matchup__team:first-child {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.bracket-matchup__team:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.bracket-matchup__team--selected {
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 20%, transparent 80%);
+}
+
+.bracket-matchup__team--selected:hover {
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 28%, transparent 72%);
+}
+
+.bracket-matchup__team--locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.bracket-matchup__team:disabled {
+  cursor: not-allowed;
+}
+
+.bracket-matchup__seed {
+  width: 1.2rem;
+  font-weight: 700;
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.bracket-matchup__name {
+  flex: 1;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.72rem;
+}
+
+.bracket-matchup__check {
+  font-weight: 700;
+  color: var(--region-color, var(--accent));
+  font-size: 0.7rem;
+  flex-shrink: 0;
+}
+
+.bracket-matchup__tbd {
+  padding: 0.3rem 0.4rem;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: 0.5;
+  font-style: italic;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.bracket-matchup__tbd:last-child {
+  border-bottom: none;
+}
+
+.bracket-matchup__upset {
+  position: absolute;
+  top: -0.3rem;
+  right: -0.2rem;
+  font-size: 0.7rem;
+  animation: upset-wobble 0.6s ease-in-out;
+}
+
+@keyframes upset-wobble {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-12deg);
+  }
+  75% {
+    transform: rotate(12deg);
+  }
+}
+
+/* ============================================
+   ROUND HEADERS
+   ============================================ */
+.bracket-round-headers {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.bracket-round-header {
+  flex: 1;
+  text-align: center;
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* ============================================
+   MOBILE: Region-by-region vertical bracket
+   ============================================ */
+@media (max-width: 767px) {
+  .bracket-full {
+    display: none;
+  }
+
+  .bracket-region {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .bracket-region--rtl {
+    flex-direction: column;
+  }
+
+  .bracket-round {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+
+  .bracket-item {
+    padding: 0;
+    flex: 0 0 auto;
+    width: calc(50% - 0.5rem);
+    min-width: 140px;
+  }
+
+  /* Hide connector lines on mobile */
+  .bracket-item::after,
+  .bracket-matchup::before {
+    display: none !important;
+  }
+}
+
+/* ============================================
+   REGION TAB NAV (mobile)
+   ============================================ */
+.bracket-region-tabs {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .bracket-region-tabs {
+    display: flex;
+    gap: 0.4rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .bracket-region-tab {
+    flex-shrink: 0;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(18, 26, 48, 0.6);
+    color: var(--text);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      background 0.15s,
+      border-color 0.15s,
+      box-shadow 0.15s;
+  }
+
+  .bracket-region-tab--active {
+    background: color-mix(in srgb, var(--tab-color, var(--accent)) 30%, transparent 70%);
+    border-color: var(--tab-color, var(--accent));
+    box-shadow: 0 0 8px color-mix(in srgb, var(--tab-color, var(--accent)) 30%, transparent 70%);
+  }
+}
+
+/* Mobile region view: show on mobile only */
+.bracket-mobile-region {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .bracket-mobile-region {
+    display: block;
+  }
+}
+
+/* Desktop: hide mobile elements */
+@media (min-width: 768px) {
+  .bracket-mobile-region {
+    display: none;
+  }
+}
