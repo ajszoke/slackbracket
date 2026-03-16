@@ -7,7 +7,7 @@ export async function GET(req: Request) {
   const url = new URL(req.url);
   const bracket = url.searchParams.get("bracket") === "women" ? "women" : "men";
   const filename = bracket === "women" ? "demo_bracket_full_women.json" : "demo_bracket_full.json";
-  const fullPath = path.resolve(process.cwd(), "../../slackbracket-react/public/data", filename);
+  const fullPath = path.resolve(process.cwd(), "../../data", filename);
 
   try {
     const content = await fs.readFile(fullPath, "utf-8");

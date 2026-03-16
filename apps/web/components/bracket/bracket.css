@@ -9,7 +9,7 @@
   --region-west: #818cf8;
   --region-south: #2dd4bf;
   --region-midwest: #38bdf8;
-  --region-finalfour: #7c4dff;
+  --region-finalfour: #a78bfa;
 }
 
 /* ============================================
@@ -121,22 +121,25 @@
   flex: none;
 }
 
+/* FF + Championship labels: same font as region headers, just bigger */
 .bracket-ff-label {
-  font-size: 0.6rem;
+  font-size: 0.84rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.12em;
   color: var(--region-finalfour);
-  font-weight: 700;
-  opacity: 0.7;
+  font-weight: 600;
   white-space: nowrap;
+  margin-top: 0.3rem;
 }
 
 .bracket-championship__label {
-  font-size: 0.7rem;
+  font-size: 1.05rem;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--muted);
+  letter-spacing: 0.12em;
+  color: var(--region-finalfour);
   font-weight: 600;
+  white-space: nowrap;
+  margin-top: 0.3rem;
 }
 
 /* ============================================
@@ -294,6 +297,28 @@
   box-shadow: 0 0 12px rgba(var(--region-color-rgb, 124, 77, 255), 0.15);
 }
 
+/* Championship card: normal dark card, but the winner row gets reversed (white bg, dark text) */
+.bracket-matchup--championship {
+  border: 2px solid var(--region-finalfour);
+  border-left: 4px solid var(--region-finalfour);
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.2), 0 0 6px rgba(167, 139, 250, 0.12);
+}
+
+.bracket-matchup--championship .bracket-matchup__team--selected {
+  background: rgba(240, 245, 255, 0.92);
+  color: #1a1a2e;
+}
+
+/* Championship upset: inline style handles white+tint blend, fire ::after still shows */
+
+.bracket-matchup--championship .bracket-matchup__team--selected .bracket-matchup__seed {
+  color: #555;
+}
+
+.bracket-matchup--championship .bracket-matchup__team--selected .bracket-matchup__check {
+  color: var(--region-finalfour);
+}
+
 .bracket-matchup--locked {
   opacity: 0.7;
 }
@@ -333,12 +358,29 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+/* User pick: solid, committed feel */
 .bracket-matchup__team--selected {
   background: color-mix(in srgb, var(--region-color, var(--accent)) 20%, transparent 80%);
 }
 
 .bracket-matchup__team--selected:hover {
   background: color-mix(in srgb, var(--region-color, var(--accent)) 28%, transparent 72%);
+}
+
+/* AI pick: ephemeral, lighter treatment */
+.bracket-matchup__team--ai-selected {
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 8%, transparent 92%);
+  opacity: 0.72;
+}
+
+.bracket-matchup__team--ai-selected:hover {
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 14%, transparent 86%);
+  opacity: 0.85;
+}
+
+/* AI upset picks: bump opacity slightly so upset warmth reads clearly */
+.bracket-matchup__team--ai-selected.bracket-matchup__team--upset-winner {
+  opacity: 0.82;
 }
 
 .bracket-matchup__team--locked {
@@ -373,6 +415,19 @@
   color: var(--region-color, var(--accent));
   font-size: 0.7rem;
   flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* AI check: 50% bigger, lighter weight */
+.bracket-matchup__check--ai {
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+/* Upset check: warm-colored matching the fill */
+.bracket-matchup__check--upset {
+  color: hsl(calc(var(--pick-hue, 50)), 95%, 55%);
 }
 
 .bracket-matchup__tbd {
@@ -393,7 +448,7 @@
   box-shadow: 0 0 10px var(--upset-glow, transparent), 0 0 3px var(--upset-glow, transparent);
 }
 
-/* Fire emoji constrained inside the upset winner's team row */
+/* Upset winner row — fire emoji fills the right side, check sits on top */
 .bracket-matchup__team--upset-winner {
   position: relative;
   overflow: hidden;
@@ -402,22 +457,17 @@
 .bracket-matchup__team--upset-winner::after {
   content: "\01F525";
   position: absolute;
-  right: 2px;
+  right: 4px;
   top: 50%;
   transform: translateY(-50%) rotate(calc(-5deg - var(--upset-degree, 0) * 25deg));
-  font-size: calc(0.9rem + var(--upset-degree, 0) * 1rem);
-  opacity: calc(0.2 + var(--upset-degree, 0) * 0.6);
+  font-size: calc(1.35rem + var(--upset-degree, 0) * 1.5rem);
+  opacity: calc(0.3 + var(--upset-degree, 0) * 0.5);
   pointer-events: none;
   z-index: 0;
 }
 
-/* Pick source indicator (user ● / AI ✦) */
-.bracket-matchup__source {
-  font-size: 0.5rem;
-  color: var(--muted);
-  flex-shrink: 0;
-  opacity: 0.6;
-}
+/* Legacy .bracket-matchup__source removed — distinction now handled via
+   --selected vs --ai-selected classes and check mark styling */
 
 /* ============================================
    ROUND HEADERS

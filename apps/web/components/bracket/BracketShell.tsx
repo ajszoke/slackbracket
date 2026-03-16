@@ -44,6 +44,7 @@ function FFGame({
   lockedByMatchup,
   teamsById,
   onPick,
+  isChampionship,
 }: {
   game: GameNode | null;
   picksByMatchup: Record<string, string>;
@@ -51,6 +52,7 @@ function FFGame({
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;
+  isChampionship?: boolean;
 }) {
   if (!game) return null;
   const teamA = resolveTeamForSource(game.sourceA, picksByMatchup, teamsById);
@@ -65,6 +67,7 @@ function FFGame({
       pickSource={picksByMatchup[game.id] ? pickSourceByMatchup[game.id] : undefined}
       onPick={(teamId) => onPick(game.id, teamId)}
       regionColor="var(--region-finalfour)"
+      isChampionship={isChampionship}
     />
   );
 }
@@ -135,7 +138,7 @@ export function BracketShell(props: Props) {
           {/* Championship — absolutely centered between the two sections */}
           <div className="bracket-ff-slot bracket-ff-slot--championship">
             <span className="bracket-ff-label">Championship</span>
-            <FFGame game={ff.championship} {...ffCellProps} />
+            <FFGame game={ff.championship} {...ffCellProps} isChampionship />
           </div>
         </div>
 
@@ -176,7 +179,7 @@ export function BracketShell(props: Props) {
             <FFGame game={ff.semi1} {...ffCellProps} />
             <FFGame game={ff.semi2} {...ffCellProps} />
             <span className="bracket-championship__label">Championship</span>
-            <FFGame game={ff.championship} {...ffCellProps} />
+            <FFGame game={ff.championship} {...ffCellProps} isChampionship />
           </div>
         ) : (
           <RegionBracket {...regionProps(selectedRegion, "ltr")} />

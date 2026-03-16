@@ -3,6 +3,12 @@ import { z } from "zod";
 export const regionSchema = z.enum(["East", "West", "South", "Midwest", "FinalFour"]);
 export type Region = z.infer<typeof regionSchema>;
 
+export const firstFourOpponentSchema = z.object({
+  team: z.string(),
+  elo: z.number(),
+  conference: z.string()
+});
+
 export const teamSchema = z.object({
   id: z.string(),
   team: z.string(),
@@ -13,7 +19,8 @@ export const teamSchema = z.object({
   elo: z.number(),
   homeCourt: z.number().default(0),
   color: z.string().optional(),
-  logoUrl: z.string().url().optional()
+  logoUrl: z.string().url().optional(),
+  firstFourOpponent: firstFourOpponentSchema.optional()
 });
 export type Team = z.infer<typeof teamSchema>;
 

@@ -65,7 +65,7 @@ type BracketStore = {
   setChaos: (value: number) => void;
   setChaosPreset: (presetId: (typeof CHAOS_PRESETS)[number]["id"]) => void;
   setRegion: (region: RegionTab) => void;
-  pick: (matchupId: string, teamId: string) => void;
+  pick: (matchupId: string, teamId: string, games?: GameNode[]) => void;
   clearPick: (matchupId: string, games: GameNode[]) => void;
   hydratePicks: (picks: Record<string, string>) => void;
   setLocked: (locked: Record<string, string>) => void;
@@ -95,13 +95,29 @@ export const useBracketStore = create<BracketStore>()(
       if (preset) set({ chaos: preset.value });
     },
     setRegion: (selectedRegion) => set({ selectedRegion }),
-    pick: (matchupId, teamId) => {
-      const lockedWinner = get().lockedByMatchup[matchupId];
+    pick: (matchupId, teamId, games?) => {
+      const state = get();
+      const lockedWinner = state.lockedByMatchup[matchupId];
       if (lockedWinner) return;
-      set((state) => ({
-        picksByMatchup: { ...state.picksByMatchup, [matchupId]: teamId },
-        pickSourceByMatchup: { ...state.pickSourceByMatchup, [matchupId]: "user" as PickSource }
-      }));
+
+      const oldPick = state.picksByMatchup[matchupId];
+      const nextPicks = { ...state.picksByMatchup, [matchupId]: teamId };
+      const nextSources: Record<string, PickSource> = {
+        ...state.pickSourceByMatchup,
+        [matchupId]: "user"
+      };
+
+      // Forward cascade: wherever the old team had advanced, slot in the new team.
+      // Mark as "user" since the user initiated this override.
+      if (oldPick && oldPick !== teamId && games) {
+        const cascaded = findCascadedClears(matchupId, oldPick, games, state.picksByMatchup);
+        for (const gameId of cascaded) {
+          nextPicks[gameId] = teamId;
+          nextSources[gameId] = "user";
+        }
+      }
+
+      set({ picksByMatchup: nextPicks, pickSourceByMatchup: nextSources });
     },
     clearPick: (matchupId, games) => {
       const state = get();
@@ -148,11 +164,32 @@ export const useBracketStore = create<BracketStore>()(
         }
       }
 
+      // Resolve First Four play-in games before main bracket.
+      // "ELO squared": use winProbability to pick which team advances,
+      // then replace the placeholder team data with the winner's ELO.
+      const resolvedTeams = { ...teamsById };
+      for (const team of Object.values(resolvedTeams)) {
+        if (!team.firstFourOpponent) continue;
+        const opp = team.firstFourOpponent;
+        const oppAsTeam = { ...team, team: opp.team, elo: opp.elo, conference: opp.conference };
+        const winner = pickWinner(team, oppAsTeam, state.chaos);
+        if (winner.elo === opp.elo) {
+          // Opponent won — update the placeholder team's ELO and name
+          resolvedTeams[team.id] = {
+            ...team,
+            team: opp.team,
+            elo: opp.elo,
+            conference: opp.conference
+          };
+        }
+        // If placeholder won, no change needed — it already has the right data
+      }
+
       for (const game of games.sort((a, b) => a.round - b.round || a.slot - b.slot)) {
         if (state.lockedByMatchup[game.id]) continue;
         if (nextPicks[game.id]) continue;
-        const teamA = resolveTeamForSource(game.sourceA, nextPicks, teamsById);
-        const teamB = resolveTeamForSource(game.sourceB, nextPicks, teamsById);
+        const teamA = resolveTeamForSource(game.sourceA, nextPicks, resolvedTeams);
+        const teamB = resolveTeamForSource(game.sourceB, nextPicks, resolvedTeams);
         if (!teamA || !teamB) continue;
         const winner = pickWinner(teamA, teamB, state.chaos);
         nextPicks[game.id] = winner.id;

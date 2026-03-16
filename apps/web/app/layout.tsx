@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
+import { Orbitron, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -7,14 +7,38 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-display"
 });
 
+const orbitron = Orbitron({
+  subsets: ["latin"],
+  variable: "--font-hero",
+  weight: ["700", "800", "900"]
+});
+
+const siteUrl = "https://slackbracket.com";
+
 export const metadata: Metadata = {
-  title: "Slackbracket",
-  description: "Have-it-your-way March Madness bracket builder"
+  title: "Slackbracket — March Madness Bracket Builder",
+  description:
+    "Build your March Madness bracket with AI-powered ELO predictions. Dial the chaos from chalk to sicko mode and challenge your friends.",
+  metadataBase: new URL(siteUrl),
+  openGraph: {
+    title: "Slackbracket",
+    description: "March Madness. Your way. AI-powered bracket builder with ELO predictions.",
+    url: siteUrl,
+    siteName: "Slackbracket",
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "Slackbracket — March Madness Bracket Builder" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Slackbracket",
+    description: "March Madness. Your way. AI-powered bracket builder with ELO predictions.",
+    images: ["/api/og"],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable}`}>
       <body>{children}</body>
     </html>
   );

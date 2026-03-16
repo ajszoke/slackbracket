@@ -22,7 +22,7 @@
   --region-west: #818cf8;
   --region-south: #2dd4bf;
   --region-midwest: #38bdf8;
-  --region-finalfour: #7c4dff;
+  --region-finalfour: #a78bfa;
 
   /* Glassmorphism */
   --glass-bg: rgba(18, 26, 48, 0.75);
@@ -60,19 +60,33 @@ body {
   font-family: "Space Grotesk", Inter, "Segoe UI", system-ui, sans-serif;
 }
 
-/* Bracket Pulse — atmospheric background that breathes with your bracket's chaos.
-   Two orbs: user energy (top-left) and AI energy (bottom-right).
-   Colors shift cool→hot based on each entity's upset ratio.
-   Speed + intensity driven by overall bracket chaos.
-   Rendered as a React div for reliable CSS custom property inheritance. */
-.bracket-pulse {
+/* Bracket Pulse — two independent orbs breathing at their own frequencies.
+   User orb (top-left): driven by user pick surprisal.
+   AI orb (bottom-right): driven by AI pick surprisal.
+   Each orb has its own speed, opacity range, and color temperature. */
+.bracket-pulse-user,
+.bracket-pulse-ai {
   position: fixed;
   inset: 0;
-  background:
-    radial-gradient(ellipse at 30% 35%, var(--user-glow), transparent var(--user-spread, 65%)),
-    radial-gradient(ellipse at 70% 65%, var(--ai-glow), transparent var(--ai-spread, 65%)),
-    radial-gradient(ellipse at 50% 50%, rgba(124, 77, 255, 0.03) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bracket-pulse-user {
+  background: radial-gradient(ellipse at 20% 25%, var(--user-glow), transparent var(--user-spread, 65%));
   animation: pulse-breathe var(--pulse-speed) ease-in-out infinite;
+}
+
+.bracket-pulse-ai {
+  background: radial-gradient(ellipse at 80% 75%, var(--ai-glow), transparent var(--ai-spread, 65%));
+  animation: pulse-breathe var(--pulse-speed) ease-in-out infinite;
+}
+
+/* Ambient purple base — static, no animation */
+.bracket-pulse-ambient {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%, rgba(124, 77, 255, 0.03) 0%, transparent 60%);
   pointer-events: none;
   z-index: 0;
 }
@@ -86,6 +100,33 @@ body {
     transform: scale(1.06);
     opacity: var(--pulse-hi, 0.18);
   }
+}
+
+/* ============================================
+   HERO TITLE
+   ============================================ */
+.hero-title {
+  margin: 0;
+  font-family: var(--font-hero), "Space Grotesk", system-ui, sans-serif;
+  font-weight: 800;
+  font-size: 2.4rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: linear-gradient(135deg, #00f0ff 0%, #7c4dff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none; /* text-shadow incompatible with background-clip */
+  filter: drop-shadow(0 0 12px rgba(124, 77, 255, 0.4)) drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
+}
+
+.hero-year {
+  font-size: 0.45em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  vertical-align: super;
+  opacity: 0.7;
+  -webkit-text-fill-color: #fff;
 }
 
 button {
@@ -369,4 +410,44 @@ html.sicko-active input[type="range"]::-webkit-slider-thumb {
   html.sicko-active .app-wrapper {
     animation: none !important;
   }
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.site-footer {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.site-footer a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
+.site-footer__inner {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.site-footer__btc {
+  opacity: 0.6;
+  cursor: help;
 }

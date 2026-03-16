@@ -3,6 +3,7 @@
 import type { Team } from "@slackbracket/domain";
 import { motion } from "framer-motion";
 
+import { teamAbbrev } from "../../lib/logos";
 import type { GameNode } from "../../lib/tournament";
 import { TeamBadge } from "../TeamBadge";
 
@@ -17,6 +18,7 @@ type Props = {
   pickSource?: PickSource;
   onPick: (teamId: string) => void;
   regionColor?: string;
+  isChampionship?: boolean;
 };
 
 /**
@@ -51,13 +53,15 @@ function upsetGlowColor(degree: number): string | undefined {
  * Mild upset: faint amber. Extreme upset: deeper fiery orange.
  * Alpha kept low so text stays readable (white on warm tint).
  */
-function upsetFillColor(degree: number): string | undefined {
+function upsetFillColor(degree: number, isAi = false): string | undefined {
   if (degree <= 0) return undefined;
   const t = Math.min(degree / 15, 1);
   // hue: 50 (warm yellow) → 10 (fiery red-orange)
   const hue = 50 - t * 40;
   const sat = 95;
-  const alpha = 0.18 + t * 0.22; // 18% → 40% — always clearly visible
+  const baseAlpha = 0.18 + t * 0.22; // 18% → 40%
+  // AI upsets: same warm colors, lower opacity (more transient feel)
+  const alpha = isAi ? baseAlpha * 0.55 : baseAlpha;
   return `hsla(${hue}, ${sat}%, 50%, ${alpha})`;
 }
 
@@ -68,6 +72,7 @@ function CompactTeamRow({
   isUpset,
   upsetDeg,
   pickSource,
+  isChampionship,
   onPick
 }: {
   team: Team | null;
@@ -76,20 +81,36 @@ function CompactTeamRow({
   isUpset: boolean;
   upsetDeg: number;
   pickSource?: PickSource;
+  isChampionship?: boolean;
   onPick: () => void;
 }) {
   if (!team) {
     return <div className="bracket-matchup__tbd">TBD</div>;
   }
 
-  const fillBg = selected && isUpset ? upsetFillColor(upsetDeg) : undefined;
+  const isAi = pickSource === "auto";
+  const upsetFill = selected && isUpset ? upsetFillColor(upsetDeg, isAi) : undefined;
+  // Championship upset: layer upset tint on top of white base
+  const fillBg = isChampionship && selected && upsetFill
+    ? `linear-gradient(${upsetFill}, ${upsetFill}), linear-gradient(rgba(240,245,255,0.92), rgba(240,245,255,0.92))`
+    : upsetFill;
+
+  const classes = [
+    "bracket-matchup__team",
+    selected ? "bracket-matchup__team--selected" : "",
+    selected && isAi ? "bracket-matchup__team--ai-selected" : "",
+    selected && isUpset ? "bracket-matchup__team--upset-winner" : "",
+    locked && !selected ? "bracket-matchup__team--locked" : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <button
       type="button"
       onClick={onPick}
       disabled={locked}
-      className={`bracket-matchup__team ${selected ? "bracket-matchup__team--selected" : ""} ${selected && isUpset ? "bracket-matchup__team--upset-winner" : ""} ${locked && !selected ? "bracket-matchup__team--locked" : ""}`}
+      className={classes}
       style={{
         ...(fillBg ? { background: fillBg } : {}),
         ...(selected && isUpset ? { "--upset-degree": `${Math.min(upsetDeg / 15, 1)}` } as Record<string, string> : {})
@@ -98,30 +119,26 @@ function CompactTeamRow({
       <TeamBadge team={team} />
       <span className="bracket-matchup__seed">{team.seed}</span>
       <span className="bracket-matchup__name">
-        {team.team}
+        {team.firstFourOpponent
+          ? `${teamAbbrev(team.team)}/${teamAbbrev(team.firstFourOpponent.team)}`
+          : team.team}
       </span>
       {selected && (
-        <>
-          <motion.span
-            className="bracket-matchup__check"
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 500, damping: 15 }}
-          >
-            ✓
-          </motion.span>
-          {pickSource && (
-            <span className="bracket-matchup__source" title={pickSource === "user" ? "Your pick" : "AI pick"}>
-              {pickSource === "user" ? "●" : "✦"}
-            </span>
-          )}
-        </>
+        <motion.span
+          className={`bracket-matchup__check ${isUpset ? "bracket-matchup__check--upset" : ""} ${isAi ? "bracket-matchup__check--ai" : ""}`}
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 500, damping: 15 }}
+          style={isUpset ? { "--pick-hue": `${50 - Math.min(upsetDeg / 15, 1) * 40}` } as React.CSSProperties : undefined}
+        >
+          {isAi ? "✧" : "✓"}
+        </motion.span>
       )}
     </button>
   );
 }
 
-export function BracketMatchup({ game, teamA, teamB, pickedId, lockedId, pickSource, onPick, regionColor }: Props) {
+export function BracketMatchup({ game, teamA, teamB, pickedId, lockedId, pickSource, onPick, regionColor, isChampionship }: Props) {
   const locked = Boolean(lockedId);
   const degree = upsetDegree(teamA, teamB, pickedId);
   const glowColor = upsetGlowColor(degree);
@@ -130,7 +147,7 @@ export function BracketMatchup({ game, teamA, teamB, pickedId, lockedId, pickSou
 
   return (
     <motion.div
-      className={`bracket-matchup ${locked ? "bracket-matchup--locked" : ""} ${degree > 0 ? "bracket-matchup--upset" : ""}`}
+      className={`bracket-matchup ${locked ? "bracket-matchup--locked" : ""} ${degree > 0 ? "bracket-matchup--upset" : ""} ${isChampionship ? "bracket-matchup--championship" : ""}`}
       style={{
         "--region-color": regionColor ?? "var(--accent)",
         ...(glowColor ? { "--upset-glow": glowColor } as Record<string, string> : {}),
@@ -146,6 +163,7 @@ export function BracketMatchup({ game, teamA, teamB, pickedId, lockedId, pickSou
         isUpset={degree > 0 && pickedId === teamA?.id}
         upsetDeg={degree}
         pickSource={pickedId === teamA?.id ? pickSource : undefined}
+        isChampionship={isChampionship}
         onPick={() => teamA && onPick(teamA.id)}
       />
       <CompactTeamRow
@@ -155,6 +173,7 @@ export function BracketMatchup({ game, teamA, teamB, pickedId, lockedId, pickSou
         isUpset={degree > 0 && pickedId === teamB?.id}
         upsetDeg={degree}
         pickSource={pickedId === teamB?.id ? pickSource : undefined}
+        isChampionship={isChampionship}
         onPick={() => teamB && onPick(teamB.id)}
       />
     </motion.div>

@@ -9,6 +9,40 @@ export function teamInitials(teamName: string): string {
     .join("");
 }
 
+/** Short abbreviation for tight spaces (First Four paired display, etc.) */
+export function teamAbbrev(teamName: string): string {
+  // Common abbreviations
+  const abbrevs: Record<string, string> = {
+    "Prairie View A&M": "PVAM",
+    "NC State": "NCST",
+    "Miami (OH)": "M-OH",
+    "Miami University (OH)": "M-OH",
+    "North Carolina": "UNC",
+    "Michigan St.": "MSU",
+    "Ohio St.": "OSU",
+    "North Dakota St.": "NDSU",
+    "Saint Mary's (CA)": "SMC",
+    "U Miami (FL)": "MIA",
+    "Texas A&M": "TAMU",
+    "Iowa St.": "ISU",
+    "Utah St.": "USU",
+    "Wright St.": "WSU",
+    "Kennesaw St.": "KSU",
+    "Tennessee St.": "TSU",
+    "California Baptist": "CBU",
+    "South Florida": "USF",
+    "Northern Iowa": "UNI",
+    "Saint Louis": "SLU",
+    "Texas Tech": "TTU",
+    "Santa Clara": "SCU",
+    "High Point": "HPU",
+  };
+  if (abbrevs[teamName]) return abbrevs[teamName];
+  // Fallback: first word, max 4 chars
+  const first = teamName.split(" ")[0] ?? teamName;
+  return first.length <= 4 ? first.toUpperCase() : first.slice(0, 4).toUpperCase();
+}
+
 export function deterministicColor(seedInput: string): string {
   let hash = 0;
   for (let i = 0; i < seedInput.length; i++) {

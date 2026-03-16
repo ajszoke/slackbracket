@@ -19,6 +19,7 @@ import { useBracketLayout } from "../lib/useBracketLayout";
 
 import { BracketShell } from "./bracket/BracketShell";
 import { ChaosMeter } from "./ChaosMeter";
+import { Footer } from "./Footer";
 import { OddsPanel } from "./OddsPanel";
 import { SocialSharePanel } from "./SocialSharePanel";
 
@@ -163,13 +164,23 @@ export function BracketApp() {
   const userHue = tempToHue(pulseMetrics.userTemp);
   const aiHue = tempToHue(pulseMetrics.aiTemp);
 
+  // Per-orb pulse speed: each orb breathes at its own frequency
+  const userPulseSpeed = 8 - pulseMetrics.userChaos * 6; // 8s calm → 2s intense
+  const aiPulseSpeed = 8 - pulseMetrics.aiChaos * 6;
+
+  // Per-orb opacity range
+  const userHasPicks = pulseMetrics.userWeight > 0;
+  const aiHasPicks = pulseMetrics.aiWeight > 0;
+  const userPulseLo = userHasPicks ? 0.1 + pulseMetrics.userChaos * 0.25 : 0.1;
+  const userPulseHi = userHasPicks ? 0.18 + pulseMetrics.userChaos * 0.47 : 0.14;
+  const aiPulseLo = aiHasPicks ? 0.1 + pulseMetrics.aiChaos * 0.25 : 0.1;
+  const aiPulseHi = aiHasPicks ? 0.18 + pulseMetrics.aiChaos * 0.47 : 0.14;
+
   // Orb visibility: transparent when no picks from that source
-  const userGlow = pulseMetrics.userWeight > 0 ? `hsl(${userHue}, 100%, 60%)` : "transparent";
-  const aiGlow = pulseMetrics.aiWeight > 0 ? `hsl(${aiHue}, 100%, 60%)` : "transparent";
-  const userSpread =
-    pulseMetrics.userWeight > 0 ? `${Math.round(20 + pulseMetrics.userWeight * 55)}%` : "0%";
-  const aiSpread =
-    pulseMetrics.aiWeight > 0 ? `${Math.round(20 + pulseMetrics.aiWeight * 55)}%` : "0%";
+  const userGlow = userHasPicks ? `hsl(${userHue}, 100%, 60%)` : "transparent";
+  const aiGlow = aiHasPicks ? `hsl(${aiHue}, 100%, 60%)` : "transparent";
+  const userSpread = userHasPicks ? `${Math.round(32 + pulseMetrics.userWeight * 88)}%` : "0%";
+  const aiSpread = aiHasPicks ? `${Math.round(32 + pulseMetrics.aiWeight * 88)}%` : "0%";
 
   const sharePayload = encodeSharePayload(store.picksByMatchup);
   const shareUrl = typeof window === "undefined" ? "" : `${window.location.origin}?b=${sharePayload}`;
@@ -186,15 +197,24 @@ export function BracketApp() {
 
   return (
     <div className="app-wrapper">
+    <div className="bracket-pulse-ambient" />
     <div
-      className="bracket-pulse"
+      className="bracket-pulse-user"
       style={{
-        "--pulse-speed": `${pulseMetrics.pulseSpeed}s`,
-        "--pulse-lo": `${pulseMetrics.pulseLo}`,
-        "--pulse-hi": `${pulseMetrics.pulseHi}`,
+        "--pulse-speed": `${userPulseSpeed}s`,
+        "--pulse-lo": `${userPulseLo}`,
+        "--pulse-hi": `${userPulseHi}`,
         "--user-glow": userGlow,
-        "--ai-glow": aiGlow,
         "--user-spread": userSpread,
+      } as React.CSSProperties}
+    />
+    <div
+      className="bracket-pulse-ai"
+      style={{
+        "--pulse-speed": `${aiPulseSpeed}s`,
+        "--pulse-lo": `${aiPulseLo}`,
+        "--pulse-hi": `${aiPulseHi}`,
+        "--ai-glow": aiGlow,
         "--ai-spread": aiSpread,
       } as React.CSSProperties}
     />
@@ -211,7 +231,7 @@ export function BracketApp() {
             marginBottom: 8
           }}
         >
-          <h1 style={{ margin: 0, fontSize: "2.2rem", fontWeight: 800, letterSpacing: "0.06em" }}>Slackbracket</h1>
+          <h1 className="hero-title">Slackbracket <span className="hero-year">2026</span></h1>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <button
               onClick={() => store.setBracketType("men")}
@@ -252,7 +272,7 @@ export function BracketApp() {
         >
           <ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} onGenerate={generateBracket} />
           <OddsPanel summary={humanOdds} filled={picksCount} />
-          <SocialSharePanel shareUrl={shareUrl} oneIn={humanOdds.display} />
+          <SocialSharePanel shareUrl={shareUrl} oneIn={humanOdds.display} filled={picksCount} />
         </div>
       </header>
 
@@ -263,10 +283,11 @@ export function BracketApp() {
         pickSourceByMatchup={store.pickSourceByMatchup}
         lockedByMatchup={lockedMap}
         teamsById={teamsById}
-        onPick={(matchupId, teamId) => store.pick(matchupId, teamId)}
+        onPick={(matchupId, teamId) => store.pick(matchupId, teamId, games)}
         selectedRegion={store.selectedRegion}
         onRegionChange={store.setRegion}
       />
+      <Footer />
     </main>
     </div>
   );

@@ -1,0 +1,454 @@
+[
+  {
+    "team": "Duke",
+    "region": "East",
+    "seed": 1,
+    "elo": 2256.2427,
+    "conference": "ACC"
+  },
+  {
+    "team": "Siena",
+    "region": "East",
+    "seed": 16,
+    "elo": 1513.0829,
+    "conference": "MAAC"
+  },
+  {
+    "team": "Ohio St.",
+    "region": "East",
+    "seed": 8,
+    "elo": 1944.8229,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "TCU",
+    "region": "East",
+    "seed": 9,
+    "elo": 1876.7333,
+    "conference": "Big 12"
+  },
+  {
+    "team": "St. John's",
+    "region": "East",
+    "seed": 5,
+    "elo": 2077.3887,
+    "conference": "Big East"
+  },
+  {
+    "team": "Northern Iowa",
+    "region": "East",
+    "seed": 12,
+    "elo": 1771.2218,
+    "conference": "MVC"
+  },
+  {
+    "team": "Kansas",
+    "region": "East",
+    "seed": 4,
+    "elo": 1940.976,
+    "conference": "Big 12"
+  },
+  {
+    "team": "California Baptist",
+    "region": "East",
+    "seed": 13,
+    "elo": 1637.8113,
+    "conference": "WAC"
+  },
+  {
+    "team": "Louisville",
+    "region": "East",
+    "seed": 6,
+    "elo": 2001.2523,
+    "conference": "ACC"
+  },
+  {
+    "team": "South Florida",
+    "region": "East",
+    "seed": 11,
+    "elo": 1853.4399,
+    "conference": "AAC"
+  },
+  {
+    "team": "Michigan St.",
+    "region": "East",
+    "seed": 3,
+    "elo": 2032.8801,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "North Dakota St.",
+    "region": "East",
+    "seed": 14,
+    "elo": 1615.3055,
+    "conference": "Summit"
+  },
+  {
+    "team": "UCLA",
+    "region": "East",
+    "seed": 7,
+    "elo": 1963.2966,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "UCF",
+    "region": "East",
+    "seed": 10,
+    "elo": 1783.5944,
+    "conference": "Big 12"
+  },
+  {
+    "team": "UConn",
+    "region": "East",
+    "seed": 2,
+    "elo": 2048.7571,
+    "conference": "Big East"
+  },
+  {
+    "team": "Furman",
+    "region": "East",
+    "seed": 15,
+    "elo": 1504.0151,
+    "conference": "Southern"
+  },
+  {
+    "team": "Florida",
+    "region": "South",
+    "seed": 1,
+    "elo": 2173.1301,
+    "conference": "SEC"
+  },
+  {
+    "team": "Lehigh",
+    "region": "South",
+    "seed": 16,
+    "elo": 1339.4188,
+    "conference": "Patriot",
+    "firstFourOpponent": { "team": "Prairie View A&M", "elo": 1266.9824, "conference": "SWAC" }
+  },
+  {
+    "team": "Clemson",
+    "region": "South",
+    "seed": 8,
+    "elo": 1871.2711,
+    "conference": "ACC"
+  },
+  {
+    "team": "Iowa",
+    "region": "South",
+    "seed": 9,
+    "elo": 1909.6945,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "Vanderbilt",
+    "region": "South",
+    "seed": 5,
+    "elo": 2001.3844,
+    "conference": "SEC"
+  },
+  {
+    "team": "McNeese",
+    "region": "South",
+    "seed": 12,
+    "elo": 1738.3672,
+    "conference": "Southland"
+  },
+  {
+    "team": "Nebraska",
+    "region": "South",
+    "seed": 4,
+    "elo": 1970.3802,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "Troy",
+    "region": "South",
+    "seed": 13,
+    "elo": 1547.6024,
+    "conference": "Sun Belt"
+  },
+  {
+    "team": "North Carolina",
+    "region": "South",
+    "seed": 6,
+    "elo": 1910.2263,
+    "conference": "ACC"
+  },
+  {
+    "team": "VCU",
+    "region": "South",
+    "seed": 11,
+    "elo": 1833.8995,
+    "conference": "A-10"
+  },
+  {
+    "team": "Illinois",
+    "region": "South",
+    "seed": 3,
+    "elo": 2077.3291,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "Penn",
+    "region": "South",
+    "seed": 14,
+    "elo": 1568.3079,
+    "conference": "Ivy"
+  },
+  {
+    "team": "Saint Mary's (CA)",
+    "region": "South",
+    "seed": 7,
+    "elo": 1938.2238,
+    "conference": "WCC"
+  },
+  {
+    "team": "Texas A&M",
+    "region": "South",
+    "seed": 10,
+    "elo": 1840.0824,
+    "conference": "SEC"
+  },
+  {
+    "team": "Houston",
+    "region": "South",
+    "seed": 2,
+    "elo": 2150.0466,
+    "conference": "Big 12"
+  },
+  {
+    "team": "Idaho",
+    "region": "South",
+    "seed": 15,
+    "elo": 1530.4246,
+    "conference": "Big Sky"
+  },
+  {
+    "team": "Arizona",
+    "region": "West",
+    "seed": 1,
+    "elo": 2210.7405,
+    "conference": "Big 12"
+  },
+  {
+    "team": "LIU",
+    "region": "West",
+    "seed": 16,
+    "elo": 1424.1088,
+    "conference": "NSEC"
+  },
+  {
+    "team": "Villanova",
+    "region": "West",
+    "seed": 8,
+    "elo": 1847.2764,
+    "conference": "Big East"
+  },
+  {
+    "team": "Utah St.",
+    "region": "West",
+    "seed": 9,
+    "elo": 1862.0286,
+    "conference": "MWC"
+  },
+  {
+    "team": "Wisconsin",
+    "region": "West",
+    "seed": 5,
+    "elo": 1972.7933,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "High Point",
+    "region": "West",
+    "seed": 12,
+    "elo": 1710.2207,
+    "conference": "Big South"
+  },
+  {
+    "team": "Arkansas",
+    "region": "West",
+    "seed": 4,
+    "elo": 2000.0878,
+    "conference": "SEC"
+  },
+  {
+    "team": "Hawaii",
+    "region": "West",
+    "seed": 13,
+    "elo": 1593.4381,
+    "conference": "Big West"
+  },
+  {
+    "team": "BYU",
+    "region": "West",
+    "seed": 6,
+    "elo": 1936.5476,
+    "conference": "Big 12"
+  },
+  {
+    "team": "Texas",
+    "region": "West",
+    "seed": 11,
+    "elo": 1835.1207,
+    "conference": "SEC",
+    "firstFourOpponent": { "team": "NC State", "elo": 1835.8156, "conference": "ACC" }
+  },
+  {
+    "team": "Gonzaga",
+    "region": "West",
+    "seed": 3,
+    "elo": 2031.2236,
+    "conference": "WCC"
+  },
+  {
+    "team": "Kennesaw St.",
+    "region": "West",
+    "seed": 14,
+    "elo": 1542.6384,
+    "conference": "CUSA"
+  },
+  {
+    "team": "U Miami (FL)",
+    "region": "West",
+    "seed": 7,
+    "elo": 1887.3522,
+    "conference": "ACC"
+  },
+  {
+    "team": "Missouri",
+    "region": "West",
+    "seed": 10,
+    "elo": 1800.142,
+    "conference": "SEC"
+  },
+  {
+    "team": "Purdue",
+    "region": "West",
+    "seed": 2,
+    "elo": 2105.748,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "Queens",
+    "region": "West",
+    "seed": 15,
+    "elo": 1481.2017,
+    "conference": "A-Sun"
+  },
+  {
+    "team": "Michigan",
+    "region": "Midwest",
+    "seed": 1,
+    "elo": 2231.342,
+    "conference": "Big Ten"
+  },
+  {
+    "team": "UMBC",
+    "region": "Midwest",
+    "seed": 16,
+    "elo": 1553.1322,
+    "conference": "ASEC",
+    "firstFourOpponent": { "team": "Howard", "elo": 1477.5039, "conference": "MEAC" }
+  },
+  {
+    "team": "Georgia",
+    "region": "Midwest",
+    "seed": 8,
+    "elo": 1874.5582,
+    "conference": "SEC"
+  },
+  {
+    "team": "Saint Louis",
+    "region": "Midwest",
+    "seed": 9,
+    "elo": 1824.2251,
+    "conference": "A-10"
+  },
+  {
+    "team": "Texas Tech",
+    "region": "Midwest",
+    "seed": 5,
+    "elo": 1972.3236,
+    "conference": "Big 12"
+  },
+  {
+    "team": "Akron",
+    "region": "Midwest",
+    "seed": 12,
+    "elo": 1736.073,
+    "conference": "MAC"
+  },
+  {
+    "team": "Alabama",
+    "region": "Midwest",
+    "seed": 4,
+    "elo": 1964.2625,
+    "conference": "SEC"
+  },
+  {
+    "team": "Hofstra",
+    "region": "Midwest",
+    "seed": 13,
+    "elo": 1703.6212,
+    "conference": "CAA"
+  },
+  {
+    "team": "Tennessee",
+    "region": "Midwest",
+    "seed": 6,
+    "elo": 1970.4119,
+    "conference": "SEC"
+  },
+  {
+    "team": "SMU",
+    "region": "Midwest",
+    "seed": 11,
+    "elo": 1821.4882,
+    "conference": "ACC",
+    "firstFourOpponent": { "team": "Miami (OH)", "elo": 1652.9951, "conference": "MAC" }
+  },
+  {
+    "team": "Virginia",
+    "region": "Midwest",
+    "seed": 3,
+    "elo": 2019.2024,
+    "conference": "ACC"
+  },
+  {
+    "team": "Wright St.",
+    "region": "Midwest",
+    "seed": 14,
+    "elo": 1531.7289,
+    "conference": "Horizon"
+  },
+  {
+    "team": "Kentucky",
+    "region": "Midwest",
+    "seed": 7,
+    "elo": 1942.5708,
+    "conference": "SEC"
+  },
+  {
+    "team": "Santa Clara",
+    "region": "Midwest",
+    "seed": 10,
+    "elo": 1867.1527,
+    "conference": "WCC"
+  },
+  {
+    "team": "Iowa St.",
+    "region": "Midwest",
+    "seed": 2,
+    "elo": 2157.8574,
+    "conference": "Big 12"
+  },
+  {
+    "team": "Tennessee St.",
+    "region": "Midwest",
+    "seed": 15,
+    "elo": 1520.6895,
+    "conference": "OVC"
+  }
+]
