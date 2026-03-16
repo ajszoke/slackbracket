@@ -6,7 +6,8 @@ export type Region = z.infer<typeof regionSchema>;
 export const firstFourOpponentSchema = z.object({
   team: z.string(),
   elo: z.number(),
-  conference: z.string()
+  conference: z.string(),
+  logoUrl: z.string().url().optional()
 });
 
 export const teamSchema = z.object({

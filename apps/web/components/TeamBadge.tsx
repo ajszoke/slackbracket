@@ -53,20 +53,22 @@ function SplitBadge({ team }: { team: Team }) {
   const colorA = deterministicColor(team.id);
   const colorB = deterministicColor(`${team.region}-${team.seed}-${opp.team}`);
 
-  // Fetch logos for both teams (ready for NCAA API sweep)
+  // Use pre-filled logos from JSON, fall back to API fetch
   const [logoA, setLogoA] = useState<string | null>(team.logoUrl ?? null);
-  const [logoB, setLogoB] = useState<string | null>(null);
+  const [logoB, setLogoB] = useState<string | null>(opp.logoUrl ?? null);
 
   useEffect(() => {
     let mounted = true;
     if (!logoA) {
       fetchLogoForTeam(team).then((url) => { if (mounted) setLogoA(url); });
     }
-    fetchLogoForTeam({ ...team, team: opp.team } as Team).then((url) => {
-      if (mounted) setLogoB(url);
-    });
+    if (!logoB) {
+      fetchLogoForTeam({ ...team, team: opp.team } as Team).then((url) => {
+        if (mounted) setLogoB(url);
+      });
+    }
     return () => { mounted = false; };
-  }, [team, opp.team, logoA]);
+  }, [team, opp.team, logoA, logoB]);
 
   return (
     <div
