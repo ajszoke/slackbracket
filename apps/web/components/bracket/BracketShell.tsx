@@ -2,9 +2,11 @@
 
 import type { Team } from "@slackbracket/domain";
 
+import type { GameNode } from "../../lib/tournament";
+import { resolveTeamForSource } from "../../lib/tournament";
 import type { BracketLayout } from "../../lib/useBracketLayout";
 
-import { FinalFourBracket } from "./FinalFourBracket";
+import { BracketMatchup } from "./BracketMatchup";
 import { RegionBracket } from "./RegionBracket";
 
 import "./bracket.css";
@@ -12,10 +14,10 @@ import "./bracket.css";
 type Props = {
   layout: BracketLayout;
   picksByMatchup: Record<string, string>;
+  pickSourceByMatchup: Record<string, "user" | "auto">;
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;
-  /** For mobile: which region tab is selected */
   selectedRegion: "East" | "West" | "South" | "Midwest" | "FinalFour";
   onRegionChange: (region: "East" | "West" | "South" | "Midwest" | "FinalFour") => void;
 };
@@ -35,18 +37,40 @@ const REGION_COLORS: Record<string, string> = {
   Midwest: "var(--region-midwest)"
 };
 
-const ffProps = (props: Props) => ({
-  semi1: props.layout.finalFour.semi1,
-  semi2: props.layout.finalFour.semi2,
-  championship: props.layout.finalFour.championship,
-  picksByMatchup: props.picksByMatchup,
-  lockedByMatchup: props.lockedByMatchup,
-  teamsById: props.teamsById,
-  onPick: props.onPick
-});
+function FFGame({
+  game,
+  picksByMatchup,
+  pickSourceByMatchup,
+  lockedByMatchup,
+  teamsById,
+  onPick,
+}: {
+  game: GameNode | null;
+  picksByMatchup: Record<string, string>;
+  pickSourceByMatchup: Record<string, "user" | "auto">;
+  lockedByMatchup: Record<string, string>;
+  teamsById: Record<string, Team>;
+  onPick: (matchupId: string, teamId: string) => void;
+}) {
+  if (!game) return null;
+  const teamA = resolveTeamForSource(game.sourceA, picksByMatchup, teamsById);
+  const teamB = resolveTeamForSource(game.sourceB, picksByMatchup, teamsById);
+  return (
+    <BracketMatchup
+      game={game}
+      teamA={teamA}
+      teamB={teamB}
+      pickedId={picksByMatchup[game.id]}
+      lockedId={lockedByMatchup[game.id]}
+      pickSource={picksByMatchup[game.id] ? pickSourceByMatchup[game.id] : undefined}
+      onPick={(teamId) => onPick(game.id, teamId)}
+      regionColor="var(--region-finalfour)"
+    />
+  );
+}
 
 export function BracketShell(props: Props) {
-  const { layout, picksByMatchup, lockedByMatchup, teamsById, onPick, selectedRegion, onRegionChange } = props;
+  const { layout, picksByMatchup, pickSourceByMatchup, lockedByMatchup, teamsById, onPick, selectedRegion, onRegionChange } = props;
 
   const regionProps = (region: "East" | "West" | "South" | "Midwest", direction: "ltr" | "rtl") => ({
     rounds: layout.regions[region],
@@ -54,30 +78,77 @@ export function BracketShell(props: Props) {
     regionColor: REGION_COLORS[region],
     regionLabel: region,
     picksByMatchup,
+    pickSourceByMatchup,
     lockedByMatchup,
     teamsById,
     onPick
   });
 
+  const ff = layout.finalFour;
+  const ffCellProps = { picksByMatchup, pickSourceByMatchup, lockedByMatchup, teamsById, onPick };
+
   return (
     <div className="bracket-shell">
-      {/* Desktop: Full bracket */}
+      {/* Desktop: Left regions | FF center | Right regions */}
       <div className="bracket-full">
-        {/* Top half: East (LTR) → FF Semi 1 + Champ ← West (RTL) */}
-        <div className="bracket-half">
-          <RegionBracket {...regionProps("East", "ltr")} />
-          <FinalFourBracket {...ffProps(props)} />
-          <RegionBracket {...regionProps("West", "rtl")} />
+        {/* Left column: East + South */}
+        <div className="bracket-col bracket-col--left">
+          <div className="bracket-region-section">
+            <div className="bracket-region-header" style={{ "--region-hdr-color": "var(--region-east)" } as React.CSSProperties}>East</div>
+            <RegionBracket {...regionProps("East", "ltr")} />
+          </div>
+          <div className="bracket-region-section">
+            <div className="bracket-region-header" style={{ "--region-hdr-color": "var(--region-south)" } as React.CSSProperties}>South</div>
+            <RegionBracket {...regionProps("South", "ltr")} />
+          </div>
         </div>
 
-        {/* Bottom half: South (LTR) → FF Semi 2 ← Midwest (RTL) */}
-        <div className="bracket-half">
-          <RegionBracket {...regionProps("South", "ltr")} />
-          {/* Spacer to align with center column */}
-          <div className="bracket-center" style={{ visibility: "hidden" }}>
-            <div style={{ minWidth: 160 }} />
+        {/* Center: FF semis + championship.
+            Each ff-section mirrors a region-section (flex:1 + header spacer + round column).
+            Phantom div takes the opposite flex:1 slot, pushing the real game
+            to the 75% (top) or 25% (bottom) position — matching R3 game alignment. */}
+        <div className="bracket-center" style={{ "--region-color": "var(--region-finalfour)" } as React.CSSProperties}>
+          {/* Top section — semi1 aligns with lower R3 game of East/West */}
+          <div className="bracket-ff-section">
+            <div className="bracket-region-header" style={{ visibility: "hidden" }} aria-hidden="true">&nbsp;</div>
+            <div className="bracket-ff-round">
+              <div className="bracket-ff-phantom" />
+              <div className="bracket-ff-slot">
+                <span className="bracket-ff-label">Final Four</span>
+                <FFGame game={ff.semi1} {...ffCellProps} />
+              </div>
+            </div>
           </div>
-          <RegionBracket {...regionProps("Midwest", "rtl")} />
+
+          {/* Bottom section — semi2 aligns with upper R3 game of South/Midwest */}
+          <div className="bracket-ff-section">
+            <div className="bracket-region-header" style={{ visibility: "hidden" }} aria-hidden="true">&nbsp;</div>
+            <div className="bracket-ff-round">
+              <div className="bracket-ff-slot">
+                <span className="bracket-ff-label">Final Four</span>
+                <FFGame game={ff.semi2} {...ffCellProps} />
+              </div>
+              <div className="bracket-ff-phantom" />
+            </div>
+          </div>
+
+          {/* Championship — absolutely centered between the two sections */}
+          <div className="bracket-ff-slot bracket-ff-slot--championship">
+            <span className="bracket-ff-label">Championship</span>
+            <FFGame game={ff.championship} {...ffCellProps} />
+          </div>
+        </div>
+
+        {/* Right column: West + Midwest */}
+        <div className="bracket-col bracket-col--right">
+          <div className="bracket-region-section">
+            <div className="bracket-region-header" style={{ "--region-hdr-color": "var(--region-west)" } as React.CSSProperties}>West</div>
+            <RegionBracket {...regionProps("West", "rtl")} />
+          </div>
+          <div className="bracket-region-section">
+            <div className="bracket-region-header" style={{ "--region-hdr-color": "var(--region-midwest)" } as React.CSSProperties}>Midwest</div>
+            <RegionBracket {...regionProps("Midwest", "rtl")} />
+          </div>
         </div>
       </div>
 
@@ -98,11 +169,17 @@ export function BracketShell(props: Props) {
       {/* Mobile: Selected region bracket */}
       <div className="bracket-mobile-region">
         {selectedRegion === "FinalFour" ? (
-          <FinalFourBracket {...ffProps(props)} />
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "1rem", padding: "1rem" }}>
+            <div className="bracket-region-header" style={{ "--region-hdr-color": "var(--region-finalfour)", textAlign: "center" } as React.CSSProperties}>
+              Final Four
+            </div>
+            <FFGame game={ff.semi1} {...ffCellProps} />
+            <FFGame game={ff.semi2} {...ffCellProps} />
+            <span className="bracket-championship__label">Championship</span>
+            <FFGame game={ff.championship} {...ffCellProps} />
+          </div>
         ) : (
-          <RegionBracket
-            {...regionProps(selectedRegion, "ltr")}
-          />
+          <RegionBracket {...regionProps(selectedRegion, "ltr")} />
         )}
       </div>
     </div>

@@ -3,30 +3,24 @@
 import {
   decodeSharePayload,
   encodeSharePayload,
+  humanReadableOneIn,
   lockCompletedGames,
-  oneIn,
-  summarizeOdds,
   type Matchup,
   type Team,
   winProbability
 } from "@slackbracket/domain";
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
+import { computePulseMetrics } from "../lib/bracketStats";
 import { useBracketStore } from "../lib/store";
-import {
-  buildGameTree,
-  normalizeTeams,
-  resolveTeamForSource,
-  type GameNode
-} from "../lib/tournament";
+import { buildGameTree, normalizeTeams, resolveTeamForSource, type GameNode } from "../lib/tournament";
 import { useBracketLayout } from "../lib/useBracketLayout";
 
 import { BracketShell } from "./bracket/BracketShell";
 import { ChaosMeter } from "./ChaosMeter";
 import { OddsPanel } from "./OddsPanel";
 import { SocialSharePanel } from "./SocialSharePanel";
-import { TutorialOverlay } from "./TutorialOverlay";
 
 type LivePayload = {
   updatedAt: number;
@@ -136,92 +130,88 @@ export function BracketApp() {
   const totalGames = 63;
   const completion = Math.min(100, Math.round((picksCount / totalGames) * 100));
 
-  const pickedProbabilityByGame = useCallback(
-    (game: GameNode): number => {
-      const selectedTeamId = store.picksByMatchup[game.id];
-      if (!selectedTeamId) return 1;
-      const teamA = resolveTeamForSource(game.sourceA, store.picksByMatchup, teamsById);
-      const teamB = resolveTeamForSource(game.sourceB, store.picksByMatchup, teamsById);
-      if (!teamA || !teamB) return 1;
-      const pA = winProbability(teamA, teamB, store.chaos);
-      if (selectedTeamId === teamA.id) return pA;
-      if (selectedTeamId === teamB.id) return 1 - pA;
-      return 1e-12;
-    },
-    [store.picksByMatchup, teamsById, store.chaos]
-  );
-
-  const mostLikelyProbability = useMemo(() => {
-    let probability = 1;
-    for (const game of games) {
-      const teamA = resolveTeamForSource(game.sourceA, store.picksByMatchup, teamsById);
-      const teamB = resolveTeamForSource(game.sourceB, store.picksByMatchup, teamsById);
-      if (!teamA || !teamB) {
-        probability *= 0.5;
-        continue;
-      }
-      const p = winProbability(teamA, teamB, store.chaos);
-      probability *= Math.max(p, 1 - p);
-    }
-    return probability;
-  }, [games, store.picksByMatchup, teamsById, store.chaos]);
-
-  const leastLikelyProbability = useMemo(() => {
-    let probability = 1;
-    for (const game of games) {
-      const teamA = resolveTeamForSource(game.sourceA, store.picksByMatchup, teamsById);
-      const teamB = resolveTeamForSource(game.sourceB, store.picksByMatchup, teamsById);
-      if (!teamA || !teamB) {
-        probability *= 0.5;
-        continue;
-      }
-      const p = winProbability(teamA, teamB, store.chaos);
-      probability *= Math.min(p, 1 - p);
-    }
-    return probability;
-  }, [games, store.picksByMatchup, teamsById, store.chaos]);
-
-  const oddsSummary = useMemo(
-    () =>
-      summarizeOdds({
-        picksByMatchup: Object.fromEntries(games.map((game) => [game.id, store.picksByMatchup[game.id] ?? ""])),
-        matchups: asMatchups(games, store.lockedByMatchup),
-        teamsById,
-        chaos: store.chaos,
-        mostLikelyProbability,
-        leastLikelyProbability
-      }),
-    [store.picksByMatchup, games, teamsById, store.chaos, store.lockedByMatchup, mostLikelyProbability, leastLikelyProbability]
-  );
-
+  // Live bracket probability
   const liveProbability = useMemo(() => {
     let probability = 1;
     for (const game of games) {
-      probability *= pickedProbabilityByGame(game);
+      const selectedTeamId = store.picksByMatchup[game.id];
+      if (!selectedTeamId) continue;
+      const teamA = resolveTeamForSource(game.sourceA, store.picksByMatchup, teamsById);
+      const teamB = resolveTeamForSource(game.sourceB, store.picksByMatchup, teamsById);
+      if (!teamA || !teamB) continue;
+      // Always use pure ELO probability (chaos=0.5 = true odds) for bracket odds —
+      // the odds panel shows real-world likelihood, not chaos-modified probability
+      const pA = winProbability(teamA, teamB, 0.5);
+      const p = selectedTeamId === teamA.id ? pA : selectedTeamId === teamB.id ? 1 - pA : 1e-12;
+      probability *= Math.max(p, 1e-12);
     }
     return probability;
-  }, [games, pickedProbabilityByGame]);
+  }, [games, store.picksByMatchup, teamsById, store.chaos]);
+
+  const humanOdds = useMemo(() => humanReadableOneIn(liveProbability), [liveProbability]);
+
+  // Bracket Pulse metrics
+  const pulseMetrics = useMemo(
+    () => computePulseMetrics(store.picksByMatchup, store.pickSourceByMatchup, games, teamsById),
+    [store.picksByMatchup, store.pickSourceByMatchup, games, teamsById]
+  );
+
+  // Color temperature: 0 = cool (cyan 190), 1 = hot (red-magenta 340)
+  // Path: cyan(190) → blue(240) → purple(280) → magenta(320) → red(340)
+  // Going UP through the hue wheel avoids the green zone
+  const tempToHue = (t: number) => 190 + t * 150; // 190 → 340
+  const userHue = tempToHue(pulseMetrics.userTemp);
+  const aiHue = tempToHue(pulseMetrics.aiTemp);
+
+  // Orb visibility: transparent when no picks from that source
+  const userGlow = pulseMetrics.userWeight > 0 ? `hsl(${userHue}, 100%, 60%)` : "transparent";
+  const aiGlow = pulseMetrics.aiWeight > 0 ? `hsl(${aiHue}, 100%, 60%)` : "transparent";
+  const userSpread =
+    pulseMetrics.userWeight > 0 ? `${Math.round(20 + pulseMetrics.userWeight * 55)}%` : "0%";
+  const aiSpread =
+    pulseMetrics.aiWeight > 0 ? `${Math.round(20 + pulseMetrics.aiWeight * 55)}%` : "0%";
 
   const sharePayload = encodeSharePayload(store.picksByMatchup);
   const shareUrl = typeof window === "undefined" ? "" : `${window.location.origin}?b=${sharePayload}`;
 
-  const quickGenerate = () => {
-    store.setMode("quick");
+  const generateBracket = () => {
     store.autoFillRemaining(games, teamsById);
   };
 
   if (isLoading) {
-    return <main style={{ padding: "2rem", textAlign: "center", color: "var(--muted)" }}>Loading bracket data...</main>;
+    return (
+      <main style={{ padding: "2rem", textAlign: "center", color: "var(--muted)" }}>Loading bracket data...</main>
+    );
   }
 
   return (
-    <main>
-      {/* Hero Header — controls consolidated above the bracket */}
+    <div className="app-wrapper">
+    <div
+      className="bracket-pulse"
+      style={{
+        "--pulse-speed": `${pulseMetrics.pulseSpeed}s`,
+        "--pulse-lo": `${pulseMetrics.pulseLo}`,
+        "--pulse-hi": `${pulseMetrics.pulseHi}`,
+        "--user-glow": userGlow,
+        "--ai-glow": aiGlow,
+        "--user-spread": userSpread,
+        "--ai-spread": aiSpread,
+      } as React.CSSProperties}
+    />
+    <main style={{ position: "relative", zIndex: 1 }}>
+      {/* Hero Header */}
       <header style={{ padding: "1rem 1rem 0", maxWidth: 1400, margin: "0 auto" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, flexWrap: "wrap", marginBottom: 8 }}>
-          <h1 style={{ margin: 0, fontSize: "1.5rem", fontWeight: 800, letterSpacing: "0.05em" }}>
-            Slackbracket
-          </h1>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 8,
+            flexWrap: "wrap",
+            marginBottom: 8
+          }}
+        >
+          <h1 style={{ margin: 0, fontSize: "2.2rem", fontWeight: 800, letterSpacing: "0.06em" }}>Slackbracket</h1>
           <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
             <button
               onClick={() => store.setBracketType("men")}
@@ -235,32 +225,34 @@ export function BracketApp() {
             >
               Women
             </button>
+            <div style={{ display: "flex", gap: 4, marginLeft: 8, alignItems: "center" }}>
+              <button className="btn-ghost" onClick={() => temporal.undo()}>
+                Undo
+              </button>
+              <button className="btn-ghost" onClick={() => temporal.redo()}>
+                Redo
+              </button>
+              <button className="btn-ghost" onClick={store.resetAll}>
+                Reset
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center", marginBottom: 8 }}>
-          <button onClick={quickGenerate}>Quick Generate</button>
-          <button onClick={() => store.autoFillRemaining(games, teamsById)}>Fill the Rest</button>
-          <button onClick={() => temporal.undo()}>Undo</button>
-          <button onClick={() => temporal.redo()}>Redo</button>
-          <button onClick={store.resetAll}>Reset</button>
-          <span style={{ color: "var(--muted)", fontSize: "0.85rem", marginLeft: "auto" }}>
-            {picksCount}/{totalGames} picks
-          </span>
         </div>
 
         <progress value={completion} max={100} style={{ width: "100%", height: 4, marginBottom: 8 }} />
 
-        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", marginBottom: 12 }}>
-          <ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} />
-          <OddsPanel
-            summary={{ ...oddsSummary, exactProbability: liveProbability, oneIn: oneIn(liveProbability) }}
-            filled={picksCount}
-            total={totalGames}
-            mostLikelyProbability={mostLikelyProbability}
-            leastLikelyProbability={leastLikelyProbability}
-          />
-          <SocialSharePanel shareUrl={shareUrl} oneIn={oneIn(oddsSummary.exactProbability)} />
+        <div
+          style={{
+            display: "grid",
+            gap: 8,
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            alignItems: "stretch",
+            marginBottom: 12
+          }}
+        >
+          <ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} onGenerate={generateBracket} />
+          <OddsPanel summary={humanOdds} filled={picksCount} />
+          <SocialSharePanel shareUrl={shareUrl} oneIn={humanOdds.display} />
         </div>
       </header>
 
@@ -268,19 +260,14 @@ export function BracketApp() {
       <BracketShell
         layout={bracketLayout}
         picksByMatchup={store.picksByMatchup}
+        pickSourceByMatchup={store.pickSourceByMatchup}
         lockedByMatchup={lockedMap}
         teamsById={teamsById}
         onPick={(matchupId, teamId) => store.pick(matchupId, teamId)}
         selectedRegion={store.selectedRegion}
         onRegionChange={store.setRegion}
       />
-
-      <TutorialOverlay
-        step={store.tutorialStep}
-        dismissed={store.tutorialDismissed}
-        onNext={store.nextTutorial}
-        onDismiss={store.dismissTutorial}
-      />
     </main>
+    </div>
   );
 }

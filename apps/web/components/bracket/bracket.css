@@ -6,9 +6,9 @@
 /* --- Region Colors --- */
 :root {
   --region-east: #00f0ff;
-  --region-west: #ff006e;
-  --region-south: #39ff14;
-  --region-midwest: #ffd700;
+  --region-west: #818cf8;
+  --region-south: #2dd4bf;
+  --region-midwest: #38bdf8;
   --region-finalfour: #7c4dff;
 }
 
@@ -24,36 +24,111 @@
 
 .bracket-full {
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  min-width: 1100px;
+  flex-direction: row;
   max-width: 1400px;
   margin: 0 auto;
-}
-
-/* Each half: left-region + final-four-slot + right-region */
-.bracket-half {
-  display: flex;
   align-items: stretch;
+  gap: 0;
+  position: relative;
 }
 
+/* Left and right columns: each holds 2 stacked regions */
+.bracket-col {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 1rem;
+}
+
+/* Region section: header + bracket */
+.bracket-region-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.bracket-region-header {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-weight: 700;
+  color: var(--region-hdr-color, var(--muted));
+  padding: 0.3rem 0.6rem;
+  opacity: 0.7;
+}
+
+.bracket-col--right .bracket-region-header {
+  text-align: right;
+}
+
+/* ============================================
+   FINAL FOUR CENTER COLUMN
+   Narrow column between region halves.
+   space-evenly places semi1 at ~25%, championship at ~50%, semi2 at ~75%
+   — aligning with the midpoints of top and bottom region sections.
+   ============================================ */
 .bracket-center {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: 0 0.75rem;
-  min-width: 160px;
+  align-self: stretch;
+  flex: 0 0 0px;
+  width: 0;
+  overflow: visible;
+  z-index: 2;
+  position: relative;
+  gap: 1rem; /* match bracket-col gap */
+  padding: 0;
 }
 
-.bracket-championship {
+/* Top/bottom FF sections mirror bracket-region-section sizing */
+.bracket-ff-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Inner round column: same flex distribution as bracket-round */
+.bracket-ff-round {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Invisible spacer — takes same flex:1 share as the visible slot,
+   pushing the real game to the 75% or 25% position to match R3 games */
+.bracket-ff-phantom {
+  flex: 1;
+}
+
+.bracket-ff-slot {
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
-  padding: 1rem 0;
+  gap: 0.25rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Championship floats at the vertical center, out of flex flow */
+.bracket-ff-slot--championship {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  flex: none;
+}
+
+.bracket-ff-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--region-finalfour);
+  font-weight: 700;
+  opacity: 0.7;
+  white-space: nowrap;
 }
 
 .bracket-championship__label {
@@ -105,10 +180,11 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: stretch;
+  align-items: center;
   position: relative;
   padding: 0.3rem 0.6rem;
   flex: 1;
+  min-width: 0;
 }
 
 /* --- Outgoing connectors (item → next round) --- */
@@ -206,6 +282,8 @@
   border-left: 3px solid var(--region-color, var(--accent));
   border-radius: 8px;
   overflow: hidden;
+  width: 155px;
+  flex-shrink: 0;
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
@@ -235,6 +313,7 @@
   align-items: center;
   gap: 0.35rem;
   width: 100%;
+  min-width: 0;
   padding: 0.3rem 0.4rem;
   border: none;
   background: transparent;
@@ -309,25 +388,35 @@
   border-bottom: none;
 }
 
-.bracket-matchup__upset {
-  position: absolute;
-  top: -0.3rem;
-  right: -0.2rem;
-  font-size: 0.7rem;
-  animation: upset-wobble 0.6s ease-in-out;
+/* Upset card: warm glow OUTSIDE the card, border-left stays region color */
+.bracket-matchup--upset {
+  box-shadow: 0 0 10px var(--upset-glow, transparent), 0 0 3px var(--upset-glow, transparent);
 }
 
-@keyframes upset-wobble {
-  0%,
-  100% {
-    transform: rotate(0deg);
-  }
-  25% {
-    transform: rotate(-12deg);
-  }
-  75% {
-    transform: rotate(12deg);
-  }
+/* Fire emoji constrained inside the upset winner's team row */
+.bracket-matchup__team--upset-winner {
+  position: relative;
+  overflow: hidden;
+}
+
+.bracket-matchup__team--upset-winner::after {
+  content: "\01F525";
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%) rotate(calc(-5deg - var(--upset-degree, 0) * 25deg));
+  font-size: calc(0.9rem + var(--upset-degree, 0) * 1rem);
+  opacity: calc(0.2 + var(--upset-degree, 0) * 0.6);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Pick source indicator (user ● / AI ✦) */
+.bracket-matchup__source {
+  font-size: 0.5rem;
+  color: var(--muted);
+  flex-shrink: 0;
+  opacity: 0.6;
 }
 
 /* ============================================
@@ -379,6 +468,10 @@
     flex: 0 0 auto;
     width: calc(50% - 0.5rem);
     min-width: 140px;
+  }
+
+  .bracket-matchup {
+    width: 100%;
   }
 
   /* Hide connector lines on mobile */

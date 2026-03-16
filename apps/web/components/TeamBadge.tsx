@@ -7,6 +7,13 @@ import { deterministicColor, fetchLogoForTeam, teamInitials } from "../lib/logos
 
 export function TeamBadge({ team }: { team: Team }) {
   const [logo, setLogo] = useState<string | null>(team.logoUrl ?? null);
+  const [currentTeamId, setCurrentTeamId] = useState(team.id);
+
+  // React 19 pattern: reset state during render when team prop changes
+  if (team.id !== currentTeamId) {
+    setCurrentTeamId(team.id);
+    setLogo(team.logoUrl ?? null);
+  }
 
   useEffect(() => {
     let mounted = true;

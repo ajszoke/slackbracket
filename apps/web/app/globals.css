@@ -19,9 +19,9 @@
 
   /* Region neon colors */
   --region-east: #00f0ff;
-  --region-west: #ff006e;
-  --region-south: #39ff14;
-  --region-midwest: #ffd700;
+  --region-west: #818cf8;
+  --region-south: #2dd4bf;
+  --region-midwest: #38bdf8;
   --region-finalfour: #7c4dff;
 
   /* Glassmorphism */
@@ -37,6 +37,11 @@
   /* Motion */
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Bracket Pulse (set by JS, defaults for empty bracket) */
+  --pulse-speed: 6s;
+  --user-glow-color: hsl(190, 100%, 60%);
+  --ai-glow-color: hsl(190, 100%, 60%);
 }
 
 /* ============================================
@@ -55,18 +60,32 @@ body {
   font-family: "Space Grotesk", Inter, "Segoe UI", system-ui, sans-serif;
 }
 
-/* Atmospheric background */
-body::before {
-  content: "";
+/* Bracket Pulse — atmospheric background that breathes with your bracket's chaos.
+   Two orbs: user energy (top-left) and AI energy (bottom-right).
+   Colors shift cool→hot based on each entity's upset ratio.
+   Speed + intensity driven by overall bracket chaos.
+   Rendered as a React div for reliable CSS custom property inheritance. */
+.bracket-pulse {
   position: fixed;
   inset: 0;
   background:
-    radial-gradient(ellipse at 15% 15%, rgba(0, 240, 255, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 85% 20%, rgba(255, 0, 110, 0.04) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(124, 77, 255, 0.05) 0%, transparent 50%),
-    radial-gradient(ellipse at 20% 70%, rgba(57, 255, 20, 0.03) 0%, transparent 40%);
+    radial-gradient(ellipse at 30% 35%, var(--user-glow), transparent var(--user-spread, 65%)),
+    radial-gradient(ellipse at 70% 65%, var(--ai-glow), transparent var(--ai-spread, 65%)),
+    radial-gradient(ellipse at 50% 50%, rgba(124, 77, 255, 0.03) 0%, transparent 60%);
+  animation: pulse-breathe var(--pulse-speed) ease-in-out infinite;
   pointer-events: none;
-  z-index: -1;
+  z-index: 0;
+}
+
+@keyframes pulse-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: var(--pulse-lo, 0.12);
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: var(--pulse-hi, 0.18);
+  }
 }
 
 button {
@@ -132,6 +151,31 @@ button:active {
   color: var(--muted);
 }
 
+.btn-primary {
+  background: color-mix(in srgb, var(--accent) 60%, transparent 40%);
+  border-color: var(--accent);
+  box-shadow: var(--glow-md) color-mix(in srgb, var(--accent) 30%, transparent 70%);
+  font-size: 0.85rem;
+}
+
+.btn-primary:hover {
+  background: color-mix(in srgb, var(--accent) 75%, transparent 25%);
+  box-shadow: var(--glow-lg) color-mix(in srgb, var(--accent) 40%, transparent 60%);
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--muted);
+  font-size: 0.75rem;
+  padding: 0.3rem 0.5rem;
+}
+
+.btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
 /* ============================================
    PROGRESS BAR
    ============================================ */
@@ -169,7 +213,7 @@ input[type="range"] {
   width: 100%;
   height: 6px;
   border-radius: 3px;
-  background: linear-gradient(90deg, #1e40af, #7c4dff, #f59e0b, #ef4444);
+  background: linear-gradient(90deg, #1e40af 0%, #6366f1 25%, #10b981 50%, #f59e0b 75%, #ef4444 100%);
   outline: none;
 }
 
@@ -263,6 +307,54 @@ a:hover {
 }
 
 /* ============================================
+   SICKO MODE ANNOUNCEMENT
+   ============================================ */
+/* Sicko window: counterclockwise rotation + grow + visible shake.
+   No filter:blur — too expensive for GPU compositing on slow hardware.
+   Animates .app-wrapper (not html) to avoid root stacking context bugs
+   that cause FF cards to flicker via overflow:visible + width:0. */
+@keyframes sicko-announce {
+  0%   { transform: rotate(0deg)    scale(1)    translate(0, 0); }
+  15%  { transform: rotate(-4deg)   scale(1.06) translate(6px, -4px); }
+  30%  { transform: rotate(-10deg)  scale(1.15) translate(-8px, 6px); }
+  45%  { transform: rotate(-7deg)   scale(1.10) translate(7px, -5px); }
+  60%  { transform: rotate(-4deg)   scale(1.06) translate(-6px, 4px); }
+  80%  { transform: rotate(-1deg)   scale(1.02) translate(3px, -2px); }
+  100% { transform: rotate(0deg)    scale(1)    translate(0, 0); }
+}
+
+html.sicko-active .app-wrapper {
+  animation: sicko-announce 1s ease-in-out;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+/* Sicko red flash overlay — synced to 1s punch, peak 30% opacity */
+.sicko-flash {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.5), rgba(239, 68, 68, 0.15));
+  z-index: 9999;
+  pointer-events: none;
+  animation: sicko-flash-anim 1s ease-in-out forwards;
+}
+
+@keyframes sicko-flash-anim {
+  0%   { opacity: 0; }
+  20%  { opacity: 0.3; }
+  35%  { opacity: 0.3; }
+  55%  { opacity: 0.2; }
+  100% { opacity: 0; }
+}
+
+/* Sicko slider thumb — fire at max chaos */
+html.sicko-active input[type="range"]::-webkit-slider-thumb {
+  background: #ef4444;
+  border-color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.6);
+}
+
+/* ============================================
    REDUCED MOTION
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -272,5 +364,9 @@ a:hover {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  html.sicko-active .app-wrapper {
+    animation: none !important;
   }
 }

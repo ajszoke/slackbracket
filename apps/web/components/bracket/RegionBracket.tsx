@@ -14,6 +14,7 @@ type Props = {
   regionColor: string;
   regionLabel: string;
   picksByMatchup: Record<string, string>;
+  pickSourceByMatchup: Record<string, "user" | "auto">;
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;
@@ -25,6 +26,7 @@ export function RegionBracket({
   regionColor,
   regionLabel,
   picksByMatchup,
+  pickSourceByMatchup,
   lockedByMatchup,
   teamsById,
   onPick
@@ -36,11 +38,7 @@ export function RegionBracket({
     >
       {rounds.map((roundGames, roundIndex) => (
         <div key={roundIndex} className="bracket-round">
-          {roundIndex === 0 && (
-            <div className="bracket-region__label" style={{ position: "absolute", top: "-1.3rem", left: 0, right: 0 }}>
-              {regionLabel}
-            </div>
-          )}
+          {/* Region label now in BracketShell header */}
           {roundGames.map((game) => {
             const teamA = resolveTeamForSource(game.sourceA, picksByMatchup, teamsById);
             const teamB = resolveTeamForSource(game.sourceB, picksByMatchup, teamsById);
@@ -52,6 +50,7 @@ export function RegionBracket({
                   teamB={teamB}
                   pickedId={picksByMatchup[game.id]}
                   lockedId={lockedByMatchup[game.id]}
+                  pickSource={picksByMatchup[game.id] ? pickSourceByMatchup[game.id] : undefined}
                   onPick={(teamId) => onPick(game.id, teamId)}
                   regionColor={regionColor}
                 />

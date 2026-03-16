@@ -12,6 +12,7 @@ type Props = {
   semi2: GameNode | null;
   championship: GameNode | null;
   picksByMatchup: Record<string, string>;
+  pickSourceByMatchup: Record<string, "user" | "auto">;
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;
@@ -20,6 +21,7 @@ type Props = {
 function FinalFourGame({
   game,
   picksByMatchup,
+  pickSourceByMatchup,
   lockedByMatchup,
   teamsById,
   onPick,
@@ -27,6 +29,7 @@ function FinalFourGame({
 }: {
   game: GameNode | null;
   picksByMatchup: Record<string, string>;
+  pickSourceByMatchup: Record<string, "user" | "auto">;
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;
@@ -42,18 +45,20 @@ function FinalFourGame({
       teamB={teamB}
       pickedId={picksByMatchup[game.id]}
       lockedId={lockedByMatchup[game.id]}
+      pickSource={picksByMatchup[game.id] ? pickSourceByMatchup[game.id] : undefined}
       onPick={(teamId) => onPick(game.id, teamId)}
       regionColor={regionColor}
     />
   );
 }
 
-export function FinalFourBracket({ semi1, semi2, championship, picksByMatchup, lockedByMatchup, teamsById, onPick }: Props) {
+export function FinalFourBracket({ semi1, semi2, championship, picksByMatchup, pickSourceByMatchup, lockedByMatchup, teamsById, onPick }: Props) {
   return (
     <div className="bracket-center">
       <FinalFourGame
         game={semi1}
         picksByMatchup={picksByMatchup}
+        pickSourceByMatchup={pickSourceByMatchup}
         lockedByMatchup={lockedByMatchup}
         teamsById={teamsById}
         onPick={onPick}
@@ -64,6 +69,7 @@ export function FinalFourBracket({ semi1, semi2, championship, picksByMatchup, l
         <FinalFourGame
           game={championship}
           picksByMatchup={picksByMatchup}
+          pickSourceByMatchup={pickSourceByMatchup}
           lockedByMatchup={lockedByMatchup}
           teamsById={teamsById}
           onPick={onPick}
@@ -73,6 +79,7 @@ export function FinalFourBracket({ semi1, semi2, championship, picksByMatchup, l
       <FinalFourGame
         game={semi2}
         picksByMatchup={picksByMatchup}
+        pickSourceByMatchup={pickSourceByMatchup}
         lockedByMatchup={lockedByMatchup}
         teamsById={teamsById}
         onPick={onPick}

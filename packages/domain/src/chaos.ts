@@ -1,15 +1,17 @@
 export type ChaosPreset = {
-  id: "chalk" | "balanced" | "chaos" | "sicko";
+  id: "chalk" | "playItSafe" | "trueOdds" | "madness" | "sicko";
   label: string;
+  emoji: string;
   value: number;
   description: string;
 };
 
 export const CHAOS_PRESETS: ChaosPreset[] = [
-  { id: "chalk", label: "Chalk City", value: 0.15, description: "Favor top seeds heavily" },
-  { id: "balanced", label: "Balanced", value: 0.4, description: "Mostly likely outcomes" },
-  { id: "chaos", label: "Chaos", value: 0.72, description: "Upsets are common" },
-  { id: "sicko", label: "Sicko Mode", value: 0.92, description: "All vibes, no rules" }
+  { id: "chalk", label: "Chalk City", emoji: "😴", value: 0, description: "ELO favorites win" },
+  { id: "playItSafe", label: "Play It Safe", emoji: "🧊", value: 0.25, description: "Mostly favorites" },
+  { id: "trueOdds", label: "True Odds", emoji: "⚖️", value: 0.5, description: "Pure ELO probability" },
+  { id: "madness", label: "Madness", emoji: "🔥", value: 0.75, description: "Upsets are common" },
+  { id: "sicko", label: "Sicko Mode", emoji: "👹", value: 1.0, description: "Total coinflip" }
 ];
 
 export function chaosCurve(raw: number): number {
@@ -19,9 +21,10 @@ export function chaosCurve(raw: number): number {
 }
 
 export function chaosLabel(value: number): string {
-  const curved = chaosCurve(value);
-  if (curved < 0.25) return "Safe Picks";
-  if (curved < 0.55) return "Balanced Madness";
-  if (curved < 0.8) return "Upset Hunting";
-  return "Absolute Mayhem";
+  if (value >= 1.0) return "True Random";
+  if (value > 0.85) return "Absolute Mayhem";
+  if (value > 0.65) return "Feeling Dangerous";
+  if (value > 0.4) return "Realistic Balance";
+  if (value > 0.15) return "Smart Money";
+  return "Snooze Fest";
 }
