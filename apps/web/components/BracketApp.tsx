@@ -131,6 +131,10 @@ export function BracketApp() {
   const totalGames = 63;
   const completion = Math.min(100, Math.round((picksCount / totalGames) * 100));
 
+  // Pick source tally
+  const userPickCount = Object.values(store.pickSourceByMatchup).filter((s) => s === "user").length;
+  const aiPickCount = picksCount - userPickCount;
+
   // Live bracket probability
   const liveProbability = useMemo(() => {
     let probability = 1;
@@ -259,7 +263,15 @@ export function BracketApp() {
           </div>
         </div>
 
-        <progress value={completion} max={100} style={{ width: "100%", height: 4, marginBottom: 8 }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+          <progress value={completion} max={100} style={{ flex: 1, height: 4 }} />
+          {picksCount > 0 && (
+            <span style={{ fontSize: "0.65rem", color: "var(--muted)", whiteSpace: "nowrap" }}>
+              <span style={{ color: "var(--text)" }}>You: {userPickCount}</span>
+              {aiPickCount > 0 && <> · <span style={{ opacity: 0.7 }}>AI: {aiPickCount}</span></>}
+            </span>
+          )}
+        </div>
 
         <div
           style={{

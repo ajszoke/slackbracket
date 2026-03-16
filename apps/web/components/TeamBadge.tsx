@@ -131,7 +131,7 @@ function StandardBadge({ team }: { team: Team }) {
 
   if (logo) {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={logo} alt={`${team.team} logo`} width={28} height={28} style={{ borderRadius: 999 }} />;
+    return <img src={logo} alt={`${team.team} logo`} width={28} height={28} style={{ objectFit: "contain" }} />;
   }
 
   const color = deterministicColor(team.id);

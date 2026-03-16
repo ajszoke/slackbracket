@@ -117,6 +117,25 @@ export const useBracketStore = create<BracketStore>()(
         }
       }
 
+      // Back-propagate: trace the picked team backward through the bracket.
+      // If user picks Duke in R3, Duke's R2 and R1 wins become user picks too.
+      if (games) {
+        let traceId = matchupId;
+        while (true) {
+          const game = games.find((g) => g.id === traceId);
+          if (!game) break;
+          const upstream =
+            game.sourceA.type === "winner" && nextPicks[game.sourceA.matchupId] === teamId
+              ? game.sourceA.matchupId
+              : game.sourceB.type === "winner" && nextPicks[game.sourceB.matchupId] === teamId
+                ? game.sourceB.matchupId
+                : null;
+          if (!upstream) break;
+          nextSources[upstream] = "user";
+          traceId = upstream;
+        }
+      }
+
       set({ picksByMatchup: nextPicks, pickSourceByMatchup: nextSources });
     },
     clearPick: (matchupId, games) => {

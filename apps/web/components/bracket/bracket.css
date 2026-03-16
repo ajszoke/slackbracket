@@ -448,10 +448,10 @@
   box-shadow: 0 0 10px var(--upset-glow, transparent), 0 0 3px var(--upset-glow, transparent);
 }
 
-/* Upset winner row — fire emoji fills the right side, check sits on top */
+/* Upset winner row — fire emoji fills the right side, check sits on top.
+   No overflow:hidden here; parent .bracket-matchup clips at card boundary. */
 .bracket-matchup__team--upset-winner {
   position: relative;
-  overflow: hidden;
 }
 
 .bracket-matchup__team--upset-winner::after {
