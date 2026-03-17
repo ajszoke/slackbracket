@@ -604,18 +604,15 @@ export function HowItWorks() {
     <section className="how-it-works" style={{ maxWidth: 1400, margin: "2rem auto", padding: "0 1rem" }}>
       <div className="card" style={{ overflow: "hidden" }}>
         {/* Header — always visible */}
-        <button
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+        <div
           onClick={handleToggle}
           style={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
             width: "100%",
-            background: "transparent",
-            border: "none",
-            color: "var(--text)",
             cursor: "pointer",
-            padding: 0,
           }}
         >
           <h3 style={{ margin: 0, fontFamily: "var(--font-hero), system-ui, sans-serif" }}>How It Works</h3>
@@ -629,7 +626,7 @@ export function HowItWorks() {
           >
             &#9660;
           </span>
-        </button>
+        </div>
 
         {/* Content — collapsible */}
         {expanded && (
