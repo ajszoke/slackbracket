@@ -25,14 +25,14 @@ export const metadata: Metadata = {
     description: "March Madness. Your way. AI-powered bracket builder with ELO predictions.",
     url: siteUrl,
     siteName: "Slackbracket",
-    images: [{ url: "/api/og", width: 1200, height: 630, alt: "Slackbracket — March Madness Bracket Builder" }],
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Slackbracket — March Madness Bracket Builder" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Slackbracket",
     description: "March Madness. Your way. AI-powered bracket builder with ELO predictions.",
-    images: ["/api/og"],
+    images: ["/og.png"],
   },
 };
 

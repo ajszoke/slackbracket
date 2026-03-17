@@ -52,9 +52,8 @@ export function deterministicColor(seedInput: string): string {
   return `hsl(${hue} 72% 52%)`;
 }
 
-export async function fetchLogoForTeam(team: Team): Promise<string | null> {
-  const response = await fetch(`/api/team-logo?team=${encodeURIComponent(team.team)}`, { cache: "force-cache" });
-  if (!response.ok) return null;
-  const payload = (await response.json()) as { logoUrl: string | null };
-  return payload.logoUrl;
+export async function fetchLogoForTeam(_team: Team): Promise<string | null> {
+  // Logos are pre-baked into bracket JSON as local paths (/logos/*.png).
+  // No runtime API fetch needed — return null to trigger initials fallback.
+  return null;
 }

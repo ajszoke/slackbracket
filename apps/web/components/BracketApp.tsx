@@ -51,22 +51,16 @@ export function BracketApp() {
   const { data: teamData, isLoading } = useQuery({
     queryKey: ["teams", store.bracketType],
     queryFn: async () => {
-      const response = await fetch(`/api/bracket-data?bracket=${store.bracketType}`);
+      const file = store.bracketType === "women" ? "bracket_women.json" : "bracket_men.json";
+      const response = await fetch(`/data/${file}`);
       if (!response.ok) throw new Error("Failed loading teams");
       const payload = (await response.json()) as unknown[];
       return normalizeTeams(payload);
     }
   });
 
-  const { data: liveData } = useQuery<LivePayload>({
-    queryKey: ["live-state"],
-    queryFn: async () => {
-      const response = await fetch("/api/live-state");
-      if (!response.ok) return { updatedAt: Date.now(), results: [] };
-      return (await response.json()) as LivePayload;
-    },
-    refetchInterval: 30_000
-  });
+  // Live state: stub for static export (no server)
+  const liveData: LivePayload = useMemo(() => ({ updatedAt: Date.now(), results: [] }), []);
 
   const teams = useMemo(() => teamData ?? [], [teamData]);
   const teamsById = useMemo<Record<string, Team>>(

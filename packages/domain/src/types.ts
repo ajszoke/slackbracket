@@ -7,7 +7,7 @@ export const firstFourOpponentSchema = z.object({
   team: z.string(),
   elo: z.number(),
   conference: z.string(),
-  logoUrl: z.string().url().optional()
+  logoUrl: z.string().optional()
 });
 
 export const teamSchema = z.object({
@@ -20,7 +20,7 @@ export const teamSchema = z.object({
   elo: z.number(),
   homeCourt: z.number().default(0),
   color: z.string().optional(),
-  logoUrl: z.string().url().optional(),
+  logoUrl: z.string().optional(),
   firstFourOpponent: firstFourOpponentSchema.optional()
 });
 export type Team = z.infer<typeof teamSchema>;
