@@ -500,6 +500,39 @@ html[data-theme="light"] .toggle-switch__grip {
   opacity: 1;
 }
 
+/* Gender toggle icons */
+.gender-icon {
+  font-weight: 900;
+  font-size: 0.95rem;
+  position: relative;
+  -webkit-text-stroke: 0.5px;
+}
+.gender-icon--male {
+  color: #38bdf8;
+  -webkit-text-stroke-color: #38bdf8;
+  right: 6px;
+  top: -2px;
+}
+.gender-icon--female {
+  color: #f472b6;
+  -webkit-text-stroke-color: #f472b6;
+  left: 6px;
+  top: -2px;
+}
+
+@media (max-width: 767px) {
+  .gender-icon--male {
+    top: -7px;
+    right: auto;
+    left: 7px;
+  }
+  .gender-icon--female {
+    top: -7px;
+    left: auto;
+    right: 7px;
+  }
+}
+
 .toggle-switch__input:focus-visible ~ .toggle-switch__track {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

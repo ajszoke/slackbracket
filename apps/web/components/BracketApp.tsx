@@ -301,8 +301,8 @@ export function BracketApp() {
             <ToggleSwitch
               checked={store.bracketType === "women"}
               onChange={(checked) => store.setBracketType(checked ? "women" : "men")}
-              iconLeft={<span title="Men's bracket" style={{ fontWeight: 900, fontSize: "1.15rem", color: "#38bdf8", WebkitTextStroke: "1px #38bdf8" }}>♂</span>}
-              iconRight={<span title="Women's bracket" style={{ fontWeight: 900, fontSize: "1.15rem", color: "#f472b6", WebkitTextStroke: "1px #f472b6" }}>♀</span>}
+              iconLeft={<span title="Men's bracket" className="gender-icon gender-icon--male">♂</span>}
+              iconRight={<span title="Women's bracket" className="gender-icon gender-icon--female">♀</span>}
               ariaLabel="Toggle men's or women's bracket"
             />
             <ToggleSwitch
