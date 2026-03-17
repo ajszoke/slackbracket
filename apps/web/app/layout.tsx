@@ -34,6 +34,9 @@ export const metadata: Metadata = {
     description: "March Madness. Your way. AI-powered bracket builder with ELO predictions.",
     images: ["/og.png"],
   },
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

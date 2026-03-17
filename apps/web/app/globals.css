@@ -638,6 +638,21 @@ a:hover {
 /* ============================================
    SICKO MODE ANNOUNCEMENT
    ============================================ */
+/* Pause pulse orbs during sicko to reduce GPU contention */
+html.sicko-active .bracket-pulse-user,
+html.sicko-active .bracket-pulse-ai {
+  animation-play-state: paused;
+}
+
+.sicko-flash {
+  will-change: opacity;
+}
+
+/* Contain bracket layout during sicko animation */
+html.sicko-active .bracket-shell {
+  contain: layout style paint;
+}
+
 /* Sicko window: counterclockwise rotation + grow + visible shake.
    No filter:blur — too expensive for GPU compositing on slow hardware.
    Animates .app-wrapper (not html) to avoid root stacking context bugs
