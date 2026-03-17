@@ -523,6 +523,45 @@
   .bracket-matchup::before {
     display: none !important;
   }
+
+  .bracket-mobile-championship {
+    width: 100%;
+    max-width: 320px;
+  }
+  .bracket-mobile-championship .bracket-matchup {
+    width: 100%;
+  }
+}
+
+/* ============================================
+   MOBILE ROUND DIVIDERS
+   ============================================ */
+.bracket-round-divider { display: none; }
+
+@media (max-width: 767px) {
+  .bracket-round-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 1rem;
+  }
+  .bracket-round-divider::before,
+  .bracket-round-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--region-color, var(--muted)), transparent);
+    opacity: 0.3;
+  }
+  .bracket-round-divider__label {
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.35em;
+    color: var(--region-color, var(--muted));
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0.6;
+  }
 }
 
 /* ============================================
@@ -573,6 +612,14 @@
   .bracket-mobile-region {
     display: block;
   }
+}
+
+/* Championship backstop: solid bg prevents page gradient bleed-through */
+.bracket-champ-backstop {
+  position: relative;
+  z-index: 1;
+  background: var(--bg);
+  border-radius: 8px;
 }
 
 /* Light mode championship: fully opaque winner — purple-tinted white */

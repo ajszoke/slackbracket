@@ -235,7 +235,7 @@
     "seed": 7,
     "elo": 1938.2238,
     "conference": "WCC",
-    "logoUrl": "/logos/saint-mary-s-ca.png"
+    "logoUrl": "/logos/saint-mary-s-ca.svg"
   },
   {
     "team": "Texas A&M",
@@ -447,6 +447,7 @@
     "seed": 12,
     "elo": 1736.073,
     "conference": "MAC",
+      "logoUrl": "/logos/miami-oh.svg",
     "logoUrl": "/logos/akron.png"
   },
   {
@@ -482,7 +483,8 @@
     "firstFourOpponent": {
       "team": "Miami (OH)",
       "elo": 1652.9951,
-      "conference": "MAC"
+      "conference": "MAC",
+      "logoUrl": "/logos/miami-oh.svg"
     },
     "logoUrl": "/logos/smu.png"
   },

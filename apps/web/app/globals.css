@@ -330,22 +330,22 @@ button:active {
     0 0 12px color-mix(in srgb, var(--accent) 40%, transparent 60%),
     0 0 24px color-mix(in srgb, var(--accent) 20%, transparent 80%),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  animation: generate-glow 3s ease-in-out infinite;
+  animation: generate-breathe 4s ease-in-out infinite;
 }
 
-@keyframes generate-glow {
+@keyframes generate-breathe {
   0%, 100% {
     box-shadow:
-      0 0 12px color-mix(in srgb, var(--accent) 40%, transparent 60%),
-      0 0 24px color-mix(in srgb, var(--accent) 20%, transparent 80%),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      0 0 10px color-mix(in srgb, var(--accent) 35%, transparent 65%),
+      0 0 20px color-mix(in srgb, var(--accent) 18%, transparent 82%),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
   50% {
     box-shadow:
-      0 0 16px color-mix(in srgb, var(--accent) 55%, transparent 45%),
-      0 0 36px color-mix(in srgb, var(--accent) 30%, transparent 70%),
-      0 0 48px color-mix(in srgb, #00f0ff 15%, transparent 85%),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      0 0 14px color-mix(in srgb, var(--accent) 50%, transparent 50%),
+      0 0 30px color-mix(in srgb, var(--accent) 25%, transparent 75%),
+      0 0 42px color-mix(in srgb, #00f0ff 10%, transparent 90%),
+      inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
 }
 
@@ -775,4 +775,138 @@ html[data-quality="ultra"] .bracket-matchup {
 .site-footer__btc {
   opacity: 0.6;
   cursor: help;
+}
+
+/* ============================================
+   HOW IT WORKS — Content Typography
+   ============================================ */
+.how-it-works__content h1 {
+  font-family: var(--font-hero), system-ui, sans-serif;
+  font-size: 1.3rem;
+  margin: 0 0 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.how-it-works__content h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 1.5rem 0 0.5rem;
+  color: var(--text);
+  border-bottom: 1px solid var(--divider);
+  padding-bottom: 0.3rem;
+}
+
+.how-it-works__content h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 1.2rem 0 0.4rem;
+  color: var(--text);
+}
+
+.how-it-works__content p {
+  font-size: 0.82rem;
+  line-height: 1.65;
+  margin: 0.5rem 0;
+  color: var(--text);
+}
+
+.how-it-works__content ul,
+.how-it-works__content ol {
+  font-size: 0.82rem;
+  line-height: 1.6;
+  margin: 0.4rem 0;
+  padding-left: 1.4rem;
+}
+
+.how-it-works__content li {
+  margin-bottom: 0.25rem;
+}
+
+.how-it-works__content blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 0.75rem 0;
+  padding: 0.4rem 0.75rem;
+  background: color-mix(in srgb, var(--accent) 6%, transparent 94%);
+  border-radius: 0 6px 6px 0;
+  font-size: 0.82rem;
+  color: var(--text);
+}
+
+.how-it-works__content strong {
+  color: var(--text);
+}
+
+.how-it-works__content hr {
+  border: none;
+  border-top: 1px solid var(--divider);
+  margin: 1.5rem 0;
+}
+
+/* Tables */
+.how-it-works__content table {
+  width: auto;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  margin: 1rem 0;
+}
+
+.how-it-works__content th {
+  background: var(--glass-bg);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 2px solid var(--accent);
+}
+
+.how-it-works__content td {
+  padding: 0.35rem 0.6rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.how-it-works__content tr:hover td {
+  background: var(--hover-tint);
+}
+
+/* Chart images */
+.how-it-works__content img {
+  max-width: 50%;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  margin: 0.75rem 0;
+}
+
+/* KaTeX theme overrides */
+.how-it-works__content .katex {
+  font-size: 1.25em;
+  color: var(--text);
+}
+
+.how-it-works__content .katex-display {
+  margin: 0.75rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.how-it-works__content .katex-display .katex {
+  font-size: 1.45em;
+}
+
+/* Scrollbar styling */
+.how-it-works__content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.how-it-works__content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.how-it-works__content::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  border-radius: 3px;
+  opacity: 0.5;
+}
+
+/* Light mode chart images */
+html[data-theme="light"] .how-it-works__content img {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }

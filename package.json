@@ -15,5 +15,12 @@
     "test": "npm run test -w @slackbracket/domain",
     "format:check": "npx prettier --check \"apps/web/**/*.{ts,tsx,js,jsx,json,css,md}\" \"packages/domain/src/**/*.{ts,js}\"",
     "format:write": "npx prettier --write \"apps/web/**/*.{ts,tsx,js,jsx,json,css,md}\" \"packages/domain/src/**/*.{ts,js}\""
+  },
+  "dependencies": {
+    "katex": "^0.16.38",
+    "react-markdown": "^10.1.0",
+    "rehype-katex": "^7.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0"
   }
 }

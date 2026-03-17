@@ -61,9 +61,9 @@ function GenerateButton({ onGenerate }: { onGenerate: () => void }) {
   }, [onGenerate]);
 
   return (
-    <button className="btn-generate" onClick={handleClick} style={{ marginTop: 10, width: "100%" }}>
+    <button className="btn-generate" data-tour-target="generate-btn" onClick={handleClick} style={{ marginTop: 10, width: "100%" }}>
       <span style={{ position: "relative", zIndex: 1 }}>
-        🎲 Generate Bracket
+        🎲 Generate AI Picks
       </span>
       {diceFlash && (
         <span

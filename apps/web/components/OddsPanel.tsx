@@ -100,6 +100,7 @@ export function OddsPanel({
         display: "flex",
         flexDirection: "column",
         textAlign: "center",
+        flex: 1,
       }}
     >
       <h3 style={{ margin: 0, flexShrink: 0 }}>Bracket Odds</h3>

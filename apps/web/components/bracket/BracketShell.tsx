@@ -200,7 +200,9 @@ export function BracketShell(props: Props) {
           {/* Championship — absolutely centered between the two sections */}
           <div className="bracket-ff-slot bracket-ff-slot--championship">
             <span className="bracket-ff-label">Championship</span>
-            <FFGame game={ff.championship} {...ffCellProps} isChampionship />
+            <div className="bracket-champ-backstop">
+              <FFGame game={ff.championship} {...ffCellProps} isChampionship />
+            </div>
             {/* Huge winner badge pinned to championship card */}
             <AnimatePresence>
               {champWinner && <ChampionBadge team={champWinner} size={440} />}
@@ -245,8 +247,10 @@ export function BracketShell(props: Props) {
             <FFGame game={ff.semi1} {...ffCellProps} />
             <FFGame game={ff.semi2} {...ffCellProps} />
             <span className="bracket-championship__label">Championship</span>
-            <div style={{ position: "relative" }}>
-              <FFGame game={ff.championship} {...ffCellProps} isChampionship />
+            <div className="bracket-mobile-championship" style={{ position: "relative" }}>
+              <div className="bracket-champ-backstop">
+                <FFGame game={ff.championship} {...ffCellProps} isChampionship />
+              </div>
               <AnimatePresence>
                 {champWinner && <ChampionBadge team={champWinner} size={280} />}
               </AnimatePresence>

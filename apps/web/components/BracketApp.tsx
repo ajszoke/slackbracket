@@ -20,6 +20,7 @@ import { useBracketLayout } from "../lib/useBracketLayout";
 import { BracketShell } from "./bracket/BracketShell";
 import { ChaosMeter } from "./ChaosMeter";
 import { Footer } from "./Footer";
+import { HowItWorks } from "./HowItWorks";
 import { OddsPanel } from "./OddsPanel";
 import { SocialSharePanel } from "./SocialSharePanel";
 import { ToggleSwitch } from "./ToggleSwitch";
@@ -141,7 +142,7 @@ export function BracketApp() {
 
   const handleTourNext = () => {
     const next = tourStep + 1;
-    if (next >= 4) {
+    if (next >= 6) {
       handleTourDismiss();
     } else {
       setTourStep(next);
@@ -292,13 +293,16 @@ export function BracketApp() {
             marginBottom: 8
           }}
         >
-          <h1 className="hero-title">Slackbracket <span className="hero-year">2026</span></h1>
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/" style={{ textDecoration: "none" }}>
+            <h1 className="hero-title">Slackbracket <span className="hero-year">2026</span></h1>
+          </a>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <ToggleSwitch
               checked={store.bracketType === "women"}
               onChange={(checked) => store.setBracketType(checked ? "women" : "men")}
-              iconLeft={<span title="Men's bracket">♂</span>}
-              iconRight={<span title="Women's bracket">♀</span>}
+              iconLeft={<span title="Men's bracket" style={{ fontWeight: 900, fontSize: "1.15rem", color: "#38bdf8", WebkitTextStroke: "1px #38bdf8" }}>♂</span>}
+              iconRight={<span title="Women's bracket" style={{ fontWeight: 900, fontSize: "1.15rem", color: "#f472b6", WebkitTextStroke: "1px #f472b6" }}>♀</span>}
               ariaLabel="Toggle men's or women's bracket"
             />
             <ToggleSwitch
@@ -341,8 +345,8 @@ export function BracketApp() {
             marginBottom: 12
           }}
         >
-          <ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} onGenerate={generateBracket} />
-          <OddsPanel summary={humanOdds} filled={picksCount} temperature={temperatureLabels} roundOdds={roundOdds} />
+          <div data-tour-target="chaos-meter" style={{ display: "flex", flexDirection: "column" }}><ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} onGenerate={generateBracket} /></div>
+          <div data-tour-target="odds-panel" style={{ display: "flex", flexDirection: "column" }}><OddsPanel summary={humanOdds} filled={picksCount} temperature={temperatureLabels} roundOdds={roundOdds} /></div>
           <SocialSharePanel shareUrl={shareUrl} oneIn={humanOdds.display} filled={picksCount} />
         </div>
       </header>
@@ -358,6 +362,7 @@ export function BracketApp() {
         selectedRegion={store.selectedRegion}
         onRegionChange={store.setRegion}
       />
+      <HowItWorks />
       <Footer />
       <TutorialOverlay
         step={tourStep}
