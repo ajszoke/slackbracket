@@ -1,17 +1,17 @@
 "use client";
 
 const STEPS = [
-  "Pick a mode: Quick Generate for instant bracket, or Guided Custom if you want selective control.",
-  "Tap winners in any game. Sparse picks are encouraged; lock your favorites and fill the rest.",
-  "Use Chaos Meter presets to control upset frequency.",
-  "Share your bracket URL and challenge friends."
+  "Welcome! Slackbracket is two chaos engines working together \u2014 your picks and the AI\u2019s. Lock in your favorites and let the algorithm fill the rest.",
+  "Tap any team to pick a winner. Don\u2019t worry about filling every game \u2014 sparse picks are encouraged.",
+  "Use the Chaos Meter to set the AI\u2019s personality. \u2018True Odds\u2019 follows ELO ratings. \u2018Sicko Mode\u2019 is pure chaos.",
+  "Hit \u2018Generate Bracket\u2019 to fill remaining games, then share your bracket URL to challenge friends!",
 ];
 
 export function TutorialOverlay({
   step,
   dismissed,
   onNext,
-  onDismiss
+  onDismiss,
 }: {
   step: number;
   dismissed: boolean;
@@ -27,31 +27,38 @@ export function TutorialOverlay({
         bottom: 16,
         zIndex: 50,
         width: "min(360px, 92vw)",
-        background: "#111a30",
-        border: "1px solid #3f517c",
+        background: "var(--glass-bg)",
+        border: "1px solid var(--glass-border)",
         borderRadius: 14,
-        padding: "0.9rem"
+        padding: "0.9rem",
+        backdropFilter: "blur(var(--glass-blur))",
       }}
     >
       <strong>Quick Tour</strong>
-      <p style={{ color: "var(--muted)" }}>{STEPS[step]}</p>
-      <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <button onClick={onDismiss} style={{ background: "transparent", border: "none", color: "#9db2dd" }}>
+      <p style={{ color: "var(--muted)", fontSize: "0.85rem", lineHeight: 1.5 }}>{STEPS[step]}</p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <button
+          onClick={onDismiss}
+          style={{ background: "transparent", border: "none", color: "var(--muted)", cursor: "pointer" }}
+        >
           Skip
         </button>
-        <button
-          onClick={onNext}
-          style={{
-            background: "var(--accent)",
-            color: "white",
-            border: "none",
-            borderRadius: 8,
-            padding: "0.35rem 0.7rem",
-            cursor: "pointer"
-          }}
-        >
-          Next
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: "0.7rem", color: "var(--muted)" }}>{step + 1}/{STEPS.length}</span>
+          <button
+            onClick={onNext}
+            style={{
+              background: "var(--accent)",
+              color: "white",
+              border: "none",
+              borderRadius: 8,
+              padding: "0.35rem 0.7rem",
+              cursor: "pointer",
+            }}
+          >
+            {step < STEPS.length - 1 ? "Next" : "Done"}
+          </button>
+        </div>
       </div>
     </div>
   );

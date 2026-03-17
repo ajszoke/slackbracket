@@ -3,14 +3,7 @@
    Based on proven ESPN/CBS patterns + Jakub Hájek codepen
    ============================================ */
 
-/* --- Region Colors --- */
-:root {
-  --region-east: #00f0ff;
-  --region-west: #818cf8;
-  --region-south: #2dd4bf;
-  --region-midwest: #38bdf8;
-  --region-finalfour: #a78bfa;
-}
+/* Region colors are defined in globals.css :root and overridden per-theme */
 
 /* ============================================
    FULL BRACKET SHELL (Desktop)
@@ -278,10 +271,10 @@
    ============================================ */
 .bracket-matchup {
   position: relative;
-  background: rgba(18, 26, 48, 0.75);
+  background: var(--glass-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
   border-left: 3px solid var(--region-color, var(--accent));
   border-radius: 8px;
   overflow: hidden;
@@ -293,19 +286,20 @@
 }
 
 .bracket-matchup:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--hover-border);
   box-shadow: 0 0 12px rgba(var(--region-color-rgb, 124, 77, 255), 0.15);
 }
 
-/* Championship card: normal dark card, but the winner row gets reversed (white bg, dark text) */
+/* Championship card: opaque background so winner fill reads true */
 .bracket-matchup--championship {
+  background: var(--card);
   border: 2px solid var(--region-finalfour);
   border-left: 4px solid var(--region-finalfour);
   box-shadow: 0 0 20px rgba(167, 139, 250, 0.2), 0 0 6px rgba(167, 139, 250, 0.12);
 }
 
 .bracket-matchup--championship .bracket-matchup__team--selected {
-  background: rgba(240, 245, 255, 0.92);
+  background: rgba(240, 245, 255, 0.96);
   color: #1a1a2e;
 }
 
@@ -351,31 +345,31 @@
 }
 
 .bracket-matchup__team:first-child {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--divider);
 }
 
 .bracket-matchup__team:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--hover-tint);
 }
 
 /* User pick: solid, committed feel */
 .bracket-matchup__team--selected {
-  background: color-mix(in srgb, var(--region-color, var(--accent)) 20%, transparent 80%);
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 28%, transparent 72%);
 }
 
 .bracket-matchup__team--selected:hover {
-  background: color-mix(in srgb, var(--region-color, var(--accent)) 28%, transparent 72%);
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 36%, transparent 64%);
 }
 
 /* AI pick: ephemeral, lighter treatment */
 .bracket-matchup__team--ai-selected {
-  background: color-mix(in srgb, var(--region-color, var(--accent)) 8%, transparent 92%);
-  opacity: 0.72;
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 16%, transparent 84%);
+  opacity: 0.78;
 }
 
 .bracket-matchup__team--ai-selected:hover {
-  background: color-mix(in srgb, var(--region-color, var(--accent)) 14%, transparent 86%);
-  opacity: 0.85;
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 22%, transparent 78%);
+  opacity: 0.88;
 }
 
 /* AI upset picks: bump opacity slightly so upset warmth reads clearly */
@@ -436,7 +430,7 @@
   color: var(--muted);
   opacity: 0.5;
   font-style: italic;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--divider);
 }
 
 .bracket-matchup__tbd:last-child {
@@ -551,8 +545,8 @@
     flex-shrink: 0;
     padding: 0.35rem 0.75rem;
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(18, 26, 48, 0.6);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
     color: var(--text);
     font-size: 0.75rem;
     font-weight: 600;
@@ -579,6 +573,25 @@
   .bracket-mobile-region {
     display: block;
   }
+}
+
+/* Light mode championship: fully opaque winner — purple-tinted white */
+html[data-theme="light"] .bracket-matchup--championship .bracket-matchup__team--selected {
+  background: #ede8f5;
+  color: var(--text);
+}
+
+html[data-theme="light"] .bracket-matchup--championship .bracket-matchup__team--selected .bracket-matchup__seed {
+  color: var(--muted);
+}
+
+html[data-theme="light"] .bracket-matchup--championship {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.15), 0 0 6px rgba(124, 58, 237, 0.08);
+}
+
+/* Light mode locked overlay */
+html[data-theme="light"] .bracket-matchup--locked::after {
+  background: rgba(248, 249, 252, 0.3);
 }
 
 /* Desktop: hide mobile elements */

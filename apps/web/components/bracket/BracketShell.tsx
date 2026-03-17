@@ -1,7 +1,10 @@
 "use client";
 
 import type { Team } from "@slackbracket/domain";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 
+import { fetchLogoForTeam, teamInitials } from "../../lib/logos";
 import type { GameNode } from "../../lib/tournament";
 import { resolveTeamForSource } from "../../lib/tournament";
 import type { BracketLayout } from "../../lib/useBracketLayout";
@@ -72,6 +75,63 @@ function FFGame({
   );
 }
 
+function ChampionBadge({ team, size = 220 }: { team: Team; size?: number }) {
+  const [logo, setLogo] = useState<string | null>(team.logoUrl ?? null);
+  const [currentId, setCurrentId] = useState(team.id);
+
+  if (team.id !== currentId) {
+    setCurrentId(team.id);
+    setLogo(team.logoUrl ?? null);
+  }
+
+  useEffect(() => {
+    let mounted = true;
+    if (!logo) {
+      fetchLogoForTeam(team).then((url) => { if (mounted) setLogo(url); });
+    }
+    return () => { mounted = false; };
+  }, [team, logo]);
+
+  return (
+    <motion.div
+      key={team.id}
+      initial={{ scale: 0.5, opacity: 0, x: "-50%", y: "-50%", rotate: 15 }}
+      animate={{ scale: 1, opacity: 0.13, x: "-50%", y: "-50%", rotate: 15 }}
+      exit={{ scale: 0.5, opacity: 0, x: "-50%", y: "-50%", rotate: 15 }}
+      transition={{ type: "spring", stiffness: 200, damping: 20, delay: 0.2 }}
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        width: size,
+        height: size,
+        pointerEvents: "none",
+        zIndex: 0,
+        filter: "blur(1.5px)",
+      }}
+    >
+      {logo ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={logo} alt="" width={size} height={size} style={{ objectFit: "contain", width: "100%", height: "100%" }} />
+      ) : (
+        <div style={{
+          width: "100%",
+          height: "100%",
+          borderRadius: "50%",
+          display: "grid",
+          placeItems: "center",
+          fontSize: size * 0.33,
+          fontWeight: 900,
+          color: "var(--region-finalfour)",
+          background: "radial-gradient(circle, color-mix(in srgb, var(--region-finalfour) 15%, transparent 85%), transparent 70%)",
+        }}>
+          {teamInitials(team.team)}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
 export function BracketShell(props: Props) {
   const { layout, picksByMatchup, pickSourceByMatchup, lockedByMatchup, teamsById, onPick, selectedRegion, onRegionChange } = props;
 
@@ -89,6 +149,8 @@ export function BracketShell(props: Props) {
 
   const ff = layout.finalFour;
   const ffCellProps = { picksByMatchup, pickSourceByMatchup, lockedByMatchup, teamsById, onPick };
+  const champWinnerId = ff.championship ? picksByMatchup[ff.championship.id] : undefined;
+  const champWinner = champWinnerId ? teamsById[champWinnerId] : undefined;
 
   return (
     <div className="bracket-shell">
@@ -139,6 +201,10 @@ export function BracketShell(props: Props) {
           <div className="bracket-ff-slot bracket-ff-slot--championship">
             <span className="bracket-ff-label">Championship</span>
             <FFGame game={ff.championship} {...ffCellProps} isChampionship />
+            {/* Huge winner badge pinned to championship card */}
+            <AnimatePresence>
+              {champWinner && <ChampionBadge team={champWinner} size={440} />}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -179,7 +245,12 @@ export function BracketShell(props: Props) {
             <FFGame game={ff.semi1} {...ffCellProps} />
             <FFGame game={ff.semi2} {...ffCellProps} />
             <span className="bracket-championship__label">Championship</span>
-            <FFGame game={ff.championship} {...ffCellProps} isChampionship />
+            <div style={{ position: "relative" }}>
+              <FFGame game={ff.championship} {...ffCellProps} isChampionship />
+              <AnimatePresence>
+                {champWinner && <ChampionBadge team={champWinner} size={280} />}
+              </AnimatePresence>
+            </div>
           </div>
         ) : (
           <RegionBracket {...regionProps(selectedRegion, "ltr")} />

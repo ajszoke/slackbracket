@@ -100,14 +100,14 @@ export function buildGameTree(teams: Team[]): GameNode[] {
     region: "FinalFour",
     slot: 1,
     sourceA: { type: "winner", matchupId: gameId(4, "East", 1) },
-    sourceB: { type: "winner", matchupId: gameId(4, "West", 1) }
+    sourceB: { type: "winner", matchupId: gameId(4, "South", 1) }
   });
   nodes.push({
     id: gameId(5, "FinalFour", 2),
     round: 5,
     region: "FinalFour",
     slot: 2,
-    sourceA: { type: "winner", matchupId: gameId(4, "South", 1) },
+    sourceA: { type: "winner", matchupId: gameId(4, "West", 1) },
     sourceB: { type: "winner", matchupId: gameId(4, "Midwest", 1) }
   });
   nodes.push({

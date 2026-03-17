@@ -53,6 +53,9 @@ function findCascadedClears(
   return toClear;
 }
 
+type Theme = "dark" | "light";
+type QualityTier = "low" | "medium" | "high" | "ultra";
+
 type BracketStore = {
   bracketType: "men" | "women";
   chaos: number;
@@ -61,6 +64,8 @@ type BracketStore = {
   pickSourceByMatchup: Record<string, PickSource>;
   lockedByMatchup: Record<string, string>;
   showTour: boolean;
+  theme: Theme;
+  quality: QualityTier;
   setBracketType: (value: "men" | "women") => void;
   setChaos: (value: number) => void;
   setChaosPreset: (presetId: (typeof CHAOS_PRESETS)[number]["id"]) => void;
@@ -70,6 +75,8 @@ type BracketStore = {
   hydratePicks: (picks: Record<string, string>) => void;
   setLocked: (locked: Record<string, string>) => void;
   setShowTour: (show: boolean) => void;
+  setTheme: (theme: Theme) => void;
+  setQuality: (quality: QualityTier) => void;
   autoFillRemaining: (games: GameNode[], teamsById: Record<string, Team>) => void;
   resetAll: () => void;
 };
@@ -81,7 +88,9 @@ const defaults = {
   picksByMatchup: {} as Record<string, string>,
   pickSourceByMatchup: {} as Record<string, PickSource>,
   lockedByMatchup: {} as Record<string, string>,
-  showTour: false
+  showTour: false,
+  theme: "light" as Theme,
+  quality: "medium" as QualityTier
 };
 
 export const useBracketStore = create<BracketStore>()(
@@ -170,6 +179,8 @@ export const useBracketStore = create<BracketStore>()(
         return { lockedByMatchup };
       }),
     setShowTour: (showTour) => set({ showTour }),
+    setTheme: (theme) => set({ theme }),
+    setQuality: (quality) => set({ quality }),
     autoFillRemaining: (games, teamsById) => {
       const state = get();
       const nextPicks = { ...state.picksByMatchup };
@@ -217,6 +228,12 @@ export const useBracketStore = create<BracketStore>()(
 
       set({ picksByMatchup: nextPicks, pickSourceByMatchup: nextSources });
     },
-    resetAll: () => set({ ...defaults })
-  }))
+    resetAll: () => set((state) => ({ ...defaults, theme: state.theme, quality: state.quality, bracketType: state.bracketType }))
+  }), {
+    partialize: (state) => {
+      // Exclude UI-only state from undo/redo history
+      const { theme: _theme, showTour: _showTour, quality: _quality, ...tracked } = state;
+      return tracked;
+    }
+  })
 );

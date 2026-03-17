@@ -8,8 +8,8 @@ type BracketRegion = (typeof REGIONS)[number];
 export type BracketLayout = {
   regions: Record<BracketRegion, GameNode[][]>; // index = round-1, each inner array sorted by slot
   finalFour: {
-    semi1: GameNode | null; // R5-FinalFour-1 (East vs West)
-    semi2: GameNode | null; // R5-FinalFour-2 (South vs Midwest)
+    semi1: GameNode | null; // R5-FinalFour-1 (East vs South)
+    semi2: GameNode | null; // R5-FinalFour-2 (West vs Midwest)
     championship: GameNode | null; // R6-FinalFour-1
   };
 };

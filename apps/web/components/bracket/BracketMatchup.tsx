@@ -90,9 +90,12 @@ function CompactTeamRow({
 
   const isAi = pickSource === "auto";
   const upsetFill = selected && isUpset ? upsetFillColor(upsetDeg, isAi) : undefined;
-  // Championship upset: layer upset tint on top of white base
-  const fillBg = isChampionship && selected && upsetFill
-    ? `linear-gradient(${upsetFill}, ${upsetFill}), linear-gradient(rgba(240,245,255,0.92), rgba(240,245,255,0.92))`
+  // Championship winner: fully opaque background via CSS var (purple in light, white in dark)
+  // Upset: layer warm upset tint on top of opaque base. Non-upset: solid opaque base.
+  const fillBg = isChampionship && selected
+    ? upsetFill
+      ? `linear-gradient(${upsetFill}, ${upsetFill}), linear-gradient(var(--champ-winner-bg), var(--champ-winner-bg))`
+      : "var(--champ-winner-bg)"
     : upsetFill;
 
   const classes = [
@@ -113,6 +116,7 @@ function CompactTeamRow({
       className={classes}
       style={{
         ...(fillBg ? { background: fillBg } : {}),
+        ...(isChampionship && selected ? { color: "var(--champ-winner-text)" } : {}),
         ...(selected && isUpset ? { "--upset-degree": `${Math.min(upsetDeg / 15, 1)}` } as Record<string, string> : {})
       } as React.CSSProperties}
     >
@@ -138,7 +142,7 @@ function CompactTeamRow({
   );
 }
 
-export function BracketMatchup({ game, teamA, teamB, pickedId, lockedId, pickSource, onPick, regionColor, isChampionship }: Props) {
+export function BracketMatchup({ game: _game, teamA, teamB, pickedId, lockedId, pickSource, onPick, regionColor, isChampionship }: Props) {
   const locked = Boolean(lockedId);
   const degree = upsetDegree(teamA, teamB, pickedId);
   const glowColor = upsetGlowColor(degree);

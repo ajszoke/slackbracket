@@ -13,7 +13,7 @@ export function Footer() {
         </p>
         <div className="site-footer__links">
           <a href="https://github.com/ajszoke/slackbracket" target="_blank" rel="noreferrer">GitHub</a>
-          <a href="mailto:zoke2556@gmail.com">Contact</a>
+          <a href="mailto:aszoke1@gmail.com">Contact</a>
           <a href="https://www.paypal.me/slackbracket" target="_blank" rel="noreferrer">PayPal</a>
           <span className="site-footer__btc" title="Bitcoin: 3Nej8eESs213wuowoAcAxYT6wytLH7mUPF">
             BTC: 3Nej...mUPF

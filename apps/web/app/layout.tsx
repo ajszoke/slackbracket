@@ -38,7 +38,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable}`}>
+    <html lang="en" className={`${spaceGrotesk.variable} ${orbitron.variable}`} data-theme="light" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: `try{var d=document.documentElement;d.setAttribute('data-theme',localStorage.getItem('slackbracket:theme')||'light');d.setAttribute('data-quality',localStorage.getItem('slackbracket:quality')||'medium')}catch(e){}` }} />
+      </head>
       <body>{children}</body>
     </html>
   );

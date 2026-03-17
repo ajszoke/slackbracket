@@ -26,8 +26,16 @@
 
   /* Glassmorphism */
   --glass-bg: rgba(18, 26, 48, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.10);
   --glass-blur: 12px;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --champ-winner-bg: rgba(240, 245, 255, 0.96);
+  --champ-winner-text: #1a1a2e;
+
+  /* Surface interaction */
+  --hover-tint: rgba(255, 255, 255, 0.04);
+  --hover-border: rgba(255, 255, 255, 0.12);
+  --divider: rgba(255, 255, 255, 0.06);
 
   /* Glow */
   --glow-sm: 0 0 8px;
@@ -42,6 +50,64 @@
   --pulse-speed: 6s;
   --user-glow-color: hsl(190, 100%, 60%);
   --ai-glow-color: hsl(190, 100%, 60%);
+}
+
+/* ============================================
+   LIGHT THEME
+   ============================================ */
+html[data-theme="light"] {
+  color-scheme: light;
+
+  --bg-deep: #e4e7ef;
+  --bg: #eaecf4;
+  --card: #f8f9fc;
+  --muted: #6b7280;
+  --text: #1a1a2e;
+  --accent: #7c4dff;
+  --good: #16a34a;
+  --warn: #d97706;
+  --danger: #dc2626;
+
+  --glass-bg: rgba(248, 249, 252, 0.82);
+  --glass-border: rgba(0, 0, 0, 0.12);
+
+  --hover-tint: rgba(0, 0, 0, 0.04);
+  --hover-border: rgba(0, 0, 0, 0.15);
+  --divider: rgba(0, 0, 0, 0.06);
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --champ-winner-bg: #d4c8ed;
+  --champ-winner-text: #2d1a4e;
+
+  /* Deeper region colors for light bg readability */
+  --region-east: #0891b2;
+  --region-west: #6366f1;
+  --region-south: #0d9488;
+  --region-midwest: #0284c7;
+  --region-finalfour: #7c3aed;
+}
+
+/* Light mode pulse: much softer, lower saturation */
+html[data-theme="light"] .bracket-pulse-user,
+html[data-theme="light"] .bracket-pulse-ai {
+  opacity: 0.2;
+  filter: saturate(0.6);
+}
+
+html[data-theme="light"] .bracket-pulse-ambient {
+  background: radial-gradient(ellipse at 50% 50%, rgba(124, 77, 255, 0.015) 0%, transparent 60%);
+}
+
+/* Light mode hero: own identity — deeper gradient, shadow instead of glow */
+html[data-theme="light"] .hero-title {
+  background: linear-gradient(135deg, #0891b2 0%, #6d28d9 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  filter: drop-shadow(0 1px 3px rgba(109, 40, 217, 0.15));
+}
+
+/* Light mode "2026" — dark navy */
+html[data-theme="light"] .hero-year {
+  -webkit-text-fill-color: #1a1a2e;
 }
 
 /* ============================================
@@ -60,6 +126,28 @@ body {
   font-family: "Space Grotesk", Inter, "Segoe UI", system-ui, sans-serif;
 }
 
+/* Animatable custom properties for smooth orb transitions */
+@property --user-glow {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --ai-glow {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --user-spread {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 65%;
+}
+@property --ai-spread {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 65%;
+}
+
 /* Bracket Pulse — two independent orbs breathing at their own frequencies.
    User orb (top-left): driven by user pick surprisal.
    AI orb (bottom-right): driven by AI pick surprisal.
@@ -75,11 +163,13 @@ body {
 .bracket-pulse-user {
   background: radial-gradient(ellipse at 20% 25%, var(--user-glow), transparent var(--user-spread, 65%));
   animation: pulse-breathe var(--pulse-speed) ease-in-out infinite;
+  transition: --user-glow 1s ease-in-out, --user-spread 1s ease-in-out;
 }
 
 .bracket-pulse-ai {
   background: radial-gradient(ellipse at 80% 75%, var(--ai-glow), transparent var(--ai-spread, 65%));
   animation: pulse-breathe var(--pulse-speed) ease-in-out infinite;
+  transition: --ai-glow 1s ease-in-out, --ai-spread 1s ease-in-out;
 }
 
 /* Ambient purple base — static, no animation */
@@ -109,7 +199,7 @@ body {
   margin: 0;
   font-family: var(--font-hero), "Space Grotesk", system-ui, sans-serif;
   font-weight: 800;
-  font-size: 2.4rem;
+  font-size: clamp(1.5rem, 5vw, 2.4rem);
   letter-spacing: 0.12em;
   text-transform: uppercase;
   background: linear-gradient(135deg, #00f0ff 0%, #7c4dff 100%);
@@ -143,13 +233,14 @@ button {
   border: 1px solid var(--glass-border);
   border-radius: 14px;
   padding: 0.9rem;
+  box-shadow: var(--card-shadow);
   transition:
     border-color 0.2s var(--ease-smooth),
     box-shadow 0.2s var(--ease-smooth);
 }
 
 .card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--hover-border);
 }
 
 /* ============================================
@@ -172,8 +263,8 @@ button {
 }
 
 button:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--hover-tint);
+  border-color: var(--hover-border);
 }
 
 button:active {
@@ -187,8 +278,8 @@ button:active {
 }
 
 .btn-muted {
-  background: rgba(18, 26, 48, 0.5);
-  border-color: rgba(255, 255, 255, 0.06);
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
   color: var(--muted);
 }
 
@@ -213,8 +304,205 @@ button:active {
 }
 
 .btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--hover-tint);
   color: var(--text);
+}
+
+/* ============================================
+   GENERATE BUTTON — THE button. Lotto machine energy.
+   ============================================ */
+.btn-generate {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 70%, transparent 30%),
+    color-mix(in srgb, #00f0ff 35%, var(--accent) 65%));
+  border: 1.5px solid var(--accent);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.5rem 1rem;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease-bounce), box-shadow 0.2s;
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--accent) 40%, transparent 60%),
+    0 0 24px color-mix(in srgb, var(--accent) 20%, transparent 80%),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  animation: generate-glow 3s ease-in-out infinite;
+}
+
+@keyframes generate-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 12px color-mix(in srgb, var(--accent) 40%, transparent 60%),
+      0 0 24px color-mix(in srgb, var(--accent) 20%, transparent 80%),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 0 16px color-mix(in srgb, var(--accent) 55%, transparent 45%),
+      0 0 36px color-mix(in srgb, var(--accent) 30%, transparent 70%),
+      0 0 48px color-mix(in srgb, #00f0ff 15%, transparent 85%),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+}
+
+.btn-generate:hover {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--accent) 80%, transparent 20%),
+    color-mix(in srgb, #00f0ff 40%, var(--accent) 60%));
+}
+
+.btn-generate:active {
+  transform: scale(0.95);
+  box-shadow:
+    0 0 20px color-mix(in srgb, var(--accent) 60%, transparent 40%),
+    0 0 40px color-mix(in srgb, var(--accent) 35%, transparent 65%),
+    0 0 60px color-mix(in srgb, #00f0ff 20%, transparent 80%);
+}
+
+/* Shimmer sweep on hover */
+.btn-generate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 60%
+  );
+  transform: translateX(-100%);
+}
+
+.btn-generate:hover::after {
+  animation: shimmer-sweep 0.8s ease-out;
+}
+
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Dice flash on click */
+@keyframes dice-flash {
+  0% { opacity: 0.8; transform: scale(1) rotate(0deg); }
+  50% { opacity: 0.4; transform: scale(1.8) rotate(180deg); }
+  100% { opacity: 0; transform: scale(2.5) rotate(360deg); }
+}
+
+/* Light mode: shadow-based instead of neon */
+html[data-theme="light"] .btn-generate {
+  box-shadow: 0 2px 12px rgba(124, 77, 255, 0.25), 0 1px 4px rgba(124, 77, 255, 0.15);
+}
+
+html[data-theme="light"] .btn-generate:active {
+  box-shadow: 0 2px 16px rgba(124, 77, 255, 0.35), 0 1px 6px rgba(124, 77, 255, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-generate { animation: none !important; }
+  .btn-generate::after { animation: none !important; }
+}
+
+/* ============================================
+   TOGGLE SWITCH
+   ============================================ */
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-switch__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.toggle-switch__track {
+  position: relative;
+  width: 52px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  transition: background 0.2s var(--ease-smooth), border-color 0.2s;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Knob — large with hamburger grip */
+.toggle-switch__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: left 0.25s var(--ease-smooth);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.toggle-switch__grip {
+  display: block;
+  width: 8px;
+  height: 1.5px;
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="light"] .toggle-switch__grip {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.toggle-switch__input:checked ~ .toggle-switch__track .toggle-switch__knob {
+  left: 28px;
+}
+
+/* Revealed icons — appear in the empty space opposite the knob */
+.toggle-switch__reveal {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.toggle-switch__reveal--left {
+  left: 6px;
+}
+
+.toggle-switch__reveal--right {
+  right: 6px;
+}
+
+.toggle-switch__reveal--visible {
+  opacity: 1;
+}
+
+.toggle-switch__input:focus-visible ~ .toggle-switch__track {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ============================================
@@ -226,11 +514,11 @@ progress {
   height: 4px;
   border: none;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--divider);
 }
 
 progress::-webkit-progress-bar {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--divider);
   border-radius: 2px;
 }
 
@@ -396,6 +684,43 @@ html.sicko-active input[type="range"]::-webkit-slider-thumb {
 }
 
 /* ============================================
+   QUALITY TIERS
+   ============================================ */
+/* Low: no glass, no pulse — solid backgrounds, max performance */
+html[data-quality="low"] .bracket-pulse-user,
+html[data-quality="low"] .bracket-pulse-ai,
+html[data-quality="low"] .bracket-pulse-ambient {
+  display: none;
+}
+
+html[data-quality="low"] .card,
+html[data-quality="low"] .bracket-matchup {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html[data-quality="low"] .btn-generate {
+  animation: none;
+}
+
+/* High: stronger glass */
+html[data-quality="high"] .card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Ultra: maximum glass + saturation boost */
+html[data-quality="ultra"] .card {
+  backdrop-filter: blur(20px) saturate(1.2);
+  -webkit-backdrop-filter: blur(20px) saturate(1.2);
+}
+
+html[data-quality="ultra"] .bracket-matchup {
+  backdrop-filter: blur(12px) saturate(1.1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.1);
+}
+
+/* ============================================
    REDUCED MOTION
    ============================================ */
 @media (prefers-reduced-motion: reduce) {
@@ -418,7 +743,7 @@ html.sicko-active input[type="range"]::-webkit-slider-thumb {
 .site-footer {
   margin-top: 2rem;
   padding: 1.5rem 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--divider);
   text-align: center;
   font-size: 0.72rem;
   color: var(--muted);

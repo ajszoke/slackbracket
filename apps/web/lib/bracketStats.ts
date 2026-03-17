@@ -6,34 +6,43 @@ import { resolveTeamForSource } from "./tournament";
 
 // --- Standardized ELO Surprisal (drives the Bracket Pulse atmosphere) ---
 //
-// Instead of raw cumulative ELO loss (which overreacts to natural variance at True Odds),
-// we measure how surprising each side's picks are relative to what pure ELO would normally
-// produce. Z-score normalization means a 9-over-8 barely registers (that's expected!),
-// while a 16-over-1 instantly lights the orb on fire.
+// Per-round weighted surprisal: each round contributes equally regardless of game count.
+// R1 has 32 games, R6 has 1 — but a championship upset matters as much as ALL of R1.
+// Weight per game: w_g = 1 / (K * n_r), where K = rounds with picks, n_r = picks in that round.
+//
+// Two score types — never conflate:
+//   surprisePercentile (centered at 0.5) → labels, hue, semantic meaning
+//   orbHeat (one-sided, 0 = calm)        → pulse speed, opacity, glow intensity
 
 export type PulseMetrics = {
-  userChaos: number; // 0–1 orb heat from ELO surprisal (user picks)
-  aiChaos: number; // 0–1 orb heat from ELO surprisal (AI picks)
-  overallChaos: number; // 0–1 orb heat from ELO surprisal (all picks combined)
+  userChaos: number; // orbHeat — one-sided intensity (pulse speed, opacity)
+  aiChaos: number;
+  overallChaos: number;
+  userPercentile: number; // centered at 0.5 — for labels + hue
+  aiPercentile: number;
+  overallPercentile: number;
+  userZScore: number; // for confidence exception in labels
+  aiZScore: number;
+  userPickCount: number; // for confidence calculation
+  aiPickCount: number;
   harmony: number; // 0–1 (1 = agree, 0 = max clash)
   pulseSpeed: number; // seconds (8 = calm, 2 = intense)
   pulseLo: number; // opacity lower bound (keyframe)
   pulseHi: number; // opacity upper bound (keyframe)
-  userTemp: number; // 0 = cool, 1 = hot (maps to hue 190→340)
-  aiTemp: number; // 0 = cool, 1 = hot (maps to hue 190→340)
   userWeight: number; // 0–1 proportion of picks that are user
   aiWeight: number; // 0–1 proportion of picks that are AI
 };
 
-type PickedGamePair = { picked: Team; opponent: Team };
+type PickedGamePair = { picked: Team; opponent: Team; round: number };
 
 type SurpriseMetrics = {
-  totalBits: number;
-  expectedBits: number;
-  sdBits: number;
-  zScore: number;
-  surprisePercentile: number;
-  orbHeat: number;
+  totalBits: number; // raw sum of -log2(p) — for future data viz
+  expectedBits: number; // raw sum of Shannon entropy — for future data viz
+  sdBits: number; // SD of round-weighted statistic
+  zScore: number; // round-weighted z-score
+  surprisePercentile: number; // normalCdf(zScore), centered at 0.5
+  orbHeat: number; // max(0, 2*percentile - 1), one-sided intensity
+  pickCount: number;
 };
 
 // Abramowitz & Stegun approximation, |error| < 1.5e-7
@@ -55,33 +64,53 @@ function normalCdf(z: number): number {
 
 function computeSurpriseMetrics(pairs: PickedGamePair[]): SurpriseMetrics {
   if (pairs.length === 0) {
-    return { totalBits: 0, expectedBits: 0, sdBits: 0, zScore: 0, surprisePercentile: 0.5, orbHeat: 0 };
+    return { totalBits: 0, expectedBits: 0, sdBits: 0, zScore: 0, surprisePercentile: 0.5, orbHeat: 0, pickCount: 0 };
   }
 
-  let totalBits = 0;
-  let expectedBits = 0;
-  let varianceBits = 0;
+  // Count picks per round for round-equal weights: w_g = 1 / (K * n_r)
+  const roundCounts = new Map<number, number>();
+  for (const pair of pairs) roundCounts.set(pair.round, (roundCounts.get(pair.round) ?? 0) + 1);
+  const K = roundCounts.size;
 
-  for (const { picked, opponent } of pairs) {
+  let T = 0;
+  let ET = 0;
+  let VarT = 0;
+  let rawTotalBits = 0;
+  let rawExpectedBits = 0;
+
+  for (const { picked, opponent, round } of pairs) {
     const rawP = winProbability(picked, opponent, 0.5); // pure ELO baseline
     const p = Math.min(Math.max(rawP, 1e-12), 1 - 1e-12);
 
     const winnerBits = -Math.log2(p);
     const loserBits = -Math.log2(1 - p);
     const mu = -p * Math.log2(p) - (1 - p) * Math.log2(1 - p); // Shannon entropy
-    const varG = p * Math.pow(winnerBits - mu, 2) + (1 - p) * Math.pow(loserBits - mu, 2);
+    const varG = p * (winnerBits - mu) ** 2 + (1 - p) * (loserBits - mu) ** 2;
 
-    totalBits += winnerBits;
-    expectedBits += mu;
-    varianceBits += varG;
+    const n_r = roundCounts.get(round)!;
+    const w = 1 / (K * n_r);
+
+    T += w * winnerBits;
+    ET += w * mu;
+    VarT += w * w * varG;
+    rawTotalBits += winnerBits;
+    rawExpectedBits += mu;
   }
 
-  const sdBits = Math.sqrt(Math.max(varianceBits, 1e-12));
-  const zScore = (totalBits - expectedBits) / sdBits;
+  const sdBits = Math.sqrt(Math.max(VarT, 1e-12));
+  const zScore = (T - ET) / sdBits;
   const surprisePercentile = normalCdf(zScore);
   const orbHeat = Math.max(0, 2 * surprisePercentile - 1);
 
-  return { totalBits, expectedBits, sdBits, zScore, surprisePercentile, orbHeat };
+  return {
+    totalBits: rawTotalBits,
+    expectedBits: rawExpectedBits,
+    sdBits,
+    zScore,
+    surprisePercentile,
+    orbHeat,
+    pickCount: pairs.length,
+  };
 }
 
 export function computePulseMetrics(
@@ -109,10 +138,10 @@ export function computePulseMetrics(
 
     if (source === "user") {
       userTotal++;
-      userPairs.push({ picked, opponent });
+      userPairs.push({ picked, opponent, round: game.round });
     } else {
       aiTotal++;
-      aiPairs.push({ picked, opponent });
+      aiPairs.push({ picked, opponent, round: game.round });
     }
   }
 
@@ -124,7 +153,7 @@ export function computePulseMetrics(
   const aiChaos = aiSurprise.orbHeat;
   const overallChaos = overallSurprise.orbHeat;
   const totalPicked = userTotal + aiTotal;
-  const harmony = 1 - Math.abs(userChaos - aiChaos);
+  const harmony = 1 - Math.abs(userSurprise.surprisePercentile - aiSurprise.surprisePercentile);
 
   const pulseSpeed = 8 - overallChaos * 6; // 8s → 2s
   const pulseLo = totalPicked === 0 ? 0.1 : 0.1 + overallChaos * 0.25; // 0.10–0.35
@@ -137,27 +166,72 @@ export function computePulseMetrics(
     userChaos,
     aiChaos,
     overallChaos,
+    userPercentile: userSurprise.surprisePercentile,
+    aiPercentile: aiSurprise.surprisePercentile,
+    overallPercentile: overallSurprise.surprisePercentile,
+    userZScore: userSurprise.zScore,
+    aiZScore: aiSurprise.zScore,
+    userPickCount: userTotal,
+    aiPickCount: aiTotal,
     harmony,
     pulseSpeed,
     pulseLo,
     pulseHi,
-    userTemp: userChaos,
-    aiTemp: aiChaos,
     userWeight,
     aiWeight,
   };
 }
 
-// --- Bracket Temperature ---
+// --- Bracket Temperature Labels ---
+//
+// Confidence-gated: low sample size → tentative labels, high → full range.
+// Driven by centered surprisePercentile (0.5 = neutral), NOT one-sided orbHeat.
+// |zScore| > 3 bumps confidence tier up (extreme upsets are legit even with few picks).
 
-export function computeBracketTemperature(upsetCount: number, totalPicked: number): string {
-  if (totalPicked === 0) return "Empty";
-  const ratio = upsetCount / totalPicked;
-  if (ratio < 0.1) return "Chalky";
-  if (ratio < 0.2) return "Mild";
-  if (ratio < 0.35) return "Spicy";
-  if (ratio < 0.5) return "Hot";
-  return "Unhinged";
+const TOTAL_GAMES = 63;
+
+export function chaosToTemperatureLabel(percentile: number, pickCount: number, zScore: number): string {
+  const confidence = pickCount / TOTAL_GAMES;
+  let tier: "low" | "mid" | "high" =
+    confidence < 0.15 ? "low" : confidence < 0.6 ? "mid" : "high";
+
+  // Extreme z-score exception: bump up one tier
+  if (Math.abs(zScore) > 3) {
+    if (tier === "low") tier = "mid";
+    else if (tier === "mid") tier = "high";
+  }
+
+  if (tier === "low") {
+    if (percentile < 0.2) return "Early Chalk...";
+    if (percentile < 0.4) return "Leaning Safe...";
+    if (percentile < 0.6) return "Feeling It Out...";
+    if (percentile < 0.8) return "A Lil' Spicy?";
+    return "Going Rogue?";
+  }
+
+  if (tier === "mid") {
+    if (percentile < 0.1) return "Playing It Safe!";
+    if (percentile < 0.22) return "Chalk-ish!";
+    if (percentile < 0.38) return "By the Book!";
+    if (percentile < 0.55) return "True Odds!";
+    if (percentile < 0.68) return "A Lil' Spicy!";
+    if (percentile < 0.8) return "Spicy!";
+    if (percentile < 0.92) return "Hot!";
+    return "Scorching!";
+  }
+
+  // High confidence: full range
+  if (percentile < 0.05) return "Chalk City!";
+  if (percentile < 0.15) return "Playing It Safe!";
+  if (percentile < 0.25) return "Chalk-ish!";
+  if (percentile < 0.38) return "By the Book!";
+  if (percentile < 0.46) return "Mild!";
+  if (percentile < 0.54) return "True Odds!";
+  if (percentile < 0.65) return "A Lil' Spicy!";
+  if (percentile < 0.76) return "Spicy!";
+  if (percentile < 0.86) return "Hot!";
+  if (percentile < 0.95) return "Scorching!";
+  return "Unhinged!";
 }
 
 // --- Round-by-Round Probability ---

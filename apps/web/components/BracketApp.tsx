@@ -10,9 +10,9 @@ import {
   winProbability
 } from "@slackbracket/domain";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-import { computePulseMetrics } from "../lib/bracketStats";
+import { chaosToTemperatureLabel, computePulseMetrics, roundByRoundProbability } from "../lib/bracketStats";
 import { useBracketStore } from "../lib/store";
 import { buildGameTree, normalizeTeams, resolveTeamForSource, type GameNode } from "../lib/tournament";
 import { useBracketLayout } from "../lib/useBracketLayout";
@@ -22,6 +22,8 @@ import { ChaosMeter } from "./ChaosMeter";
 import { Footer } from "./Footer";
 import { OddsPanel } from "./OddsPanel";
 import { SocialSharePanel } from "./SocialSharePanel";
+import { ToggleSwitch } from "./ToggleSwitch";
+import { TutorialOverlay } from "./TutorialOverlay";
 
 type LivePayload = {
   updatedAt: number;
@@ -109,6 +111,53 @@ export function BracketApp() {
     }
   }, [store.bracketType, hydratePicks]);
 
+  // Theme persistence
+  useEffect(() => {
+    const saved = localStorage.getItem("slackbracket:theme") as "dark" | "light" | null;
+    if (saved) store.setTheme(saved);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    localStorage.setItem("slackbracket:theme", store.theme);
+    document.documentElement.setAttribute("data-theme", store.theme);
+  }, [store.theme]);
+
+  // Quality persistence
+  useEffect(() => {
+    const saved = localStorage.getItem("slackbracket:quality");
+    if (saved && ["low", "medium", "high", "ultra"].includes(saved)) {
+      store.setQuality(saved as "low" | "medium" | "high" | "ultra");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    localStorage.setItem("slackbracket:quality", store.quality);
+    document.documentElement.setAttribute("data-quality", store.quality);
+  }, [store.quality]);
+
+  // Tutorial: show on first visit or via ?tour URL param
+  const [tourStep, setTourStep] = useState(0);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("tour") || !localStorage.getItem("slackbracket:tour-dismissed")) {
+      store.setShowTour(true);
+      setTourStep(0);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleTourNext = () => {
+    const next = tourStep + 1;
+    if (next >= 4) {
+      handleTourDismiss();
+    } else {
+      setTourStep(next);
+    }
+  };
+  const handleTourDismiss = () => {
+    store.setShowTour(false);
+    localStorage.setItem("slackbracket:tour-dismissed", "1");
+  };
+
   const resolvedGames = useMemo(
     () =>
       lockCompletedGames(
@@ -151,7 +200,7 @@ export function BracketApp() {
       probability *= Math.max(p, 1e-12);
     }
     return probability;
-  }, [games, store.picksByMatchup, teamsById, store.chaos]);
+  }, [games, store.picksByMatchup, teamsById]);
 
   const humanOdds = useMemo(() => humanReadableOneIn(liveProbability), [liveProbability]);
 
@@ -161,12 +210,26 @@ export function BracketApp() {
     [store.picksByMatchup, store.pickSourceByMatchup, games, teamsById]
   );
 
-  // Color temperature: 0 = cool (cyan 190), 1 = hot (red-magenta 340)
-  // Path: cyan(190) → blue(240) → purple(280) → magenta(320) → red(340)
-  // Going UP through the hue wheel avoids the green zone
-  const tempToHue = (t: number) => 190 + t * 150; // 190 → 340
-  const userHue = tempToHue(pulseMetrics.userTemp);
-  const aiHue = tempToHue(pulseMetrics.aiTemp);
+  // Temperature labels — centered percentile + confidence gating
+  const temperatureLabels = useMemo(() => ({
+    user: pulseMetrics.userWeight > 0
+      ? chaosToTemperatureLabel(pulseMetrics.userPercentile, pulseMetrics.userPickCount, pulseMetrics.userZScore)
+      : "Empty",
+    ai: pulseMetrics.aiWeight > 0
+      ? chaosToTemperatureLabel(pulseMetrics.aiPercentile, pulseMetrics.aiPickCount, pulseMetrics.aiZScore)
+      : "Empty",
+  }), [pulseMetrics]);
+
+  // Round-by-round cumulative probability
+  const roundOdds = useMemo(
+    () => roundByRoundProbability(games, store.picksByMatchup, teamsById, 0.5),
+    [games, store.picksByMatchup, teamsById]
+  );
+
+  // Orb hue: centered percentile → chalk=cyan(190), neutral=purple(265), spicy=red(340)
+  const tempToHue = (t: number) => 190 + t * 150; // 0→190, 0.5→265, 1→340
+  const userHue = tempToHue(pulseMetrics.userPercentile);
+  const aiHue = tempToHue(pulseMetrics.aiPercentile);
 
   // Per-orb pulse speed: each orb breathes at its own frequency
   const userPulseSpeed = 8 - pulseMetrics.userChaos * 6; // 8s calm → 2s intense
@@ -236,20 +299,22 @@ export function BracketApp() {
           }}
         >
           <h1 className="hero-title">Slackbracket <span className="hero-year">2026</span></h1>
-          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-            <button
-              onClick={() => store.setBracketType("men")}
-              className={store.bracketType === "men" ? "btn-active" : "btn-muted"}
-            >
-              Men
-            </button>
-            <button
-              onClick={() => store.setBracketType("women")}
-              className={store.bracketType === "women" ? "btn-active" : "btn-muted"}
-            >
-              Women
-            </button>
-            <div style={{ display: "flex", gap: 4, marginLeft: 8, alignItems: "center" }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+            <ToggleSwitch
+              checked={store.bracketType === "women"}
+              onChange={(checked) => store.setBracketType(checked ? "women" : "men")}
+              iconLeft={<span title="Men's bracket">♂</span>}
+              iconRight={<span title="Women's bracket">♀</span>}
+              ariaLabel="Toggle men's or women's bracket"
+            />
+            <ToggleSwitch
+              checked={store.theme === "dark"}
+              onChange={(checked) => store.setTheme(checked ? "dark" : "light")}
+              iconLeft={<span>☀️</span>}
+              iconRight={<span>🌙</span>}
+              ariaLabel="Toggle light or dark mode"
+            />
+            <div style={{ display: "flex", gap: 4, marginLeft: 12, alignItems: "center" }}>
               <button className="btn-ghost" onClick={() => temporal.undo()}>
                 Undo
               </button>
@@ -268,7 +333,7 @@ export function BracketApp() {
           {picksCount > 0 && (
             <span style={{ fontSize: "0.65rem", color: "var(--muted)", whiteSpace: "nowrap" }}>
               <span style={{ color: "var(--text)" }}>You: {userPickCount}</span>
-              {aiPickCount > 0 && <> · <span style={{ opacity: 0.7 }}>AI: {aiPickCount}</span></>}
+              <> · <span style={{ opacity: 0.7 }}>AI: {aiPickCount}</span></>
             </span>
           )}
         </div>
@@ -277,13 +342,13 @@ export function BracketApp() {
           style={{
             display: "grid",
             gap: 8,
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
             alignItems: "stretch",
             marginBottom: 12
           }}
         >
           <ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} onGenerate={generateBracket} />
-          <OddsPanel summary={humanOdds} filled={picksCount} />
+          <OddsPanel summary={humanOdds} filled={picksCount} temperature={temperatureLabels} roundOdds={roundOdds} />
           <SocialSharePanel shareUrl={shareUrl} oneIn={humanOdds.display} filled={picksCount} />
         </div>
       </header>
@@ -300,6 +365,12 @@ export function BracketApp() {
         onRegionChange={store.setRegion}
       />
       <Footer />
+      <TutorialOverlay
+        step={tourStep}
+        dismissed={!store.showTour}
+        onNext={handleTourNext}
+        onDismiss={handleTourDismiss}
+      />
     </main>
     </div>
   );

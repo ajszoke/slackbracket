@@ -1,9 +1,21 @@
 "use client";
 
 import { CHAOS_PRESETS, chaosLabel } from "@slackbracket/domain";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 
 let sickoTimeout: ReturnType<typeof setTimeout> | null = null;
+
+// Pre-cache the audio so it plays instantly on trigger (no fetch latency)
+let sickoAudio: HTMLAudioElement | null = null;
+if (typeof window !== "undefined") {
+  try {
+    sickoAudio = new Audio("/sicko-woomph.mp3");
+    sickoAudio.preload = "auto";
+    sickoAudio.volume = 0.7;
+  } catch {
+    // no audio support
+  }
+}
 
 function triggerSickoAnnouncement() {
   const html = document.documentElement;
@@ -12,31 +24,64 @@ function triggerSickoAnnouncement() {
   if (sickoTimeout) clearTimeout(sickoTimeout);
   document.querySelectorAll(".sicko-flash").forEach((el) => el.remove());
 
-  // Force-restart animation: remove → reflow → re-add
-  html.classList.remove("sicko-active");
-  void (html as HTMLElement).offsetWidth;
-  html.classList.add("sicko-active");
-
-  // Red flash overlay
-  const flash = document.createElement("div");
-  flash.className = "sicko-flash";
-  document.body.appendChild(flash);
-
-  // Audio (best-effort — file may not exist yet)
-  try {
-    const audio = new Audio("/sicko-woomph.mp3");
-    audio.volume = 0.7;
-    audio.play().catch(() => {});
-  } catch {
-    // no audio file yet — that's fine
+  // Audio first — pre-cached, fires instantly
+  if (sickoAudio) {
+    sickoAudio.currentTime = 0;
+    sickoAudio.play().catch(() => {});
   }
 
-  // Cleanup after animation
-  sickoTimeout = setTimeout(() => {
+  // Delay visual animation 0.3s so audio leads
+  setTimeout(() => {
+    // Force-restart animation: remove → reflow → re-add
     html.classList.remove("sicko-active");
-    flash.remove();
-    sickoTimeout = null;
-  }, 1000);
+    void (html as HTMLElement).offsetWidth;
+    html.classList.add("sicko-active");
+
+    // Red flash overlay
+    const flash = document.createElement("div");
+    flash.className = "sicko-flash";
+    document.body.appendChild(flash);
+
+    // Cleanup after animation
+    sickoTimeout = setTimeout(() => {
+      html.classList.remove("sicko-active");
+      flash.remove();
+      sickoTimeout = null;
+    }, 1000);
+  }, 300);
+}
+
+function GenerateButton({ onGenerate }: { onGenerate: () => void }) {
+  const [diceFlash, setDiceFlash] = useState(false);
+
+  const handleClick = useCallback(() => {
+    setDiceFlash(true);
+    onGenerate();
+    setTimeout(() => setDiceFlash(false), 600);
+  }, [onGenerate]);
+
+  return (
+    <button className="btn-generate" onClick={handleClick} style={{ marginTop: 10, width: "100%" }}>
+      <span style={{ position: "relative", zIndex: 1 }}>
+        🎲 Generate Bracket
+      </span>
+      {diceFlash && (
+        <span
+          style={{
+            position: "absolute",
+            right: 12,
+            top: "50%",
+            transform: "translateY(-50%)",
+            fontSize: "1.4rem",
+            animation: "dice-flash 0.6s ease-out forwards",
+            pointerEvents: "none",
+          }}
+        >
+          🎲
+        </span>
+      )}
+    </button>
+  );
 }
 
 export function ChaosMeter({
@@ -96,7 +141,7 @@ export function ChaosMeter({
           step={0.01}
           value={value}
           onChange={(event) => onChange(Number(event.target.value))}
-          style={{ width: "100%", transition: "all 0.3s" }}
+          style={{ width: "100%", transition: "all 0.3s", position: "relative", zIndex: 1 }}
         />
         {/* 50% tick mark */}
         <div
@@ -107,9 +152,11 @@ export function ChaosMeter({
             transform: "translateX(-50%)",
             width: 2,
             height: 10,
-            background: "rgba(255, 255, 255, 0.3)",
+            background: "var(--muted)",
+            opacity: 0.4,
             borderRadius: 1,
-            pointerEvents: "none"
+            pointerEvents: "none",
+            zIndex: 0
           }}
         />
       </div>
@@ -130,15 +177,15 @@ export function ChaosMeter({
                   ? "1.5px solid rgba(239, 68, 68, 0.6)"
                   : isCenter
                     ? "1.5px solid #10b981"
-                    : "1px solid rgba(255, 255, 255, 0.1)",
+                    : `1px solid var(--glass-border)`,
                 background: active
                   ? isSicko
                     ? "rgba(239, 68, 68, 0.35)"
                     : isCenter
                       ? "rgba(16, 185, 129, 0.3)"
                       : "color-mix(in srgb, var(--accent) 50%, transparent 50%)"
-                  : "rgba(18, 26, 48, 0.6)",
-                color: "#fff",
+                  : "var(--glass-bg)",
+                color: "var(--text)",
                 padding: "0.25rem 0.55rem",
                 fontSize: "0.75rem",
                 cursor: "pointer",
@@ -164,13 +211,7 @@ export function ChaosMeter({
           );
         })}
       </div>
-      <button
-        className="btn-primary"
-        onClick={onGenerate}
-        style={{ marginTop: 10, width: "100%" }}
-      >
-        🎲 Generate Bracket
-      </button>
+      <GenerateButton onGenerate={onGenerate} />
     </section>
   );
 }

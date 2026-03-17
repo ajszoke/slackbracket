@@ -24,7 +24,7 @@ export function RegionBracket({
   rounds,
   direction,
   regionColor,
-  regionLabel,
+  regionLabel: _regionLabel,
   picksByMatchup,
   pickSourceByMatchup,
   lockedByMatchup,
