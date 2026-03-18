@@ -57,7 +57,7 @@ npm run format:write # Prettier auto-format
 - Chalk zone uses power curve: `|deviation/0.5|^t`. Chaos zone uses linear blend toward 0.5.
 - Presets: Chalk City (0), Play It Safe (0.25), True Odds (0.5), Madness (0.75), Sicko Mode (1.0).
 
-**Data source:** Nate Silver COOPER ELO ratings. 2026 men's bracket integrated from CBS Selection Sunday bracket. Data files in `data/2026-mens.csv` and `data/2026-womens.csv`.
+**Data source:** Nate Silver COOPER ELO ratings. 2026 men's bracket integrated from CBS Selection Sunday bracket. Data files in `data/2026-mens.csv` and `data/2026-womens.csv`. First Four play-in results resolved via `scripts/resolve-first-four.sh <winner>`.
 
 **Web app** (`apps/web/`):
 - `app/` — Next.js App Router (layout, page, providers, globals.css)
