@@ -145,7 +145,7 @@ export function OddsPanel({
           {isEmpty ? (
             "This is definitely, 100%, a bracket"
           ) : showScientific ? (
-            <span dangerouslySetInnerHTML={{ __html: summary.scientificHtml }} />
+            <span>( <span dangerouslySetInnerHTML={{ __html: summary.scientificHtml }} /> )</span>
           ) : null}
         </div>
 

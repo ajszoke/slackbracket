@@ -1,0 +1,162 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >
+  Slackbracket telemetry — API Gateway HTTP API + Lambda + S3.
+  Bucket "slackbracket-telemetry" must already exist.
+
+Parameters:
+  BucketName:
+    Type: String
+    Default: slackbracket-telemetry
+  BucketRegion:
+    Type: String
+    Default: us-west-2
+
+Resources:
+  # ── IAM Role for Lambda ────────────────────────────────────────────
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: slackbracket-telemetry-lambda
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: s3-put
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub "arn:aws:s3:::${BucketName}/events/*"
+        - PolicyName: cloudwatch-logs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"
+
+  # ── Lambda Function ────────────────────────────────────────────────
+  TrackFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: slackbracket-telemetry-track
+      Runtime: nodejs20.x
+      Handler: index.handler
+      MemorySize: 128
+      Timeout: 5
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          BUCKET_NAME: !Ref BucketName
+          BUCKET_REGION: !Ref BucketRegion
+      Code:
+        ZipFile: |
+          const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
+          const { randomUUID } = require("crypto");
+
+          const s3 = new S3Client({ region: process.env.BUCKET_REGION });
+          const BUCKET = process.env.BUCKET_NAME;
+
+          exports.handler = async (event) => {
+            let body;
+            try {
+              body = JSON.parse(event.body || "{}");
+            } catch {
+              return { statusCode: 400 };
+            }
+
+            // Basic validation — require an event name
+            if (!body.event || typeof body.event !== "string") {
+              return { statusCode: 400 };
+            }
+
+            const now = new Date();
+            const ymd = now.toISOString().slice(0, 10).replace(/-/g, "/");
+            const hh = now.getUTCHours().toString().padStart(2, "0");
+            const key = `events/${ymd}/${hh}-${randomUUID()}.json`;
+
+            const record = {
+              ...body,
+              ip: event.requestContext?.http?.sourceIp || "unknown",
+              userAgent: event.requestContext?.http?.userAgent || "",
+              receivedAt: now.toISOString(),
+            };
+
+            await s3.send(
+              new PutObjectCommand({
+                Bucket: BUCKET,
+                Key: key,
+                Body: JSON.stringify(record),
+                ContentType: "application/json",
+              })
+            );
+
+            return { statusCode: 204 };
+          };
+
+  # ── API Gateway HTTP API ───────────────────────────────────────────
+  HttpApi:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: slackbracket-telemetry
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowOrigins:
+          - "https://slackbracket.com"
+          - "http://localhost:3000"
+        AllowMethods:
+          - POST
+          - OPTIONS
+        AllowHeaders:
+          - content-type
+        MaxAge: 86400
+
+  LambdaIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref HttpApi
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt TrackFunction.Arn
+      PayloadFormatVersion: "2.0"
+
+  TrackRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref HttpApi
+      RouteKey: "POST /track"
+      Target: !Sub "integrations/${LambdaIntegration}"
+
+  DefaultStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref HttpApi
+      StageName: "$default"
+      AutoDeploy: true
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 100
+        ThrottlingRateLimit: 50
+
+  # ── Lambda Permission for API Gateway ──────────────────────────────
+  LambdaApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref TrackFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${HttpApi}/*/*"
+
+Outputs:
+  TrackEndpoint:
+    Description: POST events to this URL
+    Value: !Sub "https://${HttpApi}.execute-api.${AWS::Region}.amazonaws.com/track"
+  LambdaRoleArn:
+    Description: IAM role used by the Lambda
+    Value: !GetAtt LambdaExecutionRole.Arn

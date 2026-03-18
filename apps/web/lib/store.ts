@@ -72,7 +72,7 @@ type BracketStore = {
   setRegion: (region: RegionTab) => void;
   pick: (matchupId: string, teamId: string, games?: GameNode[]) => void;
   clearPick: (matchupId: string, games: GameNode[]) => void;
-  hydratePicks: (picks: Record<string, string>) => void;
+  hydratePicks: (picks: Record<string, string>, sources?: Record<string, PickSource>) => void;
   setLocked: (locked: Record<string, string>) => void;
   setShowTour: (show: boolean) => void;
   setTheme: (theme: Theme) => void;
@@ -164,10 +164,10 @@ export const useBracketStore = create<BracketStore>()(
 
       set({ picksByMatchup: nextPicks, pickSourceByMatchup: nextSources });
     },
-    hydratePicks: (picksByMatchup) => {
+    hydratePicks: (picksByMatchup, sources) => {
       const pickSourceByMatchup: Record<string, PickSource> = {};
       for (const id of Object.keys(picksByMatchup)) {
-        pickSourceByMatchup[id] = "user";
+        pickSourceByMatchup[id] = sources?.[id] ?? "user";
       }
       set({ picksByMatchup, pickSourceByMatchup });
     },
@@ -215,7 +215,7 @@ export const useBracketStore = create<BracketStore>()(
         // If placeholder won, no change needed — it already has the right data
       }
 
-      for (const game of games.sort((a, b) => a.round - b.round || a.slot - b.slot)) {
+      for (const game of [...games].sort((a, b) => a.round - b.round || a.slot - b.slot)) {
         if (state.lockedByMatchup[game.id]) continue;
         if (nextPicks[game.id]) continue;
         const teamA = resolveTeamForSource(game.sourceA, nextPicks, resolvedTeams);

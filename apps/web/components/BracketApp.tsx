@@ -2,7 +2,6 @@
 
 import {
   decodeSharePayload,
-  encodeSharePayload,
   humanReadableOneIn,
   lockCompletedGames,
   type Matchup,
@@ -10,10 +9,12 @@ import {
   winProbability
 } from "@slackbracket/domain";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import { chaosToTemperatureLabel, computePulseMetrics, roundByRoundProbability } from "../lib/bracketStats";
+import { decodeCompact, encodeCompact, isCompactPayload } from "../lib/shareCompact";
 import { useBracketStore } from "../lib/store";
+import { track } from "../lib/telemetry";
 import { buildGameTree, normalizeTeams, resolveTeamForSource, type GameNode } from "../lib/tournament";
 import { useBracketLayout } from "../lib/useBracketLayout";
 
@@ -53,7 +54,8 @@ export function BracketApp() {
     queryKey: ["teams", store.bracketType],
     queryFn: async () => {
       const file = store.bracketType === "women" ? "bracket_women.json" : "bracket_men.json";
-      const response = await fetch(`/data/${file}`);
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+      const response = await fetch(`${basePath}/data/${file}`);
       if (!response.ok) throw new Error("Failed loading teams");
       const payload = (await response.json()) as unknown[];
       return normalizeTeams(payload);
@@ -79,32 +81,70 @@ export function BracketApp() {
     setLocked(locked);
   }, [liveData, setLocked]);
 
+  // Share URL takes priority over localStorage — ref avoids batching race
+  const loadedFromShare = useRef(false);
+
   useEffect(() => {
+    if (games.length === 0) return; // wait for game tree
     const params = new URLSearchParams(window.location.search);
     const encoded = params.get("b");
     if (!encoded) return;
-    const decoded = decodeSharePayload<Record<string, string>>(encoded);
-    if (decoded) {
-      hydratePicks(decoded);
+
+    // v2 compact format (26 bytes) or v1 JSON format
+    if (isCompactPayload(encoded)) {
+      const result = decodeCompact(encoded, games);
+      if (result) {
+        loadedFromShare.current = true;
+        store.setBracketType(result.bracketType);
+        store.setChaos(result.chaos);
+        hydratePicks(result.picks, result.sources);
+      }
+    } else {
+      const decoded = decodeSharePayload<Record<string, string>>(encoded);
+      if (decoded) {
+        loadedFromShare.current = true;
+        hydratePicks(decoded);
+      }
     }
-  }, [hydratePicks]);
+  }, [hydratePicks, games]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Offer to restore picks from localStorage (if any exist and no share URL)
+  const [showRestore, setShowRestore] = useState(false);
+  const savedPicksRef = useRef<Record<string, string> | null>(null);
 
   useEffect(() => {
-    const key = `slackbracket:${store.bracketType}:picks`;
-    localStorage.setItem(key, JSON.stringify(store.picksByMatchup));
-  }, [store.picksByMatchup, store.bracketType]);
-
-  useEffect(() => {
+    if (loadedFromShare.current) return;
     const key = `slackbracket:${store.bracketType}:picks`;
     const raw = localStorage.getItem(key);
     if (!raw) return;
     try {
       const parsed = JSON.parse(raw) as Record<string, string>;
-      hydratePicks(parsed);
+      if (Object.keys(parsed).length > 0) {
+        savedPicksRef.current = parsed;
+        setShowRestore(true);
+      }
     } catch {
       // ignore malformed cache
     }
   }, [store.bracketType, hydratePicks]);
+
+  const handleRestore = () => {
+    if (savedPicksRef.current) hydratePicks(savedPicksRef.current);
+    setShowRestore(false);
+  };
+  const handleStartFresh = () => {
+    const key = `slackbracket:${store.bracketType}:picks`;
+    localStorage.removeItem(key);
+    setShowRestore(false);
+  };
+
+  // Persist picks to localStorage as user works
+  useEffect(() => {
+    if (Object.keys(store.picksByMatchup).length > 0) {
+      const key = `slackbracket:${store.bracketType}:picks`;
+      localStorage.setItem(key, JSON.stringify(store.picksByMatchup));
+    }
+  }, [store.picksByMatchup, store.bracketType]);
 
   // Theme persistence
   useEffect(() => {
@@ -130,17 +170,46 @@ export function BracketApp() {
     document.documentElement.setAttribute("data-quality", store.quality);
   }, [store.quality]);
 
-  // Tutorial: show on first visit or via ?tour URL param
+  // Telemetry: page view + session end
+  useEffect(() => {
+    track("page_view", { bracketType: store.bracketType });
+
+    const handleVisChange = () => {
+      if (document.visibilityState === "hidden") {
+        const s = useBracketStore.getState();
+        track("session_end", {
+          totalPicks: Object.keys(s.picksByMatchup).length,
+          userPicks: Object.values(s.pickSourceByMatchup).filter((v) => v === "user").length,
+          chaos: s.chaos,
+          bracketType: s.bracketType,
+        });
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisChange);
+    return () => document.removeEventListener("visibilitychange", handleVisChange);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Tutorial: show on first visit or via ?tour, skip if loading shared bracket or restoring
   const [tourStep, setTourStep] = useState(0);
   useEffect(() => {
+    if (showRestore) return; // wait for restore decision
     const params = new URLSearchParams(window.location.search);
-    if (params.has("tour") || !localStorage.getItem("slackbracket:tour-dismissed")) {
+    if (params.has("tour")) {
+      store.setShowTour(true);
+      setTourStep(0);
+    } else if (!params.has("b") && !localStorage.getItem("slackbracket:tour-dismissed")) {
       store.setShowTour(true);
       setTourStep(0);
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [showRestore]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const launchTour = () => {
+    store.setShowTour(true);
+    setTourStep(0);
+  };
 
   const handleTourNext = () => {
+    track("tour_step", { step: tourStep, action: "next" });
     const next = tourStep + 1;
     if (next >= 6) {
       handleTourDismiss();
@@ -149,6 +218,7 @@ export function BracketApp() {
     }
   };
   const handleTourDismiss = () => {
+    track("tour_step", { step: tourStep, action: "dismiss" });
     store.setShowTour(false);
     localStorage.setItem("slackbracket:tour-dismissed", "1");
   };
@@ -244,11 +314,15 @@ export function BracketApp() {
   const userSpread = userHasPicks ? `${Math.round(32 + pulseMetrics.userWeight * 88)}%` : "0%";
   const aiSpread = aiHasPicks ? `${Math.round(32 + pulseMetrics.aiWeight * 88)}%` : "0%";
 
-  const sharePayload = encodeSharePayload(store.picksByMatchup);
-  const shareUrl = typeof window === "undefined" ? "" : `${window.location.origin}?b=${sharePayload}`;
+  const sharePayload = encodeCompact(store.picksByMatchup, store.pickSourceByMatchup, games, store.bracketType, store.chaos);
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+  const shareUrl = typeof window === "undefined" ? "" : `${window.location.origin}${basePath}?b=${sharePayload}`;
 
   const generateBracket = () => {
+    const before = Object.keys(store.picksByMatchup).length;
     store.autoFillRemaining(games, teamsById);
+    const after = Object.keys(useBracketStore.getState().picksByMatchup).length;
+    track("generate", { chaos: store.chaos, bracketType: store.bracketType, filledBefore: before, filledAfter: after });
   };
 
   if (isLoading) {
@@ -259,6 +333,29 @@ export function BracketApp() {
 
   return (
     <div className="app-wrapper">
+    {/* Restore prompt — shown when localStorage has saved picks */}
+    {showRestore && (
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 10000,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        background: "rgba(0,0,0,0.6)", backdropFilter: "blur(6px)",
+      }}>
+        <div className="card" style={{ maxWidth: 360, textAlign: "center", padding: "1.5rem" }}>
+          <h3 style={{ margin: "0 0 0.5rem" }}>Welcome Back</h3>
+          <p style={{ color: "var(--muted)", fontSize: "0.85rem", margin: "0 0 1rem" }}>
+            You have a bracket in progress. Pick up where you left off?
+          </p>
+          <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+            <button className="btn-active" onClick={handleRestore} style={{ padding: "0.4rem 1rem", fontSize: "0.85rem" }}>
+              Continue
+            </button>
+            <button className="btn-ghost" onClick={handleStartFresh} style={{ padding: "0.4rem 1rem", fontSize: "0.85rem" }}>
+              Start Fresh
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     <div className="bracket-pulse-ambient" />
     <div
       className="bracket-pulse-user"
@@ -300,14 +397,14 @@ export function BracketApp() {
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <ToggleSwitch
               checked={store.bracketType === "women"}
-              onChange={(checked) => store.setBracketType(checked ? "women" : "men")}
+              onChange={(checked) => { const to = checked ? "women" : "men"; store.setBracketType(to); track("bracket_switch", { to }); }}
               iconLeft={<span title="Men's bracket" className="gender-icon gender-icon--male">♂</span>}
               iconRight={<span title="Women's bracket" className="gender-icon gender-icon--female">♀</span>}
               ariaLabel="Toggle men's or women's bracket"
             />
             <ToggleSwitch
               checked={store.theme === "dark"}
-              onChange={(checked) => store.setTheme(checked ? "dark" : "light")}
+              onChange={(checked) => { const to = checked ? "dark" : "light"; store.setTheme(to); track("theme_toggle", { to }); }}
               iconLeft={<span>☀️</span>}
               iconRight={<span>🌙</span>}
               ariaLabel="Toggle light or dark mode"
@@ -358,10 +455,18 @@ export function BracketApp() {
         pickSourceByMatchup={store.pickSourceByMatchup}
         lockedByMatchup={lockedMap}
         teamsById={teamsById}
-        onPick={(matchupId, teamId) => store.pick(matchupId, teamId, games)}
+        onPick={(matchupId, teamId) => { store.pick(matchupId, teamId, games); track("pick", { matchupId, teamId, round: parseInt(matchupId.split("-")[0].slice(1), 10) }); }}
         selectedRegion={store.selectedRegion}
         onRegionChange={store.setRegion}
       />
+      {/* Take the tour CTA — show when tour was skipped (share URL or dismissed) */}
+      {!store.showTour && (
+        <div style={{ textAlign: "center", margin: "1rem 0 0" }}>
+          <button className="btn-ghost" onClick={launchTour} style={{ fontSize: "0.75rem" }}>
+            New here? Take the tour
+          </button>
+        </div>
+      )}
       <HowItWorks />
       <Footer />
       <TutorialOverlay

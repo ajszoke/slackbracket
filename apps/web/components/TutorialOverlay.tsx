@@ -336,10 +336,10 @@ export function TutorialOverlay({
         />
       )}
 
-      {/* Click-through blocker for spotlight steps */}
+      {/* Click-through blocker for spotlight steps — advance instead of dismiss */}
       {hasTarget && (
         <div
-          onClick={handleBackdropClick}
+          onClick={onNext}
           style={{
             position: "fixed",
             inset: 0,

@@ -636,6 +636,25 @@ html[data-theme="light"] .bracket-matchup--championship {
   box-shadow: 0 0 20px rgba(124, 58, 237, 0.15), 0 0 6px rgba(124, 58, 237, 0.08);
 }
 
+/* Light mode: checks and AI-pick icons need contrast on light backgrounds */
+html[data-theme="light"] .bracket-matchup__check--upset {
+  color: hsl(calc(var(--pick-hue, 40)), 90%, 38%);
+}
+
+html[data-theme="light"] .bracket-matchup__check--ai {
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+html[data-theme="light"] .bracket-matchup__team--ai-selected {
+  opacity: 0.92;
+  background: color-mix(in srgb, var(--region-color, var(--accent)) 22%, transparent 78%);
+}
+
+html[data-theme="light"] .bracket-matchup__team--ai-selected.bracket-matchup__team--upset-winner {
+  opacity: 0.95;
+}
+
 /* Light mode locked overlay */
 html[data-theme="light"] .bracket-matchup--locked::after {
   background: rgba(248, 249, 252, 0.3);

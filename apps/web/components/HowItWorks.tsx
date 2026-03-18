@@ -3,11 +3,13 @@
 import "katex/dist/katex.min.css";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
+
+import { track } from "../lib/telemetry";
 
 // ============================================
 // TIER CONTENT
@@ -587,10 +589,19 @@ const TIER_CTA: Record<number, string> = {
 export function HowItWorks() {
   const [expanded, setExpanded] = useState(false);
   const [tier, setTier] = useState(0);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Reset scroll to top when tier changes or accordion opens
+  useEffect(() => {
+    if (contentRef.current) contentRef.current.scrollTop = 0;
+  }, [tier, expanded]);
 
   const handleToggle = useCallback(() => {
-    setExpanded((prev) => !prev);
-  }, []);
+    setExpanded((prev) => {
+      if (!prev) track("how_it_works", { tier });
+      return !prev;
+    });
+  }, [tier]);
 
   const handleTierUp = useCallback(() => {
     setTier((prev) => Math.min(prev + 1, TIERS.length - 1));
@@ -604,7 +615,6 @@ export function HowItWorks() {
     <section className="how-it-works" style={{ maxWidth: 1400, margin: "2rem auto", padding: "0 1rem" }}>
       <div className="card" style={{ overflow: "hidden" }}>
         {/* Header — always visible */}
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
           onClick={handleToggle}
           style={{
@@ -645,7 +655,7 @@ export function HowItWorks() {
                 {TIERS.map((t, i) => (
                   <button
                     key={i}
-                    onClick={() => setTier(i)}
+                    onClick={() => { setTier(i); if (contentRef.current) contentRef.current.scrollTop = 0; }}
                     style={{
                       borderRadius: 999,
                       border: `1px solid ${i === tier ? "var(--accent)" : "var(--glass-border)"}`,
@@ -664,7 +674,7 @@ export function HowItWorks() {
               </div>
 
               {/* Markdown content with tier transitions */}
-              <div className="how-it-works__content" style={{ maxHeight: "60vh", overflowY: "auto" }}>
+              <div ref={contentRef} className="how-it-works__content" data-tier={tier} style={{ maxHeight: "60vh", overflowY: "auto" }}>
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={tier}
