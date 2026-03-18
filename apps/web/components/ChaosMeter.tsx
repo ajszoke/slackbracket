@@ -3,6 +3,8 @@
 import { CHAOS_PRESETS, chaosLabel } from "@slackbracket/domain";
 import { useCallback, useState } from "react";
 
+import { track } from "../lib/telemetry";
+
 let sickoTimeout: ReturnType<typeof setTimeout> | null = null;
 
 // Pre-cache the audio so it plays instantly on trigger (no fetch latency)
@@ -32,6 +34,14 @@ function triggerSickoAnnouncement() {
 
   // Delay visual animation 0.3s so audio leads
   setTimeout(() => {
+    // Set transform-origin to viewport center (not element center)
+    // so mobile doesn't rotate around the middle of the full page height
+    const wrapper = document.querySelector<HTMLElement>(".app-wrapper");
+    if (wrapper) {
+      const viewportMid = window.scrollY + window.innerHeight / 2;
+      wrapper.style.transformOrigin = `50% ${viewportMid}px`;
+    }
+
     // Force-restart animation: remove → reflow → re-add
     html.classList.remove("sicko-active");
     void (html as HTMLElement).offsetWidth;
@@ -46,6 +56,7 @@ function triggerSickoAnnouncement() {
     sickoTimeout = setTimeout(() => {
       html.classList.remove("sicko-active");
       flash.remove();
+      if (wrapper) wrapper.style.transformOrigin = "";
       sickoTimeout = null;
     }, 1000);
   }, 300);
@@ -97,6 +108,7 @@ export function ChaosMeter({
 }) {
   const handlePreset = useCallback(
     (presetId: (typeof CHAOS_PRESETS)[number]["id"]) => {
+      track("chaos_change", { value: CHAOS_PRESETS.find((p) => p.id === presetId)?.value ?? -1, preset: presetId });
       if (presetId === "sicko") {
         // Fire animation FIRST — before React re-render blocks the main thread.
         // Double-RAF ensures at least one painted frame before state change.
@@ -140,7 +152,8 @@ export function ChaosMeter({
           max={1}
           step={0.01}
           value={value}
-          onChange={(event) => onChange(Number(event.target.value))}
+          onChange={(event) => { const v = Number(event.target.value); onChange(v); }}
+          onPointerUp={(event) => track("chaos_change", { value: Number((event.target as HTMLInputElement).value) })}
           style={{ width: "100%", transition: "all 0.3s", position: "relative", zIndex: 1 }}
         />
         {/* 50% tick mark */}

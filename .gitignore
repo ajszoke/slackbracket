@@ -4,3 +4,7 @@ node_modules
 dist
 coverage
 .DS_Store
+.env.local
+.env.deploy
+.deploy-backups
+infra/telemetry/.env

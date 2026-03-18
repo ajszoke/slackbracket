@@ -481,6 +481,9 @@ html[data-theme="light"] .toggle-switch__grip {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.8rem;
   line-height: 1;
   opacity: 0;
@@ -500,37 +503,26 @@ html[data-theme="light"] .toggle-switch__grip {
   opacity: 1;
 }
 
-/* Gender toggle icons */
+/* Gender toggle icons — stay inside reveal slots, visually centered */
 .gender-icon {
   font-weight: 900;
   font-size: 0.95rem;
-  position: relative;
   -webkit-text-stroke: 0.5px;
+  line-height: 1;
+}
+
+@media (max-width: 767px) {
+  .gender-icon {
+    transform: translateY(-0.35em);
+  }
 }
 .gender-icon--male {
   color: #38bdf8;
   -webkit-text-stroke-color: #38bdf8;
-  right: 6px;
-  top: -2px;
 }
 .gender-icon--female {
   color: #f472b6;
   -webkit-text-stroke-color: #f472b6;
-  left: 6px;
-  top: -2px;
-}
-
-@media (max-width: 767px) {
-  .gender-icon--male {
-    top: -7px;
-    right: auto;
-    left: 7px;
-  }
-  .gender-icon--female {
-    top: -7px;
-    left: auto;
-    right: 7px;
-  }
 }
 
 .toggle-switch__input:focus-visible ~ .toggle-switch__track {
@@ -823,6 +815,50 @@ html[data-quality="ultra"] .bracket-matchup {
 .site-footer__btc {
   opacity: 0.6;
   cursor: help;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.site-footer__copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.15rem;
+  font-size: 0.72rem;
+  line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.15s;
+}
+
+.site-footer__copy-btn:hover {
+  opacity: 1;
+}
+
+.site-footer__copied {
+  color: var(--good);
+  font-weight: 700;
+  font-size: 0.65rem;
+  animation: copied-flash 1.5s ease-out forwards;
+}
+
+@keyframes copied-flash {
+  0% { opacity: 1; transform: scale(1.15); }
+  70% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.95); }
+}
+
+.site-footer__copy-icon {
+  font-size: 0.7rem;
+}
+
+/* How It Works — prevent accidental text selection on toggle arrow */
+.how-it-works {
+  user-select: none;
+}
+
+.how-it-works__content {
+  user-select: text;
 }
 
 /* ============================================
@@ -923,7 +959,13 @@ html[data-quality="ultra"] .bracket-matchup {
   margin: 0.75rem 0;
 }
 
-/* KaTeX theme overrides */
+@media (max-width: 767px) {
+  .how-it-works__content img {
+    max-width: 75%;
+  }
+}
+
+/* KaTeX theme overrides — scale up for more technical tiers */
 .how-it-works__content .katex {
   font-size: 1.25em;
   color: var(--text);
@@ -937,6 +979,24 @@ html[data-quality="ultra"] .bracket-matchup {
 
 .how-it-works__content .katex-display .katex {
   font-size: 1.45em;
+}
+
+/* Tier 1 (Full Details): slightly larger inline math */
+.how-it-works__content[data-tier="1"] .katex {
+  font-size: 1.35em;
+}
+
+.how-it-works__content[data-tier="1"] .katex-display .katex {
+  font-size: 1.55em;
+}
+
+/* Tier 2 (Whitepaper): larger equations for readability */
+.how-it-works__content[data-tier="2"] .katex {
+  font-size: 1.45em;
+}
+
+.how-it-works__content[data-tier="2"] .katex-display .katex {
+  font-size: 1.7em;
 }
 
 /* Scrollbar styling */

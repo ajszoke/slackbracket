@@ -1,0 +1,105 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "CloudFormationDeploy",
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:CreateStack",
+        "cloudformation:UpdateStack",
+        "cloudformation:DeleteStack",
+        "cloudformation:DescribeStacks",
+        "cloudformation:DescribeStackEvents",
+        "cloudformation:GetTemplate",
+        "cloudformation:CreateChangeSet",
+        "cloudformation:DescribeChangeSet",
+        "cloudformation:ExecuteChangeSet",
+        "cloudformation:DeleteChangeSet"
+      ],
+      "Resource": "arn:aws:cloudformation:us-east-1:ACCOUNT_ID:stack/slackbracket-telemetry/*"
+    },
+    {
+      "Sid": "LambdaManage",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:CreateFunction",
+        "lambda:UpdateFunctionCode",
+        "lambda:UpdateFunctionConfiguration",
+        "lambda:DeleteFunction",
+        "lambda:GetFunction",
+        "lambda:GetFunctionConfiguration",
+        "lambda:AddPermission",
+        "lambda:RemovePermission",
+        "lambda:GetPolicy"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:ACCOUNT_ID:function:slackbracket-telemetry-track"
+    },
+    {
+      "Sid": "ApiGatewayManage",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:POST",
+        "apigateway:GET",
+        "apigateway:PATCH",
+        "apigateway:DELETE",
+        "apigateway:PUT",
+        "apigateway:TagResource",
+        "apigateway:UntagResource"
+      ],
+      "Resource": [
+        "arn:aws:apigateway:us-east-1::/apis",
+        "arn:aws:apigateway:us-east-1::/apis/*"
+      ]
+    },
+    {
+      "Sid": "LambdaTagging",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:TagResource",
+        "lambda:UntagResource",
+        "lambda:ListTags"
+      ],
+      "Resource": "arn:aws:lambda:us-east-1:ACCOUNT_ID:function:slackbracket-telemetry-track"
+    },
+    {
+      "Sid": "IAMTagging",
+      "Effect": "Allow",
+      "Action": [
+        "iam:TagRole",
+        "iam:UntagRole"
+      ],
+      "Resource": "arn:aws:iam::ACCOUNT_ID:role/slackbracket-telemetry-lambda"
+    },
+    {
+      "Sid": "IAMRoleForLambda",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:DeleteRole",
+        "iam:GetRole",
+        "iam:PutRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:GetRolePolicy",
+        "iam:PassRole",
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::ACCOUNT_ID:role/slackbracket-telemetry-lambda"
+    },
+    {
+      "Sid": "S3Lifecycle",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutLifecycleConfiguration",
+        "s3:GetLifecycleConfiguration"
+      ],
+      "Resource": "arn:aws:s3:::slackbracket-telemetry"
+    },
+    {
+      "Sid": "CloudFormationValidate",
+      "Effect": "Allow",
+      "Action": "cloudformation:ValidateTemplate",
+      "Resource": "*"
+    }
+  ]
+}

@@ -58,24 +58,65 @@ function useTargetRect(step: number, dismissed: boolean) {
       return;
     }
 
-    const find = () => {
-      const el =
-        document.querySelector(`[data-tour-target="${def.target}"]`) ??
-        document.querySelector(def.target!);
-      if (el) {
-        setRect(el.getBoundingClientRect());
-      } else {
-        setRect(null);
+    // Find target: prefer data-tour-target, fallback to CSS selector.
+    // For CSS selectors, find the first *visible* match (non-zero rect)
+    // since mobile hides the desktop bracket layout.
+    let el: HTMLElement | null = document.querySelector(`[data-tour-target="${def.target}"]`);
+    if (!el) {
+      const candidates = document.querySelectorAll<HTMLElement>(def.target!);
+      for (const c of candidates) {
+        const r = c.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          el = c;
+          break;
+        }
       }
-    };
+    }
 
-    find();
-    // Recalculate on scroll/resize
-    window.addEventListener("resize", find);
-    window.addEventListener("scroll", find, true);
+    if (!el) {
+      setRect(null);
+      return;
+    }
+
+    const target = el;
+    let cancelled = false;
+
+    // Scroll target into view, then poll until position stabilizes
+    target.scrollIntoView({ behavior: "smooth", block: "center" });
+
+    let lastTop = -Infinity;
+    let stableFrames = 0;
+    const REQUIRED_STABLE = 5;
+
+    function pollUntilStable() {
+      if (cancelled) return;
+      const r = target.getBoundingClientRect();
+      if (Math.abs(r.top - lastTop) < 1) {
+        stableFrames++;
+        if (stableFrames >= REQUIRED_STABLE) {
+          setRect(r);
+          return; // Done polling, switch to event listeners
+        }
+      } else {
+        stableFrames = 0;
+      }
+      lastTop = r.top;
+      requestAnimationFrame(pollUntilStable);
+    }
+
+    requestAnimationFrame(pollUntilStable);
+
+    // After stable, keep updating on resize/scroll
+    const update = () => {
+      if (!cancelled) setRect(target.getBoundingClientRect());
+    };
+    window.addEventListener("resize", update);
+    window.addEventListener("scroll", update, true);
+
     return () => {
-      window.removeEventListener("resize", find);
-      window.removeEventListener("scroll", find, true);
+      cancelled = true;
+      window.removeEventListener("resize", update);
+      window.removeEventListener("scroll", update, true);
     };
   }, [step, dismissed]);
 
@@ -263,11 +304,16 @@ export function TutorialOverlay({
   const rect = useTargetRect(step, dismissed);
   const hasTarget = !!currentStep?.target && !!rect;
 
+  const handleDismissAndScroll = useCallback(() => {
+    onDismiss();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [onDismiss]);
+
   const handleBackdropClick = useCallback(
     (e: React.MouseEvent) => {
-      if (e.target === e.currentTarget) onDismiss();
+      if (e.target === e.currentTarget) handleDismissAndScroll();
     },
-    [onDismiss]
+    [handleDismissAndScroll]
   );
 
   if (dismissed || !currentStep) return null;
@@ -290,10 +336,10 @@ export function TutorialOverlay({
         />
       )}
 
-      {/* Click-through blocker for spotlight steps */}
+      {/* Click-through blocker for spotlight steps — advance instead of dismiss */}
       {hasTarget && (
         <div
-          onClick={handleBackdropClick}
+          onClick={onNext}
           style={{
             position: "fixed",
             inset: 0,
@@ -311,7 +357,7 @@ export function TutorialOverlay({
           rect={rect}
           total={STEPS.length}
           onNext={onNext}
-          onDismiss={onDismiss}
+          onDismiss={handleDismissAndScroll}
           isWelcome={step === 0}
         />
       </AnimatePresence>
