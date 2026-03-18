@@ -60,20 +60,26 @@ npm run format:write # Prettier auto-format
 **Data source:** Nate Silver COOPER ELO ratings. 2026 men's bracket integrated from CBS Selection Sunday bracket. Data files in `data/2026-mens.csv` and `data/2026-womens.csv`.
 
 **Web app** (`apps/web/`):
-- `app/` — Next.js App Router (layout, page, providers, API routes, globals.css)
+- `app/` — Next.js App Router (layout, page, providers, globals.css)
 - `components/` — React components (BracketApp orchestrator, bracket/ directory for layout)
 - `components/bracket/` — Bracket visualization (BracketShell, RegionBracket, FinalFourBracket, BracketMatchup)
 - `lib/` — Client utilities (Zustand store, tournament tree builder, logo fetching, bracket layout hook)
 
-**Data flow:** API routes serve JSON from `data/` files → React Query fetches → Zustand manages picks/chaos/mode → bracket components render.
+**Data flow:** Static JSON from `public/data/` → React Query fetches → Zustand manages picks/chaos/mode → bracket components render.
 
 **Game tree:** 63 games total. 4 regions × 15 games (rounds 1-4) + 2 FF semis (R5) + 1 championship (R6). IDs: `R{round}-{region}-{slot}`. Sources: `{type:"team",teamId}` or `{type:"winner",matchupId}`.
 
 ## Branching
 
-- `master` — stable baseline (currently at pre-2026-overhaul state, commit `b2cd08a`)
-- `2026-overhaul` — active development branch for the 2026 UI rebuild
-- Always work on `2026-overhaul`, not master
+- `master` — active development branch (2026 overhaul merged)
+- Work directly on master
+
+## Deploy
+
+- `./infra/deploy.sh stage` → build to slackbracket.com/dev
+- `./infra/deploy.sh promote` → backup + deploy to prod
+- `./infra/deploy.sh rollback` → restore previous prod
+- Credentials in `.env.deploy` (copy from `.env.deploy.example`)
 
 ## Design Direction
 
