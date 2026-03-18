@@ -404,18 +404,12 @@
     "logoUrl": "/logos/michigan.png"
   },
   {
-    "team": "UMBC",
+    "team": "Howard",
     "region": "Midwest",
     "seed": 16,
-    "elo": 1553.1322,
-    "conference": "ASEC",
-    "firstFourOpponent": {
-      "team": "Howard",
-      "elo": 1477.5039,
-      "conference": "MEAC",
-      "logoUrl": "https://r2.thesportsdb.com/images/media/team/badge/wwl7131582735701.png"
-    },
-    "logoUrl": "/logos/umbc.png"
+    "elo": 1477.5039,
+    "conference": "MEAC",
+    "logoUrl": "/logos/howard.png"
   },
   {
     "team": "Georgia",
@@ -447,7 +441,6 @@
     "seed": 12,
     "elo": 1736.073,
     "conference": "MAC",
-      "logoUrl": "/logos/miami-oh.svg",
     "logoUrl": "/logos/akron.png"
   },
   {

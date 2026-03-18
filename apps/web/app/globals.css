@@ -511,7 +511,9 @@ html[data-theme="light"] .toggle-switch__grip {
   line-height: 1;
 }
 
-@media (max-width: 767px) {
+/* iOS renders ♂/♀ glyphs lower than other platforms — nudge up via supports hack.
+   -webkit-touch-callout is iOS-only, so this targets Safari on iOS. */
+@supports (-webkit-touch-callout: none) {
   .gender-icon {
     transform: translateY(-0.35em);
   }
