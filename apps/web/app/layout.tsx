@@ -16,10 +16,12 @@ const orbitron = Orbitron({
 const siteUrl = "https://slackbracket.com";
 
 export const metadata: Metadata = {
-  title: "Slackbracket — March Madness Bracket Builder",
+  title: "Slackbracket — March Madness Bracket Builder 2026",
   description:
     "Build your March Madness bracket with AI-powered ELO predictions. Dial the chaos from chalk to sicko mode and challenge your friends.",
+  keywords: ["march madness", "bracket", "ncaa", "tournament", "2026", "bracket builder", "bracket maker", "bracket generator"],
   metadataBase: new URL(siteUrl),
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Slackbracket",
     description: "March Madness. Your way. AI-powered bracket builder with ELO predictions.",

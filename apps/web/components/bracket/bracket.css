@@ -299,7 +299,7 @@
 }
 
 .bracket-matchup--championship .bracket-matchup__team--selected {
-  background: rgba(240, 245, 255, 0.96);
+  background: #f0f5ff;
   color: #1a1a2e;
 }
 

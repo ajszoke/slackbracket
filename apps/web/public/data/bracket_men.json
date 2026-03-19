@@ -136,18 +136,12 @@
     "logoUrl": "/logos/florida.png"
   },
   {
-    "team": "Lehigh",
+    "team": "Prairie View A&M",
     "region": "South",
     "seed": 16,
-    "elo": 1339.4188,
-    "conference": "Patriot",
-    "firstFourOpponent": {
-      "team": "Prairie View A&M",
-      "elo": 1266.9824,
-      "conference": "SWAC",
-      "logoUrl": "https://r2.thesportsdb.com/images/media/team/badge/yw1rwb1585081339.png"
-    },
-    "logoUrl": "/logos/lehigh.png"
+    "elo": 1266.9824,
+    "conference": "SWAC",
+    "logoUrl": "/logos/prairie-view-a&m.png"
   },
   {
     "team": "Clemson",
@@ -339,12 +333,6 @@
     "seed": 11,
     "elo": 1835.1207,
     "conference": "SEC",
-    "firstFourOpponent": {
-      "team": "NC State",
-      "elo": 1835.8156,
-      "conference": "ACC",
-      "logoUrl": "https://r2.thesportsdb.com/images/media/team/badge/f4hbzx1641184055.png"
-    },
     "logoUrl": "/logos/texas.png"
   },
   {
@@ -468,18 +456,12 @@
     "logoUrl": "/logos/tennessee.png"
   },
   {
-    "team": "SMU",
+    "team": "Miami (OH)",
     "region": "Midwest",
     "seed": 11,
-    "elo": 1821.4882,
-    "conference": "ACC",
-    "firstFourOpponent": {
-      "team": "Miami (OH)",
-      "elo": 1652.9951,
-      "conference": "MAC",
-      "logoUrl": "/logos/miami-oh.svg"
-    },
-    "logoUrl": "/logos/smu.png"
+    "elo": 1652.9951,
+    "conference": "MAC",
+    "logoUrl": "/logos/miami-oh.svg"
   },
   {
     "team": "Virginia",
