@@ -185,6 +185,11 @@
     "status": "final"
   },
   {
+    "matchupId": "R2-Midwest-2",
+    "winnerId": "midwest-4-alabama",
+    "status": "final"
+  },
+  {
     "matchupId": "R2-Midwest-3",
     "winnerId": "midwest-6-tennessee",
     "status": "final"
