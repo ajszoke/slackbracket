@@ -7,7 +7,7 @@ import { teamAbbrev } from "../../lib/logos";
 import type { GameNode } from "../../lib/tournament";
 import { TeamBadge } from "../TeamBadge";
 
-type PickSource = "user" | "auto";
+type PickSource = "user" | "auto" | "locked";
 
 type Props = {
   game: GameNode;
@@ -144,7 +144,9 @@ function CompactTeamRow({
 
 export function BracketMatchup({ game: _game, teamA, teamB, pickedId, lockedId, pickSource, onPick, regionColor, isChampionship }: Props) {
   const locked = Boolean(lockedId);
-  const degree = upsetDegree(teamA, teamB, pickedId);
+  // When locked, show the real winner (lockedId) regardless of user's pick
+  const effectivePickedId = lockedId ?? pickedId;
+  const degree = upsetDegree(teamA, teamB, effectivePickedId);
   const glowColor = upsetGlowColor(degree);
 
   const normalizedDegree = Math.min(degree / 15, 1);
@@ -162,24 +164,40 @@ export function BracketMatchup({ game: _game, teamA, teamB, pickedId, lockedId, 
     >
       <CompactTeamRow
         team={teamA}
-        selected={pickedId === teamA?.id}
+        selected={effectivePickedId === teamA?.id}
         locked={locked}
-        isUpset={degree > 0 && pickedId === teamA?.id}
+        isUpset={degree > 0 && effectivePickedId === teamA?.id}
         upsetDeg={degree}
-        pickSource={pickedId === teamA?.id ? pickSource : undefined}
+        pickSource={effectivePickedId === teamA?.id ? pickSource : undefined}
         isChampionship={isChampionship}
         onPick={() => teamA && onPick(teamA.id)}
       />
       <CompactTeamRow
         team={teamB}
-        selected={pickedId === teamB?.id}
+        selected={effectivePickedId === teamB?.id}
         locked={locked}
-        isUpset={degree > 0 && pickedId === teamB?.id}
+        isUpset={degree > 0 && effectivePickedId === teamB?.id}
         upsetDeg={degree}
-        pickSource={pickedId === teamB?.id ? pickSource : undefined}
+        pickSource={effectivePickedId === teamB?.id ? pickSource : undefined}
         isChampionship={isChampionship}
         onPick={() => teamB && onPick(teamB.id)}
       />
+      {locked && (
+        <span style={{
+          position: "absolute",
+          top: 2,
+          right: 3,
+          fontSize: "0.45rem",
+          fontWeight: 800,
+          letterSpacing: "0.08em",
+          color: "var(--good)",
+          opacity: 0.7,
+          pointerEvents: "none",
+          zIndex: 1,
+        }}>
+          FINAL
+        </span>
+      )}
     </motion.div>
   );
 }

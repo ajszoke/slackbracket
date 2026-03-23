@@ -16,7 +16,7 @@
 
 import type { GameNode } from "./tournament";
 
-type PickSource = "user" | "auto";
+type PickSource = "user" | "auto" | "locked";
 
 // ── Bit helpers ─────────────────────────────────────────────────────
 

@@ -8,7 +8,7 @@ import type { GameNode } from "./tournament";
 import { resolveTeamForSource } from "./tournament";
 
 type RegionTab = "East" | "West" | "South" | "Midwest" | "FinalFour";
-type PickSource = "user" | "auto";
+type PickSource = "user" | "auto" | "locked";
 
 function recordsEqual(a: Record<string, string>, b: Record<string, string>): boolean {
   const aKeys = Object.keys(a);
@@ -66,6 +66,7 @@ type BracketStore = {
   showTour: boolean;
   theme: Theme;
   quality: QualityTier;
+  resultsMode: "fantasy" | "reality";
   setBracketType: (value: "men" | "women") => void;
   setChaos: (value: number) => void;
   setChaosPreset: (presetId: (typeof CHAOS_PRESETS)[number]["id"]) => void;
@@ -77,6 +78,7 @@ type BracketStore = {
   setShowTour: (show: boolean) => void;
   setTheme: (theme: Theme) => void;
   setQuality: (quality: QualityTier) => void;
+  setResultsMode: (mode: "fantasy" | "reality") => void;
   autoFillRemaining: (games: GameNode[], teamsById: Record<string, Team>) => void;
   resetAll: () => void;
 };
@@ -90,7 +92,8 @@ const defaults = {
   lockedByMatchup: {} as Record<string, string>,
   showTour: false,
   theme: "light" as Theme,
-  quality: "medium" as QualityTier
+  quality: "medium" as QualityTier,
+  resultsMode: "reality" as "fantasy" | "reality"
 };
 
 export const useBracketStore = create<BracketStore>()(
@@ -181,6 +184,7 @@ export const useBracketStore = create<BracketStore>()(
     setShowTour: (showTour) => set({ showTour }),
     setTheme: (theme) => set({ theme }),
     setQuality: (quality) => set({ quality }),
+    setResultsMode: (resultsMode) => set({ resultsMode }),
     autoFillRemaining: (games, teamsById) => {
       const state = get();
       const nextPicks = { ...state.picksByMatchup };
@@ -228,11 +232,11 @@ export const useBracketStore = create<BracketStore>()(
 
       set({ picksByMatchup: nextPicks, pickSourceByMatchup: nextSources });
     },
-    resetAll: () => set((state) => ({ ...defaults, theme: state.theme, quality: state.quality, bracketType: state.bracketType }))
+    resetAll: () => set((state) => ({ ...defaults, theme: state.theme, quality: state.quality, bracketType: state.bracketType, resultsMode: state.resultsMode }))
   }), {
     partialize: (state) => {
       // Exclude UI-only state from undo/redo history
-      const { theme: _theme, showTour: _showTour, quality: _quality, ...tracked } = state;
+      const { theme: _theme, showTour: _showTour, quality: _quality, resultsMode: _resultsMode, ...tracked } = state;
       return tracked;
     }
   })

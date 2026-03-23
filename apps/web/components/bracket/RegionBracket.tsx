@@ -15,7 +15,7 @@ type Props = {
   regionColor: string;
   regionLabel: string;
   picksByMatchup: Record<string, string>;
-  pickSourceByMatchup: Record<string, "user" | "auto">;
+  pickSourceByMatchup: Record<string, "user" | "auto" | "locked">;
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;

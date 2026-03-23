@@ -115,7 +115,7 @@ function computeSurpriseMetrics(pairs: PickedGamePair[]): SurpriseMetrics {
 
 export function computePulseMetrics(
   picksByMatchup: Record<string, string>,
-  pickSourceByMatchup: Record<string, "user" | "auto">,
+  pickSourceByMatchup: Record<string, "user" | "auto" | "locked">,
   games: GameNode[],
   teamsById: Record<string, Team>
 ): PulseMetrics {
@@ -136,6 +136,7 @@ export function computePulseMetrics(
     const picked = pick === teamA.id ? teamA : teamB;
     const opponent = pick === teamA.id ? teamB : teamA;
 
+    if (source === "locked") continue; // real results tracked separately
     if (source === "user") {
       userTotal++;
       userPairs.push({ picked, opponent, round: game.round });
@@ -300,7 +301,7 @@ export type SeedAdvancement = Map<number, Map<number, { count: number; userCount
 
 export function seedAdvancement(
   picksByMatchup: Record<string, string>,
-  pickSourceByMatchup: Record<string, "user" | "auto">,
+  pickSourceByMatchup: Record<string, "user" | "auto" | "locked">,
   games: GameNode[],
   teamsById: Record<string, Team>
 ): SeedAdvancement {
@@ -337,7 +338,7 @@ export type RegionalChalk = Record<string, { overall: number; user: number; ai: 
 
 export function regionalChalkScore(
   picksByMatchup: Record<string, string>,
-  pickSourceByMatchup: Record<string, "user" | "auto">,
+  pickSourceByMatchup: Record<string, "user" | "auto" | "locked">,
   games: GameNode[],
   teamsById: Record<string, Team>
 ): RegionalChalk {

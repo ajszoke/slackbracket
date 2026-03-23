@@ -80,11 +80,13 @@ export function OddsPanel({
   filled,
   temperature,
   roundOdds,
+  realityTemperature,
 }: {
   summary: HumanReadableOdds;
   filled: number;
   temperature?: { user: string; ai: string };
   roundOdds?: RoundProbability[];
+  realityTemperature?: string | null;
 }) {
   const isEmpty = filled === 0;
   const showScientific =
@@ -126,6 +128,20 @@ export function OddsPanel({
                 {!hasUser && <span style={{ ...BLOCK_STYLE, left: -4, top: -8, color: tempColor(temperature.ai) }}>AI</span>}
               </>
             )}
+          </div>
+        )}
+
+        {/* Reality temperature — how spicy the actual tournament has been */}
+        {realityTemperature && (
+          <div style={{
+            textAlign: "center",
+            fontSize: "0.6rem",
+            fontWeight: 700,
+            color: tempColor(realityTemperature),
+            letterSpacing: "0.05em",
+            marginBottom: 2,
+          }}>
+            Reality: {realityTemperature}
           </div>
         )}
 

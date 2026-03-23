@@ -62,8 +62,24 @@ export function BracketApp() {
     }
   });
 
-  // Live state: stub for static export (no server)
-  const liveData: LivePayload = useMemo(() => ({ updatedAt: Date.now(), results: [] }), []);
+  // Results: fetch completed game outcomes
+  const { data: resultsData } = useQuery({
+    queryKey: ["results", store.bracketType],
+    queryFn: async () => {
+      const file = store.bracketType === "women" ? "results_women.json" : "results_men.json";
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+      const response = await fetch(`${basePath}/data/${file}`);
+      if (!response.ok) return [];
+      return (await response.json()) as Array<{ matchupId: string; winnerId: string; status: "live" | "final" }>;
+    },
+    staleTime: 30_000,
+  });
+
+  // In reality mode, feed results into the lock pipeline; in fantasy, ignore them
+  const liveData: LivePayload = useMemo(() => ({
+    updatedAt: Date.now(),
+    results: store.resultsMode === "reality" ? (resultsData ?? []) : [],
+  }), [resultsData, store.resultsMode]);
 
   const teams = useMemo(() => teamData ?? [], [teamData]);
   const teamsById = useMemo<Record<string, Team>>(
@@ -79,7 +95,23 @@ export function BracketApp() {
       liveResults.filter((entry) => entry.status === "final").map((entry) => [entry.matchupId, entry.winnerId])
     );
     setLocked(locked);
-  }, [liveData, setLocked]);
+
+    // Inject locked results as picks so downstream games resolve correctly
+    if (Object.keys(locked).length > 0) {
+      const state = useBracketStore.getState();
+      const nextPicks = { ...state.picksByMatchup };
+      const nextSources = { ...state.pickSourceByMatchup };
+      let changed = false;
+      for (const [matchupId, winnerId] of Object.entries(locked)) {
+        if (nextPicks[matchupId] !== winnerId) {
+          nextPicks[matchupId] = winnerId;
+          nextSources[matchupId] = "locked";
+          changed = true;
+        }
+      }
+      if (changed) hydratePicks(nextPicks, nextSources);
+    }
+  }, [liveData, setLocked, hydratePicks]);
 
   // Share URL takes priority over localStorage — ref avoids batching race
   const loadedFromShare = useRef(false);
@@ -170,6 +202,16 @@ export function BracketApp() {
     document.documentElement.setAttribute("data-quality", store.quality);
   }, [store.quality]);
 
+  // Results mode persistence
+  useEffect(() => {
+    const saved = localStorage.getItem("slackbracket:resultsMode") as "fantasy" | "reality" | null;
+    if (saved) store.setResultsMode(saved);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    localStorage.setItem("slackbracket:resultsMode", store.resultsMode);
+  }, [store.resultsMode]);
+
   // Telemetry: page view + session end
   useEffect(() => {
     track("page_view", { bracketType: store.bracketType });
@@ -247,7 +289,8 @@ export function BracketApp() {
 
   // Pick source tally
   const userPickCount = Object.values(store.pickSourceByMatchup).filter((s) => s === "user").length;
-  const aiPickCount = picksCount - userPickCount;
+  const lockedPickCount = Object.values(store.pickSourceByMatchup).filter((s) => s === "locked").length;
+  const aiPickCount = picksCount - userPickCount - lockedPickCount;
 
   // Live bracket probability
   const liveProbability = useMemo(() => {
@@ -284,6 +327,22 @@ export function BracketApp() {
       ? chaosToTemperatureLabel(pulseMetrics.aiPercentile, pulseMetrics.aiPickCount, pulseMetrics.aiZScore)
       : "Empty",
   }), [pulseMetrics]);
+
+  // Reality temperature — how spicy are the actual tournament results?
+  const realityTempLabel = useMemo(() => {
+    if (!resultsData || resultsData.length === 0 || store.resultsMode !== "reality") return null;
+    const realityPicks: Record<string, string> = {};
+    const realitySources: Record<string, "user" | "auto" | "locked"> = {};
+    for (const r of resultsData) {
+      if (r.status === "final") {
+        realityPicks[r.matchupId] = r.winnerId;
+        realitySources[r.matchupId] = "user";
+      }
+    }
+    const metrics = computePulseMetrics(realityPicks, realitySources, games, teamsById);
+    if (metrics.userPickCount === 0) return null;
+    return chaosToTemperatureLabel(metrics.userPercentile, metrics.userPickCount, metrics.userZScore);
+  }, [resultsData, store.resultsMode, games, teamsById]);
 
   // Round-by-round cumulative probability
   const roundOdds = useMemo(
@@ -409,6 +468,15 @@ export function BracketApp() {
               iconRight={<span>🌙</span>}
               ariaLabel="Toggle light or dark mode"
             />
+            {(resultsData?.length ?? 0) > 0 && (
+              <ToggleSwitch
+                checked={store.resultsMode === "fantasy"}
+                onChange={(checked) => { const mode = checked ? "fantasy" : "reality"; store.setResultsMode(mode); track("results_mode", { mode }); }}
+                iconLeft={<span title="Reality mode">✓</span>}
+                iconRight={<span title="Fantasy mode">🔮</span>}
+                ariaLabel="Toggle fantasy or reality mode"
+              />
+            )}
             <div style={{ display: "flex", gap: 4, marginLeft: 12, alignItems: "center" }}>
               <button className="btn-ghost" onClick={() => temporal.undo()}>
                 Undo
@@ -427,8 +495,9 @@ export function BracketApp() {
           <progress value={completion} max={100} style={{ flex: 1, height: 4 }} />
           {picksCount > 0 && (
             <span style={{ fontSize: "0.65rem", color: "var(--muted)", whiteSpace: "nowrap" }}>
+              {lockedPickCount > 0 && <><span style={{ color: "var(--good)", opacity: 0.8 }}>Final: {lockedPickCount}</span> · </>}
               <span style={{ color: "var(--text)" }}>You: {userPickCount}</span>
-              <> · <span style={{ opacity: 0.7 }}>AI: {aiPickCount}</span></>
+              {aiPickCount > 0 && <> · <span style={{ opacity: 0.7 }}>AI: {aiPickCount}</span></>}
             </span>
           )}
         </div>
@@ -443,7 +512,7 @@ export function BracketApp() {
           }}
         >
           <div data-tour-target="chaos-meter" style={{ display: "flex", flexDirection: "column" }}><ChaosMeter value={store.chaos} onChange={store.setChaos} onPreset={store.setChaosPreset} onGenerate={generateBracket} /></div>
-          <div data-tour-target="odds-panel" style={{ display: "flex", flexDirection: "column" }}><OddsPanel summary={humanOdds} filled={picksCount} temperature={temperatureLabels} roundOdds={roundOdds} /></div>
+          <div data-tour-target="odds-panel" style={{ display: "flex", flexDirection: "column" }}><OddsPanel summary={humanOdds} filled={picksCount} temperature={temperatureLabels} roundOdds={roundOdds} realityTemperature={realityTempLabel} /></div>
           <SocialSharePanel shareUrl={shareUrl} oneIn={humanOdds.display} filled={picksCount} />
         </div>
       </header>

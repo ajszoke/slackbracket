@@ -1,0 +1,237 @@
+[
+  {
+    "matchupId": "R1-East-1",
+    "winnerId": "east-1-duke",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-East-2",
+    "winnerId": "east-9-tcu",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-East-3",
+    "winnerId": "east-5-st-johns",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-East-4",
+    "winnerId": "east-4-kansas",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-East-5",
+    "winnerId": "east-6-louisville",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-East-6",
+    "winnerId": "east-3-michigan-st",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-East-7",
+    "winnerId": "east-7-ucla",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-East-8",
+    "winnerId": "east-2-uconn",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-1",
+    "winnerId": "midwest-1-michigan",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-2",
+    "winnerId": "midwest-9-saint-louis",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-3",
+    "winnerId": "midwest-5-texas-tech",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-4",
+    "winnerId": "midwest-4-alabama",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-5",
+    "winnerId": "midwest-6-tennessee",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-6",
+    "winnerId": "midwest-3-virginia",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-7",
+    "winnerId": "midwest-7-kentucky",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-Midwest-8",
+    "winnerId": "midwest-2-iowa-st",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-1",
+    "winnerId": "south-1-florida",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-2",
+    "winnerId": "south-9-iowa",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-3",
+    "winnerId": "south-5-vanderbilt",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-4",
+    "winnerId": "south-4-nebraska",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-5",
+    "winnerId": "south-11-vcu",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-6",
+    "winnerId": "south-3-illinois",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-7",
+    "winnerId": "south-10-texas-a&m",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-South-8",
+    "winnerId": "south-2-houston",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-1",
+    "winnerId": "west-1-arizona",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-2",
+    "winnerId": "west-9-utah-st",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-3",
+    "winnerId": "west-12-high-point",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-4",
+    "winnerId": "west-4-arkansas",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-5",
+    "winnerId": "west-11-texas",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-6",
+    "winnerId": "west-3-gonzaga",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-7",
+    "winnerId": "west-7-u-miami-(fl)",
+    "status": "final"
+  },
+  {
+    "matchupId": "R1-West-8",
+    "winnerId": "west-2-purdue",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-East-1",
+    "winnerId": "east-1-duke",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-East-2",
+    "winnerId": "east-5-st-johns",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-East-3",
+    "winnerId": "east-3-michigan-st",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-East-4",
+    "winnerId": "east-2-uconn",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-Midwest-1",
+    "winnerId": "midwest-1-michigan",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-Midwest-3",
+    "winnerId": "midwest-6-tennessee",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-Midwest-4",
+    "winnerId": "midwest-2-iowa-st",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-South-1",
+    "winnerId": "south-9-iowa",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-South-2",
+    "winnerId": "south-4-nebraska",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-South-3",
+    "winnerId": "south-3-illinois",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-South-4",
+    "winnerId": "south-2-houston",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-West-1",
+    "winnerId": "west-1-arizona",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-West-2",
+    "winnerId": "west-4-arkansas",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-West-3",
+    "winnerId": "west-11-texas",
+    "status": "final"
+  },
+  {
+    "matchupId": "R2-West-4",
+    "winnerId": "west-2-purdue",
+    "status": "final"
+  }
+]

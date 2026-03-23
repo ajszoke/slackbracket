@@ -17,7 +17,7 @@ import "./bracket.css";
 type Props = {
   layout: BracketLayout;
   picksByMatchup: Record<string, string>;
-  pickSourceByMatchup: Record<string, "user" | "auto">;
+  pickSourceByMatchup: Record<string, "user" | "auto" | "locked">;
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;
@@ -51,7 +51,7 @@ function FFGame({
 }: {
   game: GameNode | null;
   picksByMatchup: Record<string, string>;
-  pickSourceByMatchup: Record<string, "user" | "auto">;
+  pickSourceByMatchup: Record<string, "user" | "auto" | "locked">;
   lockedByMatchup: Record<string, string>;
   teamsById: Record<string, Team>;
   onPick: (matchupId: string, teamId: string) => void;
