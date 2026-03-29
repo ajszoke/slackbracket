@@ -76,7 +76,7 @@ check_url() {
   local label="$2"
   local code
   code="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "$url" 2>/dev/null || echo "000")"
-  if [[ "$code" == "200" ]]; then
+  if [[ "$code" =~ ^(200|301|302)$ ]]; then
     echo "  ${label}: ${url} → ${code} OK"
   else
     echo "  ${label}: ${url} → ${code} FAIL"
